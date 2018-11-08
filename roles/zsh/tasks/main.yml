@@ -46,5 +46,16 @@
   git:
     repo: https://github.com/urbainvaes/fzf-marks
     dest: ~/.oh-my-zsh/plugins/fzf-marks
-    version: master
+    accept_hostkey: yes
+
+- name: install zsh-autosuggestions plugin
+  git:
+    repo: https://github.com/zsh-users/zsh-autosuggestions
+    dest: ~/.oh-my-zsh/plugins/zsh-autosuggestions
+    accept_hostkey: yes
+
+- name: install zsh-syntax-highlighting plugin
+  git:
+    repo: https://github.com/zsh-users/zsh-syntax-highlighting
+    dest: ~/.oh-my-zsh/plugins/zsh-syntax-highlighting
     accept_hostkey: yes

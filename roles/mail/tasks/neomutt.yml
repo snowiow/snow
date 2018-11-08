@@ -15,7 +15,6 @@
   git:
     repo: https://github.com/snowiow/mailboxes-splitter
     dest: ~/workspace/mailboxes-splitter
-    version: master
     accept_hostkey: yes
 
 - name: install mailboxes-splitter

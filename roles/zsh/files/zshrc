@@ -46,7 +46,7 @@ ZSH_THEME="clean"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(archlinux colored-man-pages fzf-marks git github composer vi-mode)
+plugins=(archlinux colored-man-pages fzf-marks git github composer vi-mode zsh-autosuggestions zsh-syntax-highlighting)
 
 # User configuration
 source $ZSH/oh-my-zsh.sh
@@ -63,15 +63,10 @@ source $ZSH/oh-my-zsh.sh
 # plugins, and themes. Aliases can be placed here, though oh-my-zsh
 # users are encouraged to define aliases within the ZSH_CUSTOM folder.
 # For a full list of active aliases, run `alias`.
-alias myi3lock="myi3lock.sh"
-alias http_startup="http_startup.sh"
-alias http_startup_arbeit="http_startup_arbeit.sh"
-alias esc_to_caps="esc_to_caps.sh"
 alias v="nvim"
 alias vimdiff="nvim -d"
 alias vinit="nvim ~/.config/nvim/init.vim"
 alias r="ranger"
-alias f="fuck"
 alias poweroff="systemctl poweroff"
 alias reboot="systemctl reboot"
 alias weather="curl wttr.in"
@@ -88,7 +83,7 @@ export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/u
 # Source other files
 # FZF
 if [ -f /usr/share/fzf/key-bindings.zsh ]; then
-    source /usr/share/fzf/key-bindings.zsh 
+    source /usr/share/fzf/key-bindings.zsh
 fi
 
 if [ -f /usr/share/fzf/completion.zsh ]; then
