@@ -1,0 +1,13 @@
+- name: install taskwarrior
+  become: yes
+  package:
+    name: task
+    state: present
+
+- name: symlink taskrc
+  file:
+    src: "{{ ansible_env.PWD }}/roles/taskwarrior/files/taskrc"
+    path: "~/.taskrc"
+    state: link
+    force: yes
+

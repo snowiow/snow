@@ -1,0 +1,11 @@
+- name: make sure git is installed
+  package:
+    name: git
+    state: present
+
+- name: symlink gitconfig
+  file:
+    src: "{{ ansible_env.PWD }}/roles/git/files/gitconfig"
+    path: ~/.gitconfig
+    state: link
+    force: yes

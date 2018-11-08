@@ -1,0 +1,4 @@
+- import_tasks: install.yml
+- import_tasks: offlineimap.yml
+- import_tasks: neomutt.yml
+- import_tasks: msmtp.yml

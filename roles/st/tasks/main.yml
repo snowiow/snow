@@ -1,0 +1,12 @@
+- name: clone st
+  git:
+    repo: https://github.com/snowiow/st
+    dest: ~/workspace/st
+    version: snow
+    accept_hostkey: yes
+
+- name: make and make install st
+  make:
+    chdir: "/home/{{ ansible_user_id }}/workspace/st"
+    target: install
+  become: yes

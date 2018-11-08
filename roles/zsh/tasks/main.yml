@@ -1,0 +1,50 @@
+- name: make sure zsh is installed
+  package:
+    name: zsh
+    state: present
+  become: yes
+
+- name: change default shell to zsh
+  user:
+    name: "{{ ansible_user_id }}"
+    shell: /bin/zsh
+  become: yes
+
+- name: check if oh-my-zsh is installed
+  stat:
+    path: ~/.oh-my-zsh
+  register: ohmyzsh
+
+- name: install oh-my-zsh
+  block:
+    - name: download oh-my-zsh
+      get_url:
+        url: https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh
+        dest: /tmp/install.sh
+        mode: '+x'
+    - name: install oh-my-zsh
+      command: sh /tmp/install.sh
+  always:
+    - name: delete oh-my-zsh
+      file:
+        path: /tmp/install.sh
+        state: absent
+  when: ohmyzsh.stat.exists == False
+
+- name: symlink dotfiles
+  file:
+    src: "{{ ansible_env.PWD }}/roles/zsh/files/{{ item }}"
+    path: "~/.{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - zshrc
+    - profile
+    - inputrc
+
+- name: install fzf-marks plugin
+  git:
+    repo: https://github.com/urbainvaes/fzf-marks
+    dest: ~/.oh-my-zsh/plugins/fzf-marks
+    version: master
+    accept_hostkey: yes

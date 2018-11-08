@@ -1,0 +1,19 @@
+- name: Setup local environment
+  hosts: localhost
+  roles:
+    - locale
+    - git
+    - arch
+    - gnupg
+    - dunst
+    - dwm
+    - dmenu
+    - zsh
+    - st
+    - ctags
+    - nvim
+    - qutebrowser
+    - dav
+    - ranger
+    - taskwarrior
+    - mail

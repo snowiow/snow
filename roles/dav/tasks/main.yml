@@ -1,0 +1,83 @@
+- name: check if vdirsyncer is configured
+  stat:
+    path: ~/.config/vdirsyncer
+  register: vdirsyncer
+
+- name: install vdirsyncer, khal and khard
+  become: yes
+  package:
+    name: vdirsyncer,
+          khal,
+          khard
+    state: present
+
+- name: create vdirsyncer config directory
+  file:
+    path: ~/.config/vdirsyncer
+    state: directory
+
+- name: symlink vdirsyncer config
+  file:
+    src: "{{ ansible_env.PWD }}/roles/dav/files/vdirsyncer_config"
+    path: ~/.config/vdirsyncer/config
+    state: link
+    force: yes
+
+- name: create encrypted password file
+  shell: echo "{{ lookup('env', 'DAV_PW') }}" | gpg --recipient snow --encrypt > ~/.config/vdirsyncer/pw.gpg
+  when: vdirsyncer.stat.exists == False
+
+- name: symlink get_vdirsyncer_pw command
+  file:
+    src: "{{ ansible_env.PWD }}/roles/dav/files/get_vdirsyncer_pw"
+    path: ~/.local/bin/get_vdirsyncer_pw
+    state: link
+    force: yes
+
+- name: vdirsyncer discover
+  shell: printf "y\ny\ny\n" | vdirsyncer discover
+
+- name: create systemd user directory
+  file:
+    path: ~/.config/systemd/user
+    state: directory
+
+- name: vdirsyncer copy systemd timer and service
+  copy:
+    src: "{{ item }}"
+    dest: "~/.config/systemd/user/{{ item }}"
+  loop:
+    - vdirsyncer-sync.service
+    - vdirsyncer-sync.timer
+
+- name: enable vdirsyncer timer
+  systemd:
+    name: vdirsyncer-sync.timer
+    state: started
+    enabled: yes
+    scope: user
+
+- name: create khal config directory
+  file:
+    path: ~/.config/khal
+    state: directory
+
+- name: symlink khal config
+  file:
+    src: "{{ ansible_env.PWD }}/roles/dav/files/khal_config"
+    path: ~/.config/khal/config
+    state: link
+    force: yes
+
+- name: create khard config directory
+  file:
+    path: ~/.config/khard
+    state: directory
+
+- name: symlink khard config
+  file:
+    src: "{{ ansible_env.PWD }}/roles/dav/files/khard.conf"
+    path: ~/.config/khard/khard.conf
+    state: link
+    force: yes
+

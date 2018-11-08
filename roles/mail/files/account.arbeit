@@ -1,0 +1,10 @@
+set sendmail  = "/usr/bin/msmtp -a arbeit"
+set from = "m.patzwahl@demv.de"
+set folder = ~/Mail
+set spoolfile = ~/Mail/Arbeit/INBOX
+set postponed = "~/Mail/Arbeit/Entw&APw-rfe"
+set record = ~/Mail/Arbeit/Sent
+
+unmailboxes *
+source mailboxes_Arbeit
+# vim: syntax=muttrc

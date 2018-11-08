@@ -1,0 +1,17 @@
+- name: install dunst
+  become: yes
+  package:
+    name: dunst
+    state: present
+
+- name: create dunst config directory
+  file:
+    path: ~/.config/dunst
+    state: directory
+
+- name: symlink dunstrc
+  file:
+    src: "{{ ansible_env.PWD }}/roles/dunst/files/dunstrc"
+    path: "~/.config/dunst/dunstrc"
+    state: link
+    force: yes

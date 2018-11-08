@@ -1,0 +1,21 @@
+- name: check if gnupg is setup
+  stat:
+    path: ~/.gnupg
+  register: gnupg
+
+- name: install gnupg
+  become: yes
+  package:
+    name: gnupg
+    state: present
+
+- name: create full-chain if not exists
+  command: gpg --batch --generate-key "{{ ansible_env.PWD}}/roles/gnupg/files/gnupg.conf"
+  when: gnupg.stat.exists == False
+
+- name: export public key
+  command: gpg --output ~/.gnupg/public.key --armor --export snow
+  when: gnupg.stat.exists == False
+
+- name: import public key
+  command: gpg --import ~/.gnupg/public.key

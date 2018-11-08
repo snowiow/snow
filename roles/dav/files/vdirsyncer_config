@@ -1,0 +1,70 @@
+[general]
+status_path = "~/.vdirsyncer/status/"
+
+[pair privat]
+a = "privat_local"
+b = "privat_remote"
+collections = ["from a", "from b"]
+conflict_resolution = "b wins"
+
+[storage privat_local]
+type = "filesystem"
+path = "~/.calendars/4dc20b45-bbda-5167-bd16-4f3a2a58ad09"
+fileext = ".ics"
+
+[storage privat_remote]
+type = "caldav"
+url = "https://mipi.p6wckvhmlhxhpzm4.myfritz.net:52320/snow/4dc20b45-bbda-5167-bd16-4f3a2a58ad09/"
+username = "snow"
+password.fetch = ["command", "~/.local/bin/get_vdirsyncer_pw"]
+
+[pair arbeit]
+a = "arbeit_local"
+b = "arbeit_remote"
+collections = ["from a", "from b"]
+conflict_resolution = "b wins"
+
+[storage arbeit_local]
+type = "filesystem"
+path = "~/.calendars/f5424673-aa90-f13d-192b-c7d1b38e239e/"
+fileext = ".ics"
+
+[storage arbeit_remote]
+type = "caldav"
+url = "https://mipi.p6wckvhmlhxhpzm4.myfritz.net:52320/snow/f5424673-aa90-f13d-192b-c7d1b38e239e/"
+username = "snow"
+password.fetch = ["command", "~/.local/bin/get_vdirsyncer_pw"]
+
+[pair geburtstage]
+a = "geburtstage_local"
+b = "geburtstage_remote"
+collections = ["from a", "from b"]
+conflict_resolution = "b wins"
+
+[storage geburtstage_local]
+type = "filesystem"
+path = "~/.calendars/9590d594-bb69-6e45-75ac-83c93f3129f4/"
+fileext = ".ics"
+
+[storage geburtstage_remote]
+type = "caldav"
+url = "https://mipi.p6wckvhmlhxhpzm4.myfritz.net:52320/snow/9590d594-bb69-6e45-75ac-83c93f3129f4/"
+username = "snow"
+password.fetch = ["command", "~/.local/bin/get_vdirsyncer_pw"]
+
+[pair kontakte]
+a = "kontakte_lokal"
+b = "kontakte_remote"
+collections = ["from a", "from b"]
+conflict_resolution = "b wins"
+
+[storage kontakte_lokal]
+type= "filesystem"
+path = "~/.contacts/"
+fileext = ".vcf"
+
+[storage kontakte_remote]
+type = "carddav"
+url = "https://mipi.p6wckvhmlhxhpzm4.myfritz.net:52320/snow/95c7b955-5c92-1540-f4e7-77f9f36f8e2b/"
+username = "snow"
+password.fetch = ["command", "~/.local/bin/get_vdirsyncer_pw"]

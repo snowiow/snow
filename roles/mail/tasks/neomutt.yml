@@ -1,0 +1,24 @@
+- name: symlink neomutt files
+  file:
+    src: "{{ ansible_env.PWD }}/roles/mail/files/{{ item }}"
+    path: "~/.config/mutt/{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - account.arbeit
+    - account.privat
+    - colors.rc
+    - neomuttrc
+    - vim-keys.rc
+
+- name: clone mailboxes-splitter
+  git:
+    repo: https://github.com/snowiow/mailboxes-splitter
+    dest: ~/workspace/mailboxes-splitter
+    version: master
+    accept_hostkey: yes
+
+- name: install mailboxes-splitter
+  command: stack install
+  args:
+    chdir: ~/workspace/mailboxes-splitter

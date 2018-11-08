@@ -1,0 +1,22 @@
+[user]
+	email = marcel.patzwahl@posteo.de
+	name = snowiow
+[core]
+	editor = nvim
+[web]
+	browser = qutebrowser
+[merge]
+    tool = vimdiff
+[mergetool]
+    prompt = true
+[mergetool "vimdiff"]
+    cmd = nvim -d $LOCAL $REMOTE $MERGED
+[difftool]
+    prompt = false
+[diff]
+	tool = vimdiff
+[alias]
+    files = !git diff --name-only $(git merge-base HEAD \"$REVIEW_BASE\")
+    stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
+    review = !nvim -p $(git files | grep -v composer.lock) +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
+    review-one = !nvim -p +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"

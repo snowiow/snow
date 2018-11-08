@@ -1,0 +1,20 @@
+- name: install ranger
+  become: yes
+  package:
+    name: ranger
+    state: present
+
+- name: create ranger config directory
+  file:
+    path: ~/.config/ranger
+    state: directory
+
+- name: symlink ranger config files
+  file:
+    src: "{{ansible_env.PWD}}/roles/ranger/files/{{ item }}"
+    path: "~/.config/ranger/{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - rc.conf
+    - rifle.conf

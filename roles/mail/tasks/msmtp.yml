@@ -1,0 +1,6 @@
+- name: symlink msmtprc
+  file:
+    src: "{{ ansible_env.PWD }}/roles/mail/files/msmtprc"
+    path: ~/.msmtprc
+    state: link
+    force: yes

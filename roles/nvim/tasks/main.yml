@@ -1,0 +1,34 @@
+- name: install neovim
+  package:
+    name: neovim,
+          python-neovim
+    state: present
+  become: yes
+
+- name: create nvim config directory
+  file:
+    path: ~/.config/nvim
+    state: directory
+
+- name: symlink files
+  file:
+    src: "{{ ansible_env.PWD }}/roles/nvim/files/{{ item }}"
+    path: "~/.config/nvim/{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - after
+    - ftplugin
+    - init.vim
+    - spell
+
+- name: download minpac
+  git:
+    repo: https://github.com/k-takata/minpac.git
+    dest: ~/.config/nvim/pack/minpac/opt/minpac
+    version: master
+    accept_hostkey: yes
+
+- name: install plugins
+  command: nvim -c PackUpdate -c qa!
+

@@ -1,0 +1,17 @@
+#!/bin/sh
+
+#
+# ~/.xinitrc
+#
+# Executed by startx (run your window manager from here)
+#
+while true; do
+    xsetroot -name "$(~/.local/bin/dwmstatus.sh)"
+    sleep 10
+done &
+exec dwm &
+setxkbmap de nodeadkeys -option caps:escape &
+xrandr --output eDP1 --mode 1920x1080 --output HDMI1 --primary --mode 1920x1080 --right-of eDP1 --output DP2 --mode 1920x1080 --right-of HDMI1 &
+feh --bg-scale ~/Seafile/My\ Library/wallpaper/awesome.jpg &
+xclip &
+dunst

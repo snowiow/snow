@@ -1,0 +1,9 @@
+export XDG_CONFIG_HOME="$HOME/.config"
+export EDITOR='nvim'
+export MERGE_EDITOR='nvim -d'
+export VISUAL='nvim'
+export REVIEW_BASE='master'
+export BROWSER=
+export FZF_DEFAULT_COMMAND='rg --files --hidden --smart-case --glob "!.git/*"'
+export _JAVA_AWT_WM_NONREPARENTING=1
+export RUST_SRC_PATH=$(rustc --print sysroot)/lib/rustlib/src/rust/src/

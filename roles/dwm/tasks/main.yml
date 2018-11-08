@@ -1,0 +1,52 @@
+- name: install dwm dependencies
+  become: yes
+  package:
+    name: xorg-server,
+          xorg-xinit,
+          xorg-xsetroot,
+          freetype2,
+          libx11,
+          libxft,
+          libxinerama,
+          xclip,
+          feh
+    state: present
+
+- name: clone dwm
+  git:
+    repo: https://github.com/snowiow/dwm
+    dest: ~/workspace/dwm
+    version: snow
+    accept_hostkey: yes
+
+- name: make and make install dwm
+  make:
+    chdir: "/home/{{ ansible_user_id }}/workspace/dwm"
+    target: install
+  become: yes
+
+- name: create local bin
+  file:
+    path: ~/.local/bin
+    state: directory
+
+- name: symlink dwmstatus
+  file:
+    src: "{{ansible_env.PWD}}/roles/dwm/files/dwmstatus.sh"
+    path: ~/.local/bin/dwmstatus.sh
+    state: link
+    force: yes
+
+- name: symlink xinitrc
+  file:
+    src: "{{ansible_env.PWD}}/roles/dwm/files/xinitrc"
+    path: ~/.xinitrc
+    state: link
+    force: yes
+
+- name: symlink touchpad_toggle
+  file:
+    src: "{{ansible_env.PWD}}/roles/dwm/files/touchpad_toggle.sh"
+    path: ~/.local/bin/touchpad_toggle.sh
+    state: link
+    force: yes

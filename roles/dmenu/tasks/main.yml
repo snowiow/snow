@@ -1,0 +1,12 @@
+- name: clone dmenu
+  git:
+    repo: https://github.com/snowiow/dmenu
+    dest: ~/workspace/dmenu
+    version: snow
+    accept_hostkey: yes
+
+- name: make and make install dmenu
+  make:
+    chdir: "/home/{{ ansible_user_id }}/workspace/dmenu"
+    target: install
+  become: yes

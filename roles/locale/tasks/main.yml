@@ -1,0 +1,28 @@
+- name: symlink berlin timezone
+  become: yes
+  file:
+    src: /usr/share/zoneinfo/Europe/Berlin
+    path: /etc/localtime
+    state: link
+    force: yes
+
+- name: ensure de locale exists
+  become: yes
+  locale_gen:
+    name: de_DE.UTF-8
+    state: present
+
+- name: ensure en locale exists
+  become: yes
+  locale_gen:
+    name: en_US.UTF-8
+    state: present
+
+- name: copy locale files
+  become: yes
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/{{ item }}"
+  loop:
+    - locale.conf
+    - vconsole.conf

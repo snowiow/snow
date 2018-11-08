@@ -1,0 +1,8 @@
+#!/bin/sh
+read -s -p "Enter Cal- and Kharddav password: " dav_pw
+echo
+read -s -p "Enter private mail password: " private_pw
+echo
+read -s -p "Enter work mail password: " work_pw
+echo
+DAV_PW=$dav_pw MAIL_PRIVATE_PW=$private_pw MAIL_WORK_PW=$work_pw ansible-playbook -i hosts main.yml --ask-become-pass

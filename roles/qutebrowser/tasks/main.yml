@@ -1,0 +1,17 @@
+- name: install qutebrowser
+  become: yes
+  package:
+    name: qutebrowser
+    state: present
+
+- name: create qutebrowser config directory
+  file:
+    path: ~/.config/qutebrowser
+    state: directory
+
+- name: symlink qutebrowser dotfiles
+  file:
+    src: "{{ ansible_env.PWD }}/roles/qutebrowser/files/autoconfig.yml"
+    path: ~/.config/qutebrowser/autoconfig.yml
+    state: link
+    force: yes

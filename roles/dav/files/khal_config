@@ -1,0 +1,26 @@
+[calendars]
+
+[[privat]]
+path = ~/.calendars/4dc20b45-bbda-5167-bd16-4f3a2a58ad09/4dc20b45-bbda-5167-bd16-4f3a2a58ad09/
+type = calendar
+color = dark green
+[[arbeit]]
+path = ~/.calendars/f5424673-aa90-f13d-192b-c7d1b38e239e/f5424673-aa90-f13d-192b-c7d1b38e239e/
+type = calendar
+color = dark red
+[[geburtstage]]
+path = ~/.calendars/9590d594-bb69-6e45-75ac-83c93f3129f4/9590d594-bb69-6e45-75ac-83c93f3129f4/
+type = calendar
+color = yellow
+
+[default]
+highlight_event_days = True
+timedelta = 14d
+
+[locale]
+timeformat = %H:%M
+dateformat = %d.%m.%Y
+longdateformat = %d.%m.%Y
+datetimeformat = %d.%m.%Y %H:%M
+longdatetimeformat = %d.%m.%Y %H:%M
+weeknumbers = left
