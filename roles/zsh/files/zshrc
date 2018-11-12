@@ -65,7 +65,6 @@ source $ZSH/oh-my-zsh.sh
 # For a full list of active aliases, run `alias`.
 alias v="nvim"
 alias vimdiff="nvim -d"
-alias vinit="nvim ~/.config/nvim/init.vim"
 alias r="ranger"
 alias poweroff="systemctl poweroff"
 alias reboot="systemctl reboot"
