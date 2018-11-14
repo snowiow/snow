@@ -20,7 +20,6 @@
     - after
     - ftplugin
     - init.vim
-    - spell
 
 - name: download minpac
   git:

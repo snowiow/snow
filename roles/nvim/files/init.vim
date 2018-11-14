@@ -31,10 +31,10 @@ call minpac#add('davidhalter/jedi-vim', {'type': 'opt'})
 call minpac#add('eagletmt/neco-ghc', {'type': 'opt'})
 call minpac#add('parsonsmatt/intero-neovim', {'type': 'opt'})
 call minpac#add('alx741/vim-hindent', {'type': 'opt'})
+call minpac#add('lervag/vimtex', {'type': 'opt'})
 
-command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update('', {'do': 'call minpac#status()'})
+command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
 command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
-command! PackStatus packadd minpac | source $MYVIMRC | call minpac#status()
 
 "=== Neovim Settings ========================================================="
 if has('nvim')
@@ -545,6 +545,8 @@ let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 
+"=== Vimtex =================================================================="
+let g:vimtex_view_method = 'mupdf'
 "---------------------------------VimWiki-------------------------------------"
 let g:vimwiki_list = [{'template_path': '~/workspace/dotfiles/dotfiles/vimwiki/templates/',
       \ 'template_default': 'def_template',

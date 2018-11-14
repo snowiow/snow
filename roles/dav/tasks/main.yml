@@ -1,7 +1,3 @@
-- name: check if vdirsyncer is configured
-  stat:
-    path: ~/.config/vdirsyncer
-  register: vdirsyncer
 
 - name: install vdirsyncer, khal and khard
   become: yes
@@ -22,6 +18,11 @@
     path: ~/.config/vdirsyncer/config
     state: link
     force: yes
+
+- name: check if vdirsyncer is configured
+  stat:
+    path: ~/.config/vdirsyncer/pw.gpg
+  register: vdirsyncer
 
 - name: create encrypted password file
   shell: echo "{{ lookup('env', 'DAV_PW') }}" | gpg --recipient snow --encrypt > ~/.config/vdirsyncer/pw.gpg
