@@ -19,6 +19,7 @@ call minpac#add('tpope/vim-rhubarb')
 call minpac#add('tpope/vim-surround')
 call minpac#add('mattn/emmet-vim')
 call minpac#add('chrisbra/Colorizer')
+call minpac#add('JamshedVesuna/vim-markdown-preview')
 call minpac#add('BurningEther/iron.nvim', {'do': ':UpdateRemotePlugins'})
 call minpac#add('phpactor/phpactor', {'do': 'silent! !composer install', 'branch': 'master'})
 " call minpac#add('autozimu/LanguageClient-neovim', {'branch': 'next', 'do': './install.sh'})
@@ -529,7 +530,14 @@ let g:clang_c_options = "-w"
 "--------------------------------Vim Polyglot---------------------------------"
 " let g:polyglot_disabled = ['elm']
 let g:rustfmt_autosave = 1
+let g:terraform_fmt_on_save = 1
 let g:scala_scaladoc_indent = 1
+
+"--- Vim Markdown Preview ----------------------------------------------------"
+let vim_markdown_preview_hotkey='<M-l>'
+let vim_markdown_preview_github=1
+let vim_markdown_preview_pandoc=1
+let vim_markdown_preview_use_xdg_open=1
 
 "-------------------------------------Vim Racer-------------------------------"
 let g:racer_experimental_completer = 1
@@ -559,7 +567,8 @@ let wiki = {}
 let wiki.nested_syntaxes = {
     \ 'python': 'python',
     \ 'c++': 'cpp',
-    \ 'scala': 'scala'
+    \ 'scala': 'scala',
+    \ 'zsh': 'zsh',
     \ }
 
 "===========================Custom Functions=================================="

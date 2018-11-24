@@ -4,6 +4,7 @@ set folder = ~/Mail
 set spoolfile = ~/Mail/Arbeit/INBOX
 set postponed = "~/Mail/Arbeit/Entw&APw-rfe"
 set record = ~/Mail/Arbeit/Sent
+set signature = "~/.config/mutt/email-footer-m-patzwahl.txt"
 
 unmailboxes *
 source mailboxes_Arbeit

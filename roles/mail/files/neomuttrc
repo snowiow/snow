@@ -4,6 +4,13 @@ set editor = nvim
 set mbox_type = Maildir
 set timeout = 60
 
+#HTML Mails
+auto_view text/html
+alternative_order text/plain text/enriched text/html
+
+bind index,pager V  noop        ## Unbinds V from version
+macro index,pager V "<view-attachments><search>html<enter><view-mailcap><exit>"
+
 #Khard
 set query_command= "khard email --parsable '%s'"
 bind editor <Tab> complete-query
