@@ -22,6 +22,7 @@ call minpac#add('chrisbra/Colorizer')
 call minpac#add('BurningEther/iron.nvim', {'do': ':UpdateRemotePlugins'})
 call minpac#add('phpactor/phpactor', {'do': 'silent! !composer install', 'branch': 'master'})
 " call minpac#add('autozimu/LanguageClient-neovim', {'branch': 'next', 'do': './install.sh'})
+call minpac#add('justmao945/vim-clang')
 
 "--- Optional Packages -------------------------------------------------------"
 call minpac#add('ElmCast/elm-vim', {'type': 'opt'})
@@ -320,7 +321,6 @@ augroup packages
     autocmd Filetype haskell packadd vim-hindent
     autocmd Filetype haskell packadd neco-ghc
     autocmd Filetype haskell packadd intero-neovim
-
     autocmd Filetype python packadd jedi-vim
 augroup END
 
@@ -522,6 +522,9 @@ augroup phpactor
     autocmd Filetype php nnoremap <localleader>m :call phpactor#ContextMenu()<CR>
     autocmd Filetype php nnoremap <localleader>d :call phpactor#GotoDefinition()<CR>
 augroup END
+
+"--- Vim Clang ---------------------------------------------------------------"
+let g:clang_c_options = "-w"
 
 "--------------------------------Vim Polyglot---------------------------------"
 " let g:polyglot_disabled = ['elm']
