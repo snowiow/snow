@@ -498,9 +498,7 @@ let g:netrw_list_hide='.*\.swp$,
             \.*\.fls$,
             \.*\.blg,
             \.*\.o,
-            \.*\.hi,
-            \.*\*,
-            \^\.\.\=/\=$'
+            \.*\.hi'
 
 noremap <leader>e :Explore<CR>
 augroup netrw_mapping
