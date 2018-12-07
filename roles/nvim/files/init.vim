@@ -367,6 +367,7 @@ augroup END
 
 augroup filetype_markdown
     autocmd!
+    autocmd Filetype markdown set tw=79
     autocmd Filetype markdown setlocal spell
 augroup END
 
