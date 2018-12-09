@@ -19,6 +19,7 @@
   loop:
     - after
     - ftplugin
+    - plugin
     - init.vim
 
 - name: download minpac

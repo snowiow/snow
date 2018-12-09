@@ -374,9 +374,8 @@ augroup END
 augroup filetype_php
     autocmd!
     autocmd BufNewFile,BufRead .php_cs :set filetype=php syntax=php
-    autocmd Filetype php nnoremap <localleader>f :call MyPhpCsFixer()<CR>
     autocmd Filetype php ino ' ''<left>
-    autocmd BufWritePost *.php silent! call MyPhpCsFixer()
+    autocmd BufWritePost *.php silent! call PhpCsFixer()
     autocmd BufWritePost *.php silent lmake!
 augroup END
 
@@ -555,8 +554,9 @@ let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 
-"=== Vimtex =================================================================="
+"--- Vimtex ------------------------------------------------------------------"
 let g:vimtex_view_method = 'mupdf'
+
 "---------------------------------VimWiki-------------------------------------"
 let g:vimwiki_list = [{'template_path': '~/workspace/dotfiles/dotfiles/vimwiki/templates/',
       \ 'template_default': 'def_template',
@@ -571,36 +571,6 @@ let wiki.nested_syntaxes = {
     \ }
 
 "===========================Custom Functions=================================="
-"---------------------------XML File Format-----------------------------------"
-function! DoPrettyXML()
-  " save the filetype so we can restore it later
-  let l:origft = &ft
-  set ft=
-  " delete the xml header if it exists. This will
-  " permit us to surround the document with fake tags
-  " without creating invalid xml.
-  1s/<?xml .*?>//e
-  " insert fake tags around the entire document.
-  " This will permit us to pretty-format excerpts of
-  " XML that may contain multiple top-level elements.
-  0put ='<PrettyXML>'
-  $put ='</PrettyXML>'
-  silent %!xmllint --format -
-  " xmllint will insert an <?xml?> header. it's easy enough to delete
-  " if you don't want it.
-  " delete the fake tags
-  2d
-  $d
-  " restore the 'normal' indentation, which is one extra level
-  " too deep due to the extra tags we wrapped around the document.
-  silent %<
-  " back to home
-  1
-  " restore the filetype
-  exe "set ft=" . l:origft
-endfunction
-command! PrettyXML call DoPrettyXML()
-
 "-----Function and Command for opening the current keyword in devdocs---"
 let stub = "xdg-open 'https://devdocs.io/?q="
 command! -nargs=* DD silent! call system(len(split(<q-args>, ' ')) == 0 ?
@@ -608,9 +578,3 @@ command! -nargs=* DD silent! call system(len(split(<q-args>, ' ')) == 0 ?
 \ stub . <q-args> . "'" : stub . <q-args> . "'")
 
 set keywordprg=:DD "Set the keywordprg to be opened in devdocs
-
-
-function! MyPhpCsFixer()
-    execute "!php-cs-fixer fix --config=" . expand("~") . "/.php_cs %"
-    e
-endfunction
