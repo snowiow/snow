@@ -1,3 +1,5 @@
+inoremap ' ''<left>
+
 set makeprg=php\ -ln\ %
 set errorformat=%m\ in\ %f\ on\ line\ %l
     \,%-GErrors\ parsing\ %f
