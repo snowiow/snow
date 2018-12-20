@@ -315,68 +315,9 @@ augroup autocomplete
 augroup END
 
 "------------------------------Opt Packackes----------------------------------"
-augroup packages
-    autocmd!
-    autocmd Filetype elm packadd elm-vim
-    autocmd Filetype tex packadd vimtex
-    autocmd Filetype rust packadd vim-racer
-    autocmd Filetype haskell packadd vim-hindent
-    autocmd Filetype haskell packadd neco-ghc
-    autocmd Filetype haskell packadd intero-neovim
-    autocmd Filetype python packadd jedi-vim
-    autocmd Filetype go packadd vim-go
-augroup END
-
-augroup filetype_elm
-    autocmd!
-    autocmd Filetype elm nnoremap <localleader>r :ElmRepl<CR>
-    autocmd Filetype elm nnoremap <localleader>i :ElmShowDocs<CR>
-    autocmd Filetype elm nnoremap <localleader>d :ElmBrowseDocs<CR>
-augroup END
-
-augroup filetype_haskell
-    autocmd!
-    autocmd! FileType haskell setl sw=2 sts=2 et
-augroup END
-
-augroup filetype_html
-    autocmd!
-    autocmd FileType html setl sw=2 sts=2 et
-augroup END
-
-augroup filetype_json
-    autocmd!
-    autocmd Filetype json nnoremap <localleader>f :%!python -m json.tool<CR>
-augroup END
-
-augroup filetype_gitcommit
-    autocmd!
-    autocmd Filetype gitcommit setlocal spell | setlocal spelllang=de,en
-augroup END
-
-augroup filetype_latex
-    autocmd!
-    autocmd Filetype tex call vimtex#init()
-    autocmd Filetype tex nnoremap <localleader>f :VimtexCompile<CR>
-    autocmd Filetype tex set spell
-    autocmd Filetype tex set colorcolumn=74
-augroup END
-
-augroup filetype_mail
-    autocmd!
-    autocmd Filetype mail setlocal spell
-augroup END
-
-augroup filetype_markdown
-    autocmd!
-    autocmd Filetype markdown set tw=79
-    autocmd Filetype markdown setlocal spell
-augroup END
-
 augroup filetype_php
     autocmd!
     autocmd BufNewFile,BufRead .php_cs :set filetype=php syntax=php
-    autocmd Filetype php ino ' ''<left>
     autocmd BufWritePost *.php silent! call PhpCsFixer()
     autocmd BufWritePost *.php silent lmake!
 augroup END
@@ -388,21 +329,14 @@ augroup filetype_rust
     autocmd BufWritePost *.rs :silent! exec "!rusty-tags vi --quiet --start-dir=" . expand('%:p:h') . "&" | redraw!
 augroup END
 
-augroup filetype_typescript
-    autocmd!
-    autocmd FileType typescript setl sw=2 sts=2 et
-augroup END
 
 augroup filetype_wiki
     autocmd!
     autocmd Filetype *.wiki setlocal spell
+    autocmd Filetype *.wiki setlocal spelllang=de,en
     autocmd BufWritePost *.wiki :silent Vimwiki2HTML
 augroup END
 
-augroup filetype_xml
-    autocmd!
-    autocmd Filetype xml nnoremap <localleader>f :PrettyXML<CR>
-augroup END
 "=================================Plugins====================================="
 "--- Elm-Vim -----------------------------------------------------------------"
 let g:elm_setup_keybindings = 0
@@ -471,6 +405,7 @@ let g:haskell_indent_in = 1
 "--- Jedi Vim ----------------------------------------------------------------"
 let g:jedi#completions_enabled=0
 let g:jedi#documentation_command='<localleader>k'
+
 "----------------------------------LiveDown-----------------------------------"
 autocmd Filetype markdown nnoremap <localleader>l :LivedownPreview<CR>
 
@@ -555,6 +490,9 @@ let g:UltiSnipsSnippetsDir="~/.local/share/nvim/site/UltiSnips"
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+"--- Vim-Hindent -------------------------------------------------------------"
+let g:hindent_on_save = 1
 
 "--- Vimtex ------------------------------------------------------------------"
 let g:vimtex_view_method = 'mupdf'

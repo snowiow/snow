@@ -1,3 +1,5 @@
+packadd vim-racer
+
 set makeprg=cargo\ check
 set errorformat=%Eerror:\ %m
     \,%-Gerror:\ aborting\ due\ to\ previous\ error
