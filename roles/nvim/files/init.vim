@@ -27,6 +27,7 @@ call minpac#add('justmao945/vim-clang')
 
 "--- Optional Packages -------------------------------------------------------"
 call minpac#add('ElmCast/elm-vim', {'type': 'opt'})
+call minpac#add('fatih/vim-go', {'type': 'opt'})
 call minpac#add('shime/vim-livedown', {'type': 'opt'})
 call minpac#add('racer-rust/vim-racer', {'type': 'opt'})
 call minpac#add('davidhalter/jedi-vim', {'type': 'opt'})
@@ -323,6 +324,7 @@ augroup packages
     autocmd Filetype haskell packadd neco-ghc
     autocmd Filetype haskell packadd intero-neovim
     autocmd Filetype python packadd jedi-vim
+    autocmd Filetype go packadd vim-go
 augroup END
 
 augroup filetype_elm
