@@ -15,6 +15,7 @@
     src: "{{ ansible_env.PWD }}/roles/nvim/files/{{ item }}"
     path: "~/.config/nvim/{{ item }}"
     state: link
+    follow: false
     force: yes
   loop:
     - after
