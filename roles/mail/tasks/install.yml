@@ -12,20 +12,10 @@
     path: ~/.config/mutt/
     state: directory
 
-- name: check if encrypted password file for mail_privat exists
-  stat:
-    path: ~/.mailpw_privat.gpg
-  register: mailpw_privat
-
 - name: create encrypted password file for mail_privat
   shell: echo "{{ lookup('env', 'MAIL_PRIVATE_PW') }}" | gpg --recipient snow --encrypt > ~/.mailpw_privat.gpg
-  when: mailpw_privat.stat.exists == False
-
-- name: check if encrypted password file for mail_arbeit exists
-  stat:
-    path: ~/.mailpw_arbeit.gpg
-  register: mailpw_arbeit
+  when: lookup('env', 'MAIL_PRIVATE_PW') != ""
 
 - name: create encrypted password file for mail_arbeit
   shell: echo "{{ lookup('env', 'MAIL_WORK_PW') }}" | gpg --recipient snow --encrypt > ~/.mailpw_arbeit.gpg
-  when: mailpw_arbeit.stat.exists == False
+  when: lookup('env', 'MAIL_WORK_PW') != ""

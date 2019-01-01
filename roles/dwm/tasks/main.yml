@@ -25,17 +25,18 @@
     target: install
   become: yes
 
-- name: create local bin
-  file:
-    path: ~/.local/bin
-    state: directory
+- name: clone dwmstatus
+  git:
+    repo: https://github.com/snowiow/dwmstatus
+    dest: ~/workspace/dwmstatus
+    version: snow
+    accept_hostkey: yes
 
-- name: symlink dwmstatus
-  file:
-    src: "{{ansible_env.PWD}}/roles/dwm/files/dwmstatus.sh"
-    path: ~/.local/bin/dwmstatus.sh
-    state: link
-    force: yes
+- name: make and make install dwmstatus
+  make:
+    chdir: "/home/{{ ansible_user_id }}/workspace/dwmstatus"
+    target: install
+  become: yes
 
 - name: symlink xinitrc
   file:
@@ -43,6 +44,11 @@
     path: ~/.xinitrc
     state: link
     force: yes
+
+- name: create local bin
+  file:
+    path: ~/.local/bin
+    state: directory
 
 - name: symlink touchpad_toggle
   file:

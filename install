@@ -1,8 +1,30 @@
 #!/bin/sh
-read -s -p "Enter Cal- and Kharddav password: " dav_pw
-echo
-read -s -p "Enter private mail password: " private_pw
-echo
-read -s -p "Enter work mail password: " work_pw
-echo
+help() {
+    echo "Usage: ./install [-p arg] [-w arg]"
+    echo "-p (the password for the private mail account)"
+    echo "-w (the password for the work mail account)"
+    echo "-d (the password for the cal- and carddav account)"
+    echo "-h (print this message)"
+}
+
+while getopts ':p:w:d:h' opt; do
+    case $opt in
+        p)
+            private_pw=$OPTARG
+            ;;
+        w)
+            work_pw=$OPTARG
+            ;;
+        d)
+            dav_pw=$OPTARG
+            ;;
+        h)
+            help
+            ;;
+        ?)
+            echo "Invalid Parameter given. $(help)"
+            ;;
+    esac
+done
+
 DAV_PW=$dav_pw MAIL_PRIVATE_PW=$private_pw MAIL_WORK_PW=$work_pw ansible-playbook -i hosts main.yml --ask-become-pass
