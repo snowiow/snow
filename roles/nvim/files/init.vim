@@ -406,9 +406,6 @@ let g:haskell_indent_in = 1
 let g:jedi#completions_enabled=0
 let g:jedi#documentation_command='<localleader>k'
 
-"----------------------------------LiveDown-----------------------------------"
-autocmd Filetype markdown nnoremap <localleader>l :LivedownPreview<CR>
-
 "---------------------------Language Client-----------------------------------"
 " nnoremap K :call LanguageClient_textDocument_hover()<CR>
 " nnoremap gd :call LanguageClient_textDocument_definition()<CR>
@@ -466,7 +463,6 @@ let g:clang_c_options = "-w"
 " let g:polyglot_disabled = ['elm']
 let g:rustfmt_autosave = 1
 let g:terraform_fmt_on_save = 1
-let g:scala_scaladoc_indent = 1
 
 "--- Vim Markdown Preview ----------------------------------------------------"
 let vim_markdown_preview_hotkey='<M-l>'
