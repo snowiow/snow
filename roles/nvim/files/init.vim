@@ -27,7 +27,7 @@ call minpac#add('justmao945/vim-clang')
 
 "--- Optional Packages -------------------------------------------------------"
 call minpac#add('ElmCast/elm-vim', {'type': 'opt'})
-call minpac#add('fatih/vim-go', {'type': 'opt'})
+call minpac#add('fatih/vim-go')
 call minpac#add('shime/vim-livedown', {'type': 'opt'})
 call minpac#add('racer-rust/vim-racer', {'type': 'opt'})
 call minpac#add('davidhalter/jedi-vim', {'type': 'opt'})
@@ -486,6 +486,13 @@ let g:UltiSnipsSnippetsDir="~/.local/share/nvim/site/UltiSnips"
 let g:UltiSnipsExpandTrigger="<tab>"
 let g:UltiSnipsJumpForwardTrigger="<tab>"
 let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
+
+"--- Vim-Go ------------------------------------------------------------------"
+augroup vimgo
+    autocmd!
+    autocmd FileType go nmap <localleader>d :GoDef<cr>
+    autocmd FileType rust nmap <localleader>K <Plug>(rust-doc)
+augroup END
 
 "--- Vim-Hindent -------------------------------------------------------------"
 let g:hindent_on_save = 1
