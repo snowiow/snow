@@ -39,3 +39,6 @@ taskd.credentials=Public\/snow\/27842d53-5b91-42b7-b3a5-290d4785f9a0
 taskd.trust=ignore hostname
 alias.arbeit=list project:Arbeit
 alias.privat=list project:Privat
+context.work=+work
+context.home=-work
+context=work

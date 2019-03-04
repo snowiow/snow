@@ -4,6 +4,7 @@ set folder = ~/Mail
 set spoolfile = ~/Mail/Privat/INBOX
 set postponed = ~/Mail/Privat/Drafts
 set record = ~/Mail/Privat/Sent
+set trash = ~/Mail/Privat/Trash
 
 unmailboxes *
 source mailboxes_Privat
