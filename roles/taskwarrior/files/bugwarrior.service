@@ -1,0 +1,6 @@
+[Unit]
+Description=bugwarrior-pull
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/bugwarrior-pull

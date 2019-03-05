@@ -1,0 +1,15 @@
+[general]
+targets=demv
+annotation_links = True
+annotation_comments = False
+
+[demv]
+service = github
+github.login = snowiow
+github.username = demvsystems
+github.password = @oracle:eval:gpg -dq ~/.config/bugwarrior/pw.gpg
+github.only_if_assigned = snowiow
+github.filter_pull_requests = True
+github.exclude_repos = eternaldeztiny
+github.add_tags = work
+github.description_template = {{githubnumber}}: {{githubtitle}}

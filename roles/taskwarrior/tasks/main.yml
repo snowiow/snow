@@ -11,3 +11,41 @@
     state: link
     force: yes
 
+- name: install bugwarrior
+  become: yes
+  pip:
+    name:
+      - bugwarrior
+      - bugwarrior[keyring]
+
+
+- name: create bugwarrior config directory
+  file:
+    path: ~/.config/bugwarrior
+    state: directory
+
+- name: symlink bugwarriorrc
+  file:
+    src: "{{ ansible_env.PWD }}/roles/taskwarrior/files/bugwarriorrc"
+    path: "~/.config/bugwarrior/bugwarriorrc"
+    state: link
+    force: yes
+
+- name: create encrypted password file
+  shell: echo "{{ lookup('env', 'GITHUB_PW') }}" | gpg --recipient snow --encrypt > ~/.config/bugwarrior/pw.gpg
+  when: lookup('env', 'GITHUB_PW') != ""
+
+- name: bugwarrior copy systemd timer and service
+  copy:
+    src: "{{ item }}"
+    dest: "~/.config/systemd/user/{{ item }}"
+  loop:
+    - bugwarrior.service
+    - bugwarrior.timer
+
+- name: enable bugwarrior timer
+  systemd:
+    name: bugwarrior.timer
+    state: started
+    enabled: yes
+    scope: user

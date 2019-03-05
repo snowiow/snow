@@ -25,5 +25,3 @@
   args:
     chdir: ~/workspace/ttf-iosevka-term
   when: iosevka.stat.exists
-
-
