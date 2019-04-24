@@ -104,11 +104,14 @@ settings:
     global: 6
   session.default_name:
     global: default
+  url.open_base_url:
+    global: false
   url.searchengines:
     global:
       DEFAULT: https://duckduckgo.com/?q={}
       a: https://www.amazon.de/s/field-keywords={}
       arch: https://wiki.archlinux.org/?search={}
+      devdocs: https://devdocs.io/?q={}
       dict: https://www.dict.cc/?s={}
       g: https://google.de/search?q={}
       php: https://php.net/{}

@@ -8,7 +8,7 @@ help() {
     echo "-h (print this message)"
 }
 
-while getopts ':p:w:d:h' opt; do
+while getopts ':p:w:d:g:h' opt; do
     case $opt in
         p)
             private_pw=$OPTARG

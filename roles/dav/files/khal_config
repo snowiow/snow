@@ -15,7 +15,7 @@ color = yellow
 
 [default]
 highlight_event_days = True
-timedelta = 14d
+timedelta = 30d
 
 [locale]
 timeformat = %H:%M
