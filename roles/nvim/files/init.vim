@@ -239,9 +239,6 @@ nnoremap <silent> <leader>r :nohlsearch<CR>
 
 "switch to previous tab
 noremap <a-h> :tabprevious<CR>
-"switch to next tab
-" noremap <a-l> :tabnext<CR>
-" noremap <a-t> :tabnew<CR>
 
 "open vimrc
 nnoremap <leader>c :e ~/.config/nvim/init.vim<CR>

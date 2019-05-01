@@ -4,7 +4,8 @@
     name: msmtp,
           neomutt,
           offlineimap,
-          stack
+          stack,
+          notmuch
     state: present
 
 - name: create neomutt config directory

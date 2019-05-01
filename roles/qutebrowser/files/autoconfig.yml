@@ -109,7 +109,7 @@ settings:
   url.searchengines:
     global:
       DEFAULT: https://duckduckgo.com/?q={}
-      a: https://www.amazon.de/s/field-keywords={}
+      a: https://www.amazon.de/s?k={}
       arch: https://wiki.archlinux.org/?search={}
       devdocs: https://devdocs.io/?q={}
       dict: https://www.dict.cc/?s={}

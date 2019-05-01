@@ -14,6 +14,7 @@ footer = "\n"
 [Account Arbeit]
 localrepository = Arbeit-Local
 remoterepository = Arbeit-Remote
+postsynchook = /usr/bin/notmuch new
 
 [Repository Arbeit-Local]
 type = Maildir
@@ -34,6 +35,7 @@ nametrans = lambda foldername: foldername.decode('imap4-utf-7').encode('utf-8')
 [Account Privat]
 localrepository = Privat-Local
 remoterepository = Privat-Remote
+postsynchook = /usr/bin/notmuch new
 
 [Repository Privat-Local]
 type=Maildir
