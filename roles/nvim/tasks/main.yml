@@ -10,7 +10,7 @@
     path: ~/.config/nvim
     state: directory
 
-- name: symlink files
+- name: symlink config files
   file:
     src: "{{ ansible_env.PWD }}/roles/nvim/files/{{ item }}"
     path: "~/.config/nvim/{{ item }}"
@@ -33,3 +33,14 @@
 - name: install plugins
   command: nvim -c PackUpdate -c qa!
 
+- name: create nvim share directory
+  file:
+    path: ~/.local/share/nvim/site/
+    state: directory
+
+- name: symlink UltiSnips
+  file:
+    src: "{{ ansible_env.PWD }}/roles/nvim/files/UltiSnips"
+    path: "~/.local/share/nvim/site/UltiSnips"
+    state: link
+    force: yes

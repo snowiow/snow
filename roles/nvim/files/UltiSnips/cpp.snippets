@@ -1,0 +1,35 @@
+snippet for
+for (${1:u16_t} ${2:i} = ${3:0}; $2 < ${4:end}; $2++) {
+	${5://code}
+}${6}
+endsnippet
+
+snippet fore
+for (${1:auto} ${2:item} : ${3:collection}) {
+	${4://code}
+}${5}
+endsnippet
+
+snippet vec
+std::vector<${1:auto}>
+endsnippet
+
+snippet tuple
+std::tuple<${1:auto}, ${2:auto}>
+endsnippet
+
+snippet cout
+std::cout << ${1:" "} << std::endl;
+endsnippet
+
+snippet class
+#ifndef ${1:ClASS_HPP}
+#define $1
+
+namespace ${2:namespace} {
+	class ${3:ClassName} {
+		${4}
+	};
+}
+#endif //$1
+endsnippet

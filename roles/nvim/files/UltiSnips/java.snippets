@@ -1,0 +1,28 @@
+snippet fun
+${1:public} ${2:void} ${3:name}(${4:}) {
+	${5://content}
+}
+endsnippet
+
+snippet testm
+@Test
+public void ${1:name}() {
+	${2://test}
+}
+endsnippet
+
+snippet fore
+for (${1:type} ${2:var}: ${3:array}) {
+	${4://do something}
+}
+endsnippet
+
+snippet equ
+@Override
+public boolean equals(Object other) {
+	if (other == null || getClass() != other.getClass()) {
+		return false;
+	}
+	${1://equals}
+}
+endsnippet

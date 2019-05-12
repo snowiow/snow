@@ -1,0 +1,80 @@
+snippet frame
+\begin{frame}${1}
+${2}
+\end{frame}
+endsnippet
+
+snippet itemize
+\begin{itemize}
+	\item ${1}
+\end{itemize}
+endsnippet
+
+snippet enum
+\begin{enumerate}
+	\item ${1}
+\end{enumerate}
+endsnippet
+
+snippet column
+\begin{columns}[T]
+	\begin{column}{${1:.5\textwidth}}
+		${2}
+	\end{column}
+	\begin{column}{${3:.5\textwidth}}
+		${4}
+	\end{column}
+\end{columns}
+endsnippet
+
+snippet ra
+$\rightarrow$
+endsnippet
+
+snippet la
+$\leftarrow$
+endsnippet
+
+snippet bf
+\textbf{${1:}}
+endsnippet
+
+snippet it
+\textit{${1:}}
+endsnippet
+
+snippet glos
+\newglossaryentry{${1:Name}}
+{
+	name=${2:Name},
+	description={${3:Descritpion}}
+} 
+endsnippet
+
+snippet fig
+\begin{figure}[${1:H}]
+	${2}
+	\captionof{${3:figure}}{${4}}
+\end{figure}
+endsnippet
+
+snippet wrapfig
+\begin{wrapfigure}{${1:r}}{${2:0.4\textwidth}}
+	${3}
+	\captionof{${4:figure}}{${5}}
+\end{wrapfigure}
+endsnippet
+
+snippet graph
+	\includegraphics[${1:width=0.4\textwidth}]{${2:path}}
+endsnippet
+
+snippet listing
+\begin{lstlisting}
+${1}
+\end{lstlisting}
+endsnippet
+
+snippet a
+"\`${1}"'
+endsnippet
