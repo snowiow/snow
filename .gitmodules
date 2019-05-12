@@ -1,0 +1,3 @@
+[submodule "vendor/ansible"]
+	path = vendor/ansible
+	url = git@github.com:ansible/ansible.git

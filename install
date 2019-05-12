@@ -31,8 +31,11 @@ while getopts ':p:w:d:g:h' opt; do
     esac
 done
 
+# Initialization steps
+source vendor/ansible/hacking/env-setup
+
 DAV_PW=$dav_pw \
 MAIL_PRIVATE_PW=$private_pw \
 MAIL_WORK_PW=$work_pw \
 GITHUB_PW=$github_pw \
-ansible-playbook -i hosts main.yml --ask-become-pass
+ansible-playbook --ask-become-pass -i hosts main.yml
