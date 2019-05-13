@@ -4,6 +4,15 @@ resource "${1:}" "${2:}" {
 }
 endsnippet
 
+snippet var
+variable "${1:}" {
+  description = "${2:}"
+  type		  = "${3:string}"
+  default	  = "${4:}"
+  $5
+}
+endsnippet
+
 snippet data
 data "${1:}" "${2:}" {
 	${3:}

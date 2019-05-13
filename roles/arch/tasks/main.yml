@@ -1,9 +1,3 @@
-- name: update system
-  become: yes
-  pacman:
-    update_cache: yes
-    upgrade: yes
-
 - name: install essential packages
   become: yes
   pacman:
