@@ -7,3 +7,4 @@ export BROWSER=
 export FZF_DEFAULT_COMMAND='rg --files --hidden --smart-case --glob "!.git/*"'
 export _JAVA_AWT_WM_NONREPARENTING=1
 export RUST_SRC_PATH=$(rustc --print sysroot)/lib/rustlib/src/rust/src/
+export GOPATH="$HOME/go"

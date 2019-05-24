@@ -53,6 +53,7 @@ if (has("termguicolors") || has('nvim'))        "24 bit colorspace
 endif
 
 "=== VIM Design =============================================================="
+filetype plugin indent on               "make vim improved
 syntax on                               "set syntax highlighting on
 set background=dark
 set list                                "Show invisible chracters
@@ -147,7 +148,6 @@ set showtabline=1
 set hidden                                      "allow hidden buffers to exist
 set undofile                                    "save persistent undos to file
 set encoding=utf8                               "Default encoding
-filetype plugin indent on                       "make vim improved
 set path+=**                                    "path is where vim is opened
 set wildmenu                                    "activate wildmenu
 set wildmode=list:longest,full                  "how wildmenu should act
@@ -172,8 +172,6 @@ set smartcase                                   "case sensitive when writing
 set so=5                                        "show number of lines above or
                                                 "under the cursor
 set tags=./tags,tags                            "Sources for tag files
-set noautochdir                                 "Don't switch cwd to the file
-                                                "currently worked on
 autocmd! bufwritepost init.vim source %         "Automatically reload vimrc
                                                 "after save
 set shell=/bin/zsh                              "Set ZSH as standard shell
@@ -185,8 +183,11 @@ let g:tex_flavor='latex'                        "Starting with Vim 7, the
                                                 "filetype of empty .tex files
                                                 "defaults to plaintext instead
 set breakindent                                 "also indent wrapped lines
-set completeopt=menu,preview,noselect
-
+set completeopt=menu,preview,noselect           "Complete Options:
+                                                "menu: Always show completion menu
+                                                "preview: show preview window
+                                                "noselect: no automatic
+                                                "selection of completion item
 let g:tex_conceal = "abdmgs"                    "Don't show any conceals in latex
 set shortmess+=c                                "Disable CompletionMessages at
                                                 "the buttom
@@ -238,9 +239,6 @@ vnoremap <Leader>P "+P
 "turn off search results
 nnoremap <silent> <leader>r :nohlsearch<CR>
 
-"switch to previous tab
-noremap <a-h> :tabprevious<CR>
-
 "open vimrc
 nnoremap <leader>c :e ~/.config/nvim/init.vim<CR>
 
@@ -274,11 +272,7 @@ inoremap <c-d> <c-x><c-d>
 
 if (has("nvim"))
     tnoremap <C-n> <C-\><C-n>
-    tnoremap <a-l> <C-\><C-n>:tabnext<CR>
-    tnoremap <a-h> <C-\><C-n>:tabprevious<CR>
-    tnoremap <a-t> <C-\><C-n>:tabnew<CR>
 endif
-
 noremap <c-space> <c-^>
 
 "---------------------------------Unimpaired----------------------------------"
