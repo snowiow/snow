@@ -186,6 +186,7 @@ let g:tex_flavor='latex'                        "Starting with Vim 7, the
                                                 "defaults to plaintext instead
 set breakindent                                 "also indent wrapped lines
 set completeopt=menu,preview,noselect
+
 let g:tex_conceal = "abdmgs"                    "Don't show any conceals in latex
 set shortmess+=c                                "Disable CompletionMessages at
                                                 "the buttom
@@ -307,8 +308,9 @@ augroup END
 "----------------------------------Autocompletion-----------------------------"
 augroup autocomplete
     autocmd!
-    autocmd InsertEnter * set noignorecase
-    autocmd InsertLeave * set ignorecase
+    autocmd InsertEnter  * set noignorecase
+    autocmd InsertLeave  * set ignorecase
+    autocmd CompleteDone * pclose
 augroup END
 
 "------------------------------Opt Packackes----------------------------------"
@@ -443,6 +445,7 @@ endfunction
 
 let g:netrw_banner=0
 let g:netrw_liststyle=1
+let g:netrw_localrmdir='rm -r'
 
 "-------------------------------------PHPActor--------------------------------"
 augroup phpactor
@@ -488,7 +491,6 @@ let g:UltiSnipsJumpBackwardTrigger="<s-tab>"
 augroup vimgo
     autocmd!
     autocmd FileType go nmap <localleader>d :GoDef<cr>
-    autocmd FileType rust nmap <localleader>K <Plug>(rust-doc)
 augroup END
 
 "--- Vim-Hindent -------------------------------------------------------------"
