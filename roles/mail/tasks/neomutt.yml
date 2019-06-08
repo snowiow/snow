@@ -5,7 +5,6 @@
     state: link
     force: yes
   loop:
-    - account.arbeit
     - account.privat
     - colors.rc
     - neomuttrc

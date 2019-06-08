@@ -26,7 +26,6 @@ set sidebar_indent_string = ' '
 set sidebar_format = "%B%?F? [%F]?%* %?N?%N/?%S"
 
 #Mail Hooks
-folder-hook 'account.arbeit' 'source ~/.config/mutt/account.arbeit'
 folder-hook 'account.privat' 'source ~/.config/mutt/account.privat'
 
 #Default Mail
@@ -34,4 +33,3 @@ source ~/.config/mutt/account.privat
 
 #Switch Mailboxes
 macro index <f2> '<sync-mailbox><enter-command>source ~/.config/mutt/account.privat<enter><change-folder>!<enter>'
-macro index <f3> '<sync-mailbox><enter-command>source ~/.config/mutt/account.arbeit<enter><change-folder>!<enter>'

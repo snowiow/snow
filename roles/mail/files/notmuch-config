@@ -31,7 +31,6 @@ path=Mail
 [user]
 name=Marcel Patzwahl
 primary_email=marcel.patzwahl@posteo.de
-other_email=marcel.patzwahl@demv.de;
 
 # Configuration for "notmuch new"
 #

@@ -2,7 +2,6 @@
 help() {
     echo "Usage: ./install [-p arg] [-w arg] [-d arg] [-g arg]"
     echo "-p (the password for the private mail account)"
-    echo "-w (the password for the work mail account)"
     echo "-d (the password for the cal- and carddav account)"
     echo "-g (the password for the github account)"
     echo "-h (print this message)"
@@ -41,7 +40,6 @@ if [ "$os" = "Darwin" ]; then
 elif [ "$os" = "Linux" ]; then
     DAV_PW=$dav_pw \
     MAIL_PRIVATE_PW=$private_pw \
-    MAIL_WORK_PW=$work_pw \
     GITHUB_PW=$github_pw \
     ansible-playbook --ask-become-pass -i hosts linux.yml
 else

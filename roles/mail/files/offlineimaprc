@@ -1,6 +1,6 @@
 [general]
 ui = ttyui
-accounts = Arbeit, Privat
+accounts = Privat
 pythonfile = ~/.offlineimap.py
 
 [mbnames]
@@ -10,27 +10,6 @@ header = "mailboxes "
 peritem = "+%(accountname)s/%(foldername)s"
 sep = " "
 footer = "\n"
-
-[Account Arbeit]
-localrepository = Arbeit-Local
-remoterepository = Arbeit-Remote
-postsynchook = /usr/bin/notmuch new
-
-[Repository Arbeit-Local]
-type = Maildir
-localfolders = ~/Mail/Arbeit
-createfolders = True
-nametrans = lambda foldername: foldername.decode('utf-8').encode('imap4-utf-7')
-
-[Repository Arbeit-Remote]
-type = IMAP
-remoteuser = m.patzwahl@demv.de
-remotepasseval = get_pass('~/.mailpw_arbeit.gpg')
-remotehost = imap.strato.de
-maxconnections = 3
-sslcacertfile = /etc/ssl/certs/ca-certificates.crt
-createfolders = True
-nametrans = lambda foldername: foldername.decode('imap4-utf-7').encode('utf-8')
 
 [Account Privat]
 localrepository = Privat-Local
