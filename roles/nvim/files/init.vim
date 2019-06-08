@@ -255,7 +255,7 @@ nnoremap <c-space> <c-^>
 nnoremap <leader>7 :silent grep<space>
 " Autocomplete
 " Keyword
-inoremap <c-k> <c-x><c-n>
+" inoremap <c-k> <c-x><c-n>
 " Omni
 inoremap <c-o> <c-x><c-o>
 " Line
@@ -328,7 +328,6 @@ augroup filetype_wiki
     autocmd!
     autocmd Filetype *.wiki setlocal spell
     autocmd Filetype *.wiki setlocal spelllang=de,en
-    autocmd BufWritePost *.wiki :silent Vimwiki2HTML
 augroup END
 
 "=================================Plugins====================================="
@@ -495,9 +494,12 @@ let g:hindent_on_save = 1
 let g:vimtex_view_method = 'mupdf'
 
 "---------------------------------VimWiki-------------------------------------"
-let g:vimwiki_list = [{'template_path': '~/workspace/dotfiles/dotfiles/vimwiki/templates/',
+let g:vimwiki_list = [{
+      \ 'template_path': '~/workspace/dotfiles/dotfiles/vimwiki/templates/',
       \ 'template_default': 'def_template',
-      \ 'template_ext': '.html'}]
+      \ 'template_ext': '.html',
+      \ 'auto_export': 1,
+      \ 'css_name': 'css/main.css'}]
 
 let wiki = {}
 let wiki.nested_syntaxes = {

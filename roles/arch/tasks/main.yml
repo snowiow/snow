@@ -1,9 +1,3 @@
-- name: install essential packages
-  become: yes
-  pacman:
-    name: fzf
-    state: present
-
 - name: download iosevka-term font
   git:
     repo: https://aur.archlinux.org/ttf-iosevka-term.git
