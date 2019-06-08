@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 help() {
     echo "Usage: ./install [-p arg] [-w arg] [-d arg] [-g arg]"
     echo "-p (the password for the private mail account)"
@@ -31,11 +31,20 @@ while getopts ':p:w:d:g:h' opt; do
     esac
 done
 
-# Initialization steps
-source vendor/ansible/hacking/env-setup
+os="$(uname)"
 
-DAV_PW=$dav_pw \
-MAIL_PRIVATE_PW=$private_pw \
-MAIL_WORK_PW=$work_pw \
-GITHUB_PW=$github_pw \
-ansible-playbook --ask-become-pass -i hosts main.yml
+if [ "$os" = "Darwin" ]; then
+    ansible-playbook --ask-become-pass \
+        -i hosts \
+        -e 'ansible_python_interpreter=/usr/local/bin/python3' \
+        mac.yml
+elif [ "$os" = "Linux" ]; then
+    DAV_PW=$dav_pw \
+    MAIL_PRIVATE_PW=$private_pw \
+    MAIL_WORK_PW=$work_pw \
+    GITHUB_PW=$github_pw \
+    ansible-playbook --ask-become-pass -i hosts linux.yml
+else
+   echo "Unknow OS: $os"
+   exit 1
+fi

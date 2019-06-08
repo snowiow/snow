@@ -1,0 +1,39 @@
+- name: create nvim config directory
+  file:
+    path: ~/.config/nvim
+    state: directory
+
+- name: symlink config files
+  file:
+    src: "{{ ansible_env.PWD }}/roles/nvim/files/{{ item }}"
+    path: "~/.config/nvim/{{ item }}"
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - after
+    - ftplugin
+    - plugin
+    - init.vim
+
+- name: download minpac
+  git:
+    repo: https://github.com/k-takata/minpac.git
+    dest: ~/.config/nvim/pack/minpac/opt/minpac
+    version: master
+    accept_hostkey: yes
+
+- name: install plugins
+  command: nvim -c PackUpdate -c qa!
+
+- name: create nvim share directory
+  file:
+    path: ~/.local/share/nvim/site/
+    state: directory
+
+- name: symlink UltiSnips
+  file:
+    src: "{{ ansible_env.PWD }}/roles/nvim/files/UltiSnips"
+    path: "~/.local/share/nvim/site/UltiSnips"
+    state: link
+    force: yes

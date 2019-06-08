@@ -1,20 +1,5 @@
-- name: install ranger
-  become: yes
-  package:
-    name: ranger
-    state: present
-
-- name: create ranger config directory
-  file:
-    path: ~/.config/ranger
-    state: directory
-
-- name: symlink ranger config files
-  file:
-    src: "{{ansible_env.PWD}}/roles/ranger/files/{{ item }}"
-    path: "~/.config/ranger/{{ item }}"
-    state: link
-    force: yes
-  loop:
-    - rc.conf
-    - rifle.conf
+- import_tasks: install_darwin.yml
+  when: ansible_facts['os_family'] == "Darwin"
+- import_tasks: install_linux.yml
+  when: ansible_facts['os_family'] == "ArchLinux"
+- import_tasks: config.yml

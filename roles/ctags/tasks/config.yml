@@ -1,0 +1,6 @@
+- name: symlink ctags
+  file:
+    src: "{{ ansible_env.PWD }}/roles/ctags/files/ctags"
+    path: ~/.ctags
+    state: link
+    force: yes

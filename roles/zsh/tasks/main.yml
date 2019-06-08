@@ -1,15 +1,3 @@
-- name: make sure zsh is installed
-  package:
-    name: zsh
-    state: present
-  become: yes
-
-- name: change default shell to zsh
-  user:
-    name: "{{ ansible_user_id }}"
-    shell: /bin/zsh
-  become: yes
-
 - name: check if oh-my-zsh is installed
   stat:
     path: ~/.oh-my-zsh

@@ -1,12 +1,5 @@
-- name: install ctags
-  package:
-    name: ctags
-    state: present
-  become: yes
-
-- name: symlink ctags
-  file:
-    src: "{{ ansible_env.PWD }}/roles/ctags/files/ctags"
-    path: ~/.ctags
-    state: link
-    force: yes
+- import_tasks: install_darwin.yml
+  when: ansible_facts['os_family'] == "Darwin"
+- import_tasks: install_linux.yml
+  when: ansible_facts['os_family'] == "ArchLinux"
+- import_tasks: config.yml

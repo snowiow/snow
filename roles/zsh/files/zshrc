@@ -75,22 +75,8 @@ alias vssh="vagrant ssh"
 mvcd() {mv "$1" "$2" && cd "$2"; }
 cpcd() {cp -r "$1" "$2" && cd "$2"; }
 
-export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/lib/jvm/default/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl:$GOPATH/bin:$HOME/.config/composer/vendor/bin:$HOME/.local/bin"
-
 # Source other files
-# FZF
-if [ -f /usr/share/fzf/key-bindings.zsh ]; then
-    source /usr/share/fzf/key-bindings.zsh
-fi
-
-if [ -f /usr/share/fzf/completion.zsh ]; then
-    source /usr/share/fzf/completion.zsh
-fi
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
 #Keybindings
 bindkey '^g' fzm
-
-# added by travis gem
-if [ -f ~/.travis/travis.sh ]; then
-    source ~/.travis/travis.sh
-fi

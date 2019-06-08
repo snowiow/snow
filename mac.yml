@@ -1,0 +1,7 @@
+- name: Setup local environment
+  hosts: localhost
+  roles:
+    - ctags
+    - zsh
+    - nvim
+    - ranger

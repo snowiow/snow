@@ -1,0 +1,5 @@
+- name: install ranger on darwin
+  homebrew:
+    name: ranger
+    state: present
+

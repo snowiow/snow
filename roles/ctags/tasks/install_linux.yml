@@ -1,0 +1,5 @@
+- name: install ctags on linux
+  package:
+    name: ctags
+    state: present
+  become: yes
