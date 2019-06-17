@@ -71,6 +71,12 @@ alias vr="vagrant reload"
 alias vh="vagrant halt"
 alias vssh="vagrant ssh"
 
+#Mac Aliases
+if [ "$(uname)" = "Darwin" ]; then
+    alias tar="gtar"
+    alias grep="ggrep"
+fi
+
 # My functions
 mvcd() {mv "$1" "$2" && cd "$2"; }
 cpcd() {cp -r "$1" "$2" && cd "$2"; }

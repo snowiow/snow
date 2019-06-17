@@ -1,0 +1,16 @@
+- name: install taskwarrior
+  package:
+    name: task
+    state: present
+
+- name: create task config directory
+  file:
+    path: ~/.config/task
+    state: directory
+
+- name: copy theme
+  copy:
+    src:
+      /usr/local/share/doc/task/rc/dark-256.theme
+    dest:
+      ~/.config/task/dark-256.theme

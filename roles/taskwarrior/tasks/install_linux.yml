@@ -1,0 +1,24 @@
+- name: install taskwarrior
+  become: yes
+  package:
+    name: task
+    state: present
+
+- name: install bugwarrior
+  become: yes
+  pip:
+    name:
+      - bugwarrior
+      - bugwarrior[keyring]
+
+- name: create task config directory
+  file:
+    path: ~/.config/task
+    state: directory
+
+- name: copy theme
+  copy:
+    src:
+      /usr/share/doc/task/rc/dark-256.theme
+    dest:
+      ~/.config/task/dark-256.theme
