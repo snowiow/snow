@@ -30,6 +30,13 @@
     - profile
     - inputrc
 
+- name: symlink theme
+  file:
+    src: "{{ ansible_env.PWD }}/roles/zsh/files/snow.zsh-theme"
+    path: "~/.oh-my-zsh/themes/snow.zsh-theme"
+    state: link
+    force: yes
+
 - name: install fzf-marks plugin
   git:
     repo: https://github.com/urbainvaes/fzf-marks
