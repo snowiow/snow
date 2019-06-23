@@ -1,6 +1,6 @@
 # Path to your oh-my-zsh installation.
 export ZSH=~/.oh-my-zsh
-#export DISABLE_AUTO_TITLE='true'
+export DISABLE_AUTO_TITLE='true'
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -55,6 +55,7 @@ source $ZSH/oh-my-zsh.sh
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
+export PATH=$PATH:$HOME/go/bin
 
 # My aliases
 alias v="nvim"

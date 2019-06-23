@@ -29,6 +29,7 @@ call minpac#add('justmao945/vim-clang')
 "--- Optional Packages -------------------------------------------------------"
 call minpac#add('ElmCast/elm-vim', {'type': 'opt'})
 call minpac#add('fatih/vim-go')
+call minpac#add('buoto/gotests-vim')
 call minpac#add('shime/vim-livedown', {'type': 'opt'})
 call minpac#add('racer-rust/vim-racer', {'type': 'opt'})
 call minpac#add('davidhalter/jedi-vim', {'type': 'opt'})
