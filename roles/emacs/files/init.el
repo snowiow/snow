@@ -97,11 +97,13 @@
   (define-key ivy-minibuffer-map (kbd "C-d") 'ivy-scroll-up-command)
   (define-key ivy-minibuffer-map (kbd "C-u") 'ivy-scroll-down-command)
   (evil-leader/set-key
-    "b" 'ivy-switch-buffer
-    "hv" 'counsel-describe-variable
-    "hf" 'counsel-describe-function
-    "ha" 'counsel-apropos
-    ":" 'counsel-M-x
+    "b"   'ivy-switch-buffer
+    "hv"  'counsel-describe-variable
+    "hf"  'counsel-describe-function
+    "hf"  'counsel-describe-function
+    "hia" 'info-apropos
+    "hii" 'info
+    ":"   'counsel-M-x
     ))
 
 (use-package dashboard
@@ -181,16 +183,30 @@
     "RET" 'org-open-at-point
     "it" 'org-toggle-inline-images
     "li" 'org-insert-link
-    "lo" 'org-agenda-open-link))
+    "lo" 'org-agenda-open-link
+    "SPC" 'org-ctrl-c-ctrl-c))
 
 (use-package evil-magit
-  :ensure t)
+  :after (evil-leader magit)
+  :ensure t
+  :config
+  (evil-leader/set-key
+    "gg" 'magit
+  ))
 
 (use-package evil-org
   :after evil
   :ensure t
   :config
-  (evil-org-set-key-theme '(navigation insert textobjects additional calendar todo heading))
+  (evil-org-set-key-theme '(
+			    navigation
+			    insert
+			    textobjects
+			    additional
+			    calendar
+			    todo
+			    heading))
+
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys)
   :hook (org-mode . evil-org-mode))
