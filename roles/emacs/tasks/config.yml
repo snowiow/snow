@@ -1,0 +1,16 @@
+- name: create emacs.d config directory
+  file:
+    path: ~/.emacs.d
+    state: directory
+
+- name: symlink files
+  file:
+    src: "{{ ansible_env.PWD }}/roles/emacs/files/{{ item }}"
+    path: "~/.emacs.d/{{ item }}"
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - init.el
+    - modeline.el
+    - snippets

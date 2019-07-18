@@ -1,0 +1,4 @@
+- name: install emacs on darwin
+  homebrew:
+    name: emacs
+    state: present

@@ -5,9 +5,11 @@
 #
 # Executed by startx (run your window manager from here)
 #
-exec dwm &
-dwmstatus 2>&1 >/dev/null &
-setxkbmap de nodeadkeys -option caps:escape &
+sxhkd &
+exec bspwm &
+# exec dwm &
+# dwmstatus 2>&1 >/dev/null &
+setxkbmap us -option caps:escape -option compose:ralt &
 feh --bg-scale ~/Seafile/My\ Library/wallpaper/hollowknight.png &
 xclip &
 dunst

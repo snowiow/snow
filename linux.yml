@@ -12,6 +12,7 @@
     - st
     - ctags
     - nvim
+    - emacs
     - qutebrowser
     - dav
     - ranger

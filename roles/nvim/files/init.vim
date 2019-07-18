@@ -26,6 +26,7 @@ call minpac#add('phpactor/phpactor', {'do': 'silent! !composer install', 'branch
 " call minpac#add('autozimu/LanguageClient-neovim', {'branch': 'next', 'do': './install.sh'})
 call minpac#add('justmao945/vim-clang')
 call minpac#add('tpope/vim-unimpaired')
+call minpac#add('NerdyPepper/agila.vim')
 
 "--- Optional Packages -------------------------------------------------------"
 call minpac#add('ElmCast/elm-vim', {'type': 'opt'})
@@ -75,7 +76,7 @@ augroup cursorline                      "Highlight the current line of the curso
     autocmd WinLeave * set nocursorline
 augroup END
 
-colorscheme base16-tomorrow-night
+colorscheme agila
 
 "--- Statusline --------------------------------------------------------------"
 function! MyGitStatus()
@@ -98,6 +99,7 @@ function! MyMode()
     elseif mode == 'v' || mode == 'V'
         return '%#Define# ' . mode . ' '
     elseif mode == 'R'
+        return '%#ErrorMsg# ' . mode . ' '
     endif
     return '%#Operator#' . mode . ' '
 endfunction
@@ -105,7 +107,7 @@ endfunction
 function! MyStatusLine(active)
     let activeHl = '%#StatusLineNC#'
     if a:active == 1
-        let activeHl = '%#StatusLine#'
+        let activeHl = '%#Normal#'
     endif
     let statusStr = ''
     let statusStr .= MyMode()
@@ -484,11 +486,12 @@ let g:vimtex_view_method = 'mupdf'
 
 "---------------------------------VimWiki-------------------------------------"
 let g:vimwiki_list = [{
-      \ 'template_path': '~/workspace/dotfiles/dotfiles/vimwiki/templates/',
-      \ 'template_default': 'def_template',
+      \ 'path': '~/Seafile/My Library/vimwiki',
       \ 'template_ext': '.html',
-      \ 'auto_export': 1,
-      \ 'css_name': 'css/main.css'}]
+      \ 'auto_export': 0,
+      \ 'syntax': 'markdown',
+      \ 'ext': '.md'
+      \ }]
 
 let wiki = {}
 let wiki.nested_syntaxes = {

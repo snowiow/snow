@@ -4,5 +4,6 @@
     - ctags
     - zsh
     - nvim
+    - emacs
     - ranger
     - taskwarrior
