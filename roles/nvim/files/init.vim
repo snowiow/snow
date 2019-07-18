@@ -25,11 +25,13 @@ call minpac#add('BurningEther/iron.nvim', {'do': ':UpdateRemotePlugins'})
 call minpac#add('phpactor/phpactor', {'do': 'silent! !composer install', 'branch': 'master'})
 " call minpac#add('autozimu/LanguageClient-neovim', {'branch': 'next', 'do': './install.sh'})
 call minpac#add('justmao945/vim-clang')
+call minpac#add('tpope/vim-unimpaired')
 
 "--- Optional Packages -------------------------------------------------------"
 call minpac#add('ElmCast/elm-vim', {'type': 'opt'})
 call minpac#add('fatih/vim-go')
 call minpac#add('buoto/gotests-vim')
+call minpac#add('google/vim-jsonnet')
 call minpac#add('shime/vim-livedown', {'type': 'opt'})
 call minpac#add('racer-rust/vim-racer', {'type': 'opt'})
 call minpac#add('davidhalter/jedi-vim', {'type': 'opt'})
@@ -91,10 +93,11 @@ function! MyMode()
         return '%#Label# N '
     elseif mode == 'i'
         return '%#String# I '
+    elseif mode == 't'
+        return '%#String# T '
     elseif mode == 'v' || mode == 'V'
         return '%#Define# ' . mode . ' '
     elseif mode == 'R'
-
     endif
     return '%#Operator#' . mode . ' '
 endfunction
@@ -277,21 +280,6 @@ if (has("nvim"))
 endif
 noremap <c-space> <c-^>
 
-"---------------------------------Unimpaired----------------------------------"
-nnoremap <b :bprevious<CR>
-nnoremap >b :bnext<CR>
-nnoremap <B :bfirst<CR>
-nnoremap >B :blast<CR>
-
-nnoremap <q :cprevious<CR>
-nnoremap >q :cnext<CR>
-nnoremap <Q :cfirst<CR>
-nnoremap >Q :clast<CR>
-
-nnoremap <l :lprevious<CR>
-nnoremap >l :lnext<CR>
-nnoremap <L :lfirst<CR>
-nnoremap >L :llast<CR>
 "===============================Autocommands=================================="
 
 "-----------------------------------Make-------------------------------------"
@@ -518,3 +506,6 @@ command! -nargs=* DD silent! call system(len(split(<q-args>, ' ')) == 0 ?
 \ stub . <q-args> . "'" : stub . <q-args> . "'")
 
 set keywordprg=:DD "Set the keywordprg to be opened in devdocs
+
+"=========================== Custom Commands ================================="
+command! Bd :buffer #|bd #

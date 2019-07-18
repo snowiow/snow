@@ -52,6 +52,8 @@ plugins=(
     colored-man-pages
     fzf-marks
     git
+    kubectl
+    kube-ps1
     vi-mode
     zsh-autosuggestions
     zsh-syntax-highlighting
