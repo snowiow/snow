@@ -1,9 +1,9 @@
-(package-initialize)
 (require 'package)
 (require 'dired)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 
+(package-initialize)
 ; =============================> BuiltIns
 ; Increase/Decrease Text size
 (global-set-key (kbd "C-+") 'text-scale-increase)
@@ -32,9 +32,14 @@
                     :weight 'normal
                     :width 'normal)
 
+(setq mac-option-modifier 'super)
+(setq mac-command-modifier 'meta)
 ; ============================> BuiltIn Packages
 ; Auto Fill Mode
 (setq-default fill-column 80)
+
+; Dired
+(require 'dired)
 
 ; ERC
 (defun my-erc ()
