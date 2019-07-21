@@ -5,7 +5,7 @@
 			'face 'font-lock-keyword-face))
        '(:eval (when (not (string= "" vc-mode))
 		 (propertize (concat " " (substring vc-mode 5))
-			     'face 'font-lock-variable-name-face)))
+			     'face 'font-lock-negation-char-face)))
        (propertize " %b " 'face 'font-lock-defaults)
        '(:eval (when (buffer-modified-p)
 	 	 (propertize "+" 'face 'font-lock-variable-name-face)))
@@ -27,15 +27,15 @@
        (propertize " %m " 'face 'font-lock-string-face)))
 
 (set-face-attribute 'mode-line nil
-                    :background "#21252B"
-                    :foreground "white"
-                    :box '(:line-width 8 :color "#21252B")
+                    :background "#f2f2f2"
+                    :foreground "black"
+                    :box '(:line-width 8 :color "#f2f2f2")
                     :overline nil
                     :underline nil)
 
 (set-face-attribute 'mode-line-inactive nil
-                    :background "#21252B"
-                    :foreground "white"
-                    :box '(:line-width 8 :color "#21252B")
+                    :background "#f2f2f2"
+                    :foreground "black"
+                    :box '(:line-width 8 :color "#f2f2f2")
                     :overline nil
                     :underline nil)

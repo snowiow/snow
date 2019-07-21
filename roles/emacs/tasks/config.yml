@@ -12,5 +12,6 @@
     force: yes
   loop:
     - init.el
-    - modeline.el
+    - modeline-dark.el
+    - modeline-light.el
     - snippets

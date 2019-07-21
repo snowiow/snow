@@ -1,5 +1,4 @@
 (require 'package)
-(require 'dired)
 (add-to-list 'package-archives
              '("melpa" . "https://melpa.org/packages/") t)
 
@@ -42,11 +41,6 @@
 (require 'dired)
 
 ; ERC
-(defun my-erc ()
-    "Join ERC with default settings"
-    (interactive)
-    (erc :server "irc.freenode.net" :port "6667" :nick "snowiow"))
-
 (setq erc-autojoin-channels-alist '(("freenode.net" "#emacs")))
 (setq erc-prompt-for-password nil)
 
@@ -58,11 +52,6 @@
 	(file-expand-wildcards (concat org-directory "/*.org")))
 (setq org-default-notes-file (concat org-directory "/capture.org"))
 
-; Term Mode
-(defun my-term ()
-  "Opens term without asking which shell to run"
-  (interactive)
-  (projectile-run-term "zsh"))
 
 ; Whitspace Column
 (setq-default
@@ -72,8 +61,9 @@
 (add-hook 'emacs-lisp-mode-hook 'whitespace-mode)
 
 ; =============================> Packages
+(setq use-package-always-ensure t)
+
 (use-package company
-  :ensure t
   :config
   (define-key company-active-map (kbd "M-n") nil)
   (define-key company-active-map (kbd "M-p") nil)
@@ -85,7 +75,6 @@
 
 (use-package counsel
   :after evil-leader
-  :ensure t
   :init
   (setq ivy-use-virtual-buffers t)
   (setq ivy-initial-inputs-alist nil)
@@ -101,6 +90,7 @@
   (define-key ivy-minibuffer-map (kbd "C-S-j") 'ivy-end-of-buffer)
   (define-key ivy-minibuffer-map (kbd "C-d") 'ivy-scroll-up-command)
   (define-key ivy-minibuffer-map (kbd "C-u") 'ivy-scroll-down-command)
+  (define-key ivy-minibuffer-map (kbd "C-y") 'ivy-immediate-done)
   (evil-leader/set-key
     "b"   'ivy-switch-buffer
     "hv"  'counsel-describe-variable
@@ -112,7 +102,6 @@
     ))
 
 (use-package dashboard
-  :ensure t
   :init
   (setq dashboard-startup-banner 'logo)
   (setq dashboard-items '((projects . 5)
@@ -123,16 +112,15 @@
   (dashboard-setup-startup-hook))
 
 (use-package doom-themes
-  :ensure t
   :init
   (setq doom-themes-enable-bold t    
 	doom-themes-enable-italic t)
   :config
+  (load-theme 'doom-one-light t)
   (load-theme 'doom-vibrant t)
   )
 
 (use-package evil
-  :ensure t
   :init
   (setq evil-want-C-u-scroll t)
   (setq evil-want-keybinding nil)
@@ -143,19 +131,16 @@
 
 (use-package evil-collection
   :after evil
-  :ensure t
   :config
   (evil-collection-init 'term))
 
 (use-package evil-commentary
   :after evil
-  :ensure t
   :config
   (evil-commentary-mode))
 
 (use-package evil-leader
   :after evil
-  :ensure t
   :config
   (global-evil-leader-mode)
   (evil-leader/set-leader "SPC")
@@ -193,15 +178,12 @@
 
 (use-package evil-magit
   :after (evil-leader magit)
-  :ensure t
   :config
   (evil-leader/set-key
-    "gg" 'magit
-  ))
+    "gg" 'magit))
 
 (use-package evil-org
   :after evil
-  :ensure t
   :config
   (evil-org-set-key-theme '(
 			    navigation
@@ -217,28 +199,22 @@
   :hook (org-mode . evil-org-mode))
 
 (use-package evil-surround
-  :ensure t
   :config
   (global-evil-surround-mode 1))
 
 (use-package highlight-indent-guides
-  :ensure t
   :init
   (setq highlight-indent-guides-method 'character)
   :config
   (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
 
 (use-package linum-relative
-  :ensure t
   :config
   (linum-relative-global-mode))
 
-(use-package magit
-  :ensure t
-  )
+(use-package magit)
 
 (use-package markdown-mode
-  :ensure t
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
@@ -248,15 +224,12 @@
   (markdown-mode . whitespace-mode))
 
 (use-package org-bullets
-  :ensure t
   :hook (org-mode . org-bullets-mode))
 
-(use-package ripgrep
-  :ensure t)
+(use-package ripgrep)
 
 (use-package projectile
   :after evil-leader
-  :ensure t
   :init
   (setq projectile-completion-system 'ivy)
   :config
@@ -269,16 +242,39 @@
     "pt" 'projectile-run-term))
 
 (use-package yaml-mode
-  :ensure t
   :config
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
 
 (use-package yasnippet
-  :ensure t
   :config
   (yas-global-mode 1))
 
-(load "~/.emacs.d/modeline.el")
+(load "~/.emacs.d/modeline-dark.el")
+
+; Custom Functions
+(defun snow/switch-theme ()
+    "switches between dark and light theme"
+    (interactive)
+  (if (eq (car custom-enabled-themes) 'doom-vibrant)
+      (progn
+	(disable-theme 'doom-vibrant)
+	(load "~/.emacs.d/modeline-light.el"))
+    (progn
+      (enable-theme 'doom-vibrant)
+	(load "~/.emacs.d/modeline-dark.el"))))
+
+; ERC
+(defun snow/erc ()
+    "Join ERC with default settings"
+    (interactive)
+    (erc :server "irc.freenode.net" :port "6667" :nick "snowiow"))
+
+; Term Mode
+(defun snow/term ()
+  "Opens term without asking which shell to run"
+  (interactive)
+  (projectile-run-term "zsh"))
+
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -291,5 +287,5 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  )
-(put 'dired-find-alternate-file 'disabled nil)
 (put 'erase-buffer 'disabled nil)
+(put 'dired-find-alternate-file 'disabled nil)
