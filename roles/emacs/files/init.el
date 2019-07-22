@@ -31,8 +31,11 @@
                     :weight 'normal
                     :width 'normal)
 
+; Mac OSX Settings make command meta
 (setq mac-option-modifier 'super)
 (setq mac-command-modifier 'meta)
+; Always add a final newline at the end of the file
+(setq require-final-newline t)
 ; ============================> BuiltIn Packages
 ; Auto Fill Mode
 (setq-default fill-column 80)
@@ -220,6 +223,7 @@
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "multimarkdown")
   :hook
+  (markdown-mode . flyspell-mode)
   (markdown-mode . auto-fill-mode)
   (markdown-mode . whitespace-mode))
 
@@ -234,11 +238,10 @@
   (setq projectile-completion-system 'ivy)
   :config
   (projectile-mode +1)
-  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map)
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (evil-leader/set-key
     "o" 'projectile-find-file
     "7" 'projectile-ripgrep
+    "po" 'projectile-switch-project
     "pt" 'projectile-run-term))
 
 (use-package yaml-mode
