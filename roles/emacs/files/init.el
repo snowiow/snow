@@ -1,6 +1,7 @@
 (require 'package)
-(add-to-list 'package-archives
-             '("melpa" . "https://melpa.org/packages/") t)
+(setq package-archives
+      '(("gnu" . "http://elpa.gnu.org/packages/")
+        ("melpa" . "https://melpa.org/packages/")))
 
 (package-initialize)
 ; =============================> BuiltIns
@@ -114,6 +115,8 @@
   :config
   (dashboard-setup-startup-hook))
 
+(use-package dockerfile-mode)
+
 (use-package doom-themes
   :init
   (setq doom-themes-enable-bold t    
@@ -205,11 +208,19 @@
   :config
   (global-evil-surround-mode 1))
 
+(use-package exec-path-from-shell
+  :config
+  (when (memq window-system '(mac ns x))
+  (exec-path-from-shell-initialize)))
+
+
 (use-package highlight-indent-guides
   :init
   (setq highlight-indent-guides-method 'character)
   :config
   (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
+
+(use-package jsonnet-mode)
 
 (use-package linum-relative
   :config
@@ -246,7 +257,9 @@
 
 (use-package yaml-mode
   :config
-  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode)))
+  (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+  (add-hook 'yaml-mode-hook (function (lambda ()
+					(setq evil-shift-width 2)))))
 
 (use-package yasnippet
   :config
@@ -283,7 +296,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (magit markdown-mode ripgrep yasnippet use-package))))
+ '(package-selected-packages
+   (quote
+    (dockerfile-mode exec-path-from-shell jsonnet-mode magit markdown-mode ripgrep yasnippet use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

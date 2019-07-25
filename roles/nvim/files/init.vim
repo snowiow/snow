@@ -76,7 +76,7 @@ augroup cursorline                      "Highlight the current line of the curso
     autocmd WinLeave * set nocursorline
 augroup END
 
-colorscheme agila
+colorscheme base16-tomorrow-night
 
 "--- Statusline --------------------------------------------------------------"
 function! MyGitStatus()
