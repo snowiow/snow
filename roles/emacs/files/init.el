@@ -1,9 +1,12 @@
+; =============================> Package Management
 (require 'package)
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")))
 
 (package-initialize)
+(require 'use-package)
+(setq use-package-always-ensure t)
 ; =============================> BuiltIns
 ; Increase/Decrease Text size
 (global-set-key (kbd "C-+") 'text-scale-increase)
@@ -66,7 +69,6 @@
 (add-hook 'emacs-lisp-mode-hook 'whitespace-mode)
 
 ; =============================> Packages
-(setq use-package-always-ensure t)
 
 (use-package company
   :config
@@ -79,6 +81,7 @@
   :hook (after-init . global-company-mode))
 
 (use-package company-lsp
+  :after company
   :config
   (push 'company-lsp company-backends))
 
@@ -86,6 +89,7 @@
   :after evil-leader
   :init
   (setq ivy-use-virtual-buffers t)
+  (setq ivy-wrap t)
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-display-style nil)
@@ -100,11 +104,12 @@
   (define-key ivy-minibuffer-map (kbd "C-d") 'ivy-scroll-up-command)
   (define-key ivy-minibuffer-map (kbd "C-u") 'ivy-scroll-down-command)
   (define-key ivy-minibuffer-map (kbd "C-y") 'ivy-immediate-done)
+  (define-key ivy-switch-buffer-map (kbd "C-d") 'ivy-switch-buffer-kill)
   (evil-leader/set-key
     "b"   'ivy-switch-buffer
     "hv"  'counsel-describe-variable
     "hf"  'counsel-describe-function
-    "hf"  'counsel-describe-function
+    "hk"  'describe-key
     "hia" 'info-apropos
     "hii" 'info
     ":"   'counsel-M-x
