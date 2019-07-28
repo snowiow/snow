@@ -8,6 +8,7 @@
 ; Increase/Decrease Text size
 (global-set-key (kbd "C-+") 'text-scale-increase)
 (global-set-key (kbd "C--") 'text-scale-decrease)
+(global-set-key (kbd "C-k") 'previous-line)
 
 (setq backup-directory-alist `(("." . "~/tmp")))
 
@@ -28,7 +29,7 @@
 ; Set default font
 (set-face-attribute 'default nil
 		    :family "Iosevka Term"
-                    :height 110
+                    :height 120
                     :weight 'normal
                     :width 'normal)
 
@@ -76,6 +77,10 @@
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
   (define-key company-active-map (kbd "C-d") 'company-show-doc-buffer)
   :hook (after-init . global-company-mode))
+
+(use-package company-lsp
+  :config
+  (push 'company-lsp company-backends))
 
 (use-package counsel
   :after evil-leader
@@ -213,6 +218,7 @@
   (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize)))
 
+(use-package go-mode)
 
 (use-package highlight-indent-guides
   :init
@@ -225,6 +231,16 @@
 (use-package linum-relative
   :config
   (linum-relative-global-mode))
+
+(use-package lsp-mode
+  :hook
+  (go-mode . lsp)
+  :config
+  (evil-leader/set-key
+    "ld"   'lsp-find-definition
+    "lr"   'lsp-find-references
+    "lf"   'lsp-format-buffer
+    ))
 
 (use-package magit)
 
@@ -298,7 +314,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (dockerfile-mode exec-path-from-shell jsonnet-mode magit markdown-mode ripgrep yasnippet use-package))))
+    (company-lsp lsp-mode go-mode dockerfile-mode exec-path-from-shell jsonnet-mode magit markdown-mode ripgrep yasnippet use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
