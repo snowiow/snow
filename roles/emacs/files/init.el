@@ -67,7 +67,7 @@
  whitespace-style '(face lines-tail))
 
 (add-hook 'emacs-lisp-mode-hook 'whitespace-mode)
-
+(setq-default tab-width 4)
 ; =============================> Packages
 
 (use-package company
@@ -105,6 +105,7 @@
   (define-key ivy-minibuffer-map (kbd "C-u") 'ivy-scroll-down-command)
   (define-key ivy-minibuffer-map (kbd "C-y") 'ivy-immediate-done)
   (define-key ivy-switch-buffer-map (kbd "C-d") 'ivy-switch-buffer-kill)
+  (define-key ivy-switch-buffer-map (kbd "C-k") 'ivy-previous-line)
   (evil-leader/set-key
     "b"   'ivy-switch-buffer
     "hv"  'counsel-describe-variable
@@ -169,10 +170,7 @@
     (lambda ()
       (interactive)
       (find-file "~/.emacs.d/init.el")))
-  (evil-leader/set-key "ww"
-    (lambda ()
-      (interactive)
-      (find-file "~/Seafile/My Library/notes/main.org")))
+  (evil-leader/set-key "ga" 'org-agenda)
   ; Dired
   (evil-define-key 'normal dired-mode-map (kbd "h")
     (lambda ()
@@ -233,6 +231,8 @@
 
 (use-package jsonnet-mode)
 
+(use-package kubel)
+
 (use-package linum-relative
   :config
   (linum-relative-global-mode))
@@ -240,6 +240,7 @@
 (use-package lsp-mode
   :hook
   (go-mode . lsp)
+  (python-mode . lsp)
   :config
   (evil-leader/set-key
     "ld"   'lsp-find-definition
@@ -258,6 +259,8 @@
   (markdown-mode . flyspell-mode)
   (markdown-mode . auto-fill-mode)
   (markdown-mode . whitespace-mode))
+
+(use-package python-mode)
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
@@ -319,7 +322,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (company-lsp lsp-mode go-mode dockerfile-mode exec-path-from-shell jsonnet-mode magit markdown-mode ripgrep yasnippet use-package))))
+	(company-lsp lsp-mode go-mode dockerfile-mode exec-path-from-shell jsonnet-mode magit markdown-mode ripgrep yasnippet use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
