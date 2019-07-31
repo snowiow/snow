@@ -41,6 +41,9 @@
 (setq mac-command-modifier 'meta)
 ; Always add a final newline at the end of the file
 (setq require-final-newline t)
+; Tab width
+(setq-default tab-width 4)
+(setq-default indent-tabs-mode nil)
 ; ============================> BuiltIn Packages
 ; Auto Fill Mode
 (setq-default fill-column 80)
@@ -67,7 +70,6 @@
  whitespace-style '(face lines-tail))
 
 (add-hook 'emacs-lisp-mode-hook 'whitespace-mode)
-(setq-default tab-width 4)
 ; =============================> Packages
 
 (use-package company
@@ -232,6 +234,8 @@
 (use-package jsonnet-mode)
 
 (use-package kubel)
+(load-file "~/.emacs.d/kubel-evil.el")
+(require 'kubel-evil)
 
 (use-package linum-relative
   :config
@@ -315,6 +319,10 @@
   (interactive)
   (projectile-run-term "zsh"))
 
+(defun snow/jsonnet-reformat-buffer ()
+  "Reformat entire buffer using the Jsonnet format utility."
+  (interactive)
+  (call-process-region (point-min) (point-max) "jsonnetfmt" t t nil "-"))
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
