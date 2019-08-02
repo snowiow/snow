@@ -139,6 +139,8 @@
   (load-theme 'doom-vibrant t)
   )
 
+(use-package go-tag)
+
 (use-package evil
   :init
   (setq evil-want-C-u-scroll t)
@@ -222,6 +224,11 @@
   :config
   (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize)))
+
+(use-package flymake-cursor
+  :load-path "~/.emacs.d/packages/emacs-flymake-cursor"
+  :config
+  (flymake-cursor-mode))
 
 (use-package go-mode)
 
@@ -330,7 +337,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-	(company-lsp lsp-mode go-mode dockerfile-mode exec-path-from-shell jsonnet-mode magit markdown-mode ripgrep yasnippet use-package))))
+    (go-tag emacs-go-tag company-lsp lsp-mode go-mode dockerfile-mode exec-path-from-shell jsonnet-mode magit markdown-mode ripgrep yasnippet use-package))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
