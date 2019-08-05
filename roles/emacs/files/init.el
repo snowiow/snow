@@ -55,6 +55,9 @@
 (setq erc-autojoin-channels-alist '(("freenode.net" "#emacs")))
 (setq erc-prompt-for-password nil)
 
+; Flymake
+(setq flymake-start-syntax-check-on-newline nil)
+
 ; Org Mode
 (require 'org)
 (setq org-image-actual-width nil)
