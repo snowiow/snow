@@ -247,6 +247,14 @@
 (load-file "~/.emacs.d/kubel-evil.el")
 (require 'kubel-evil)
 
+(use-package ledger-mode
+  :config
+  (evil-leader/set-key-for-mode 'ledger-mode
+    "lr" 'ledger-reconcile
+    "la" 'ledger-add-transaction
+    "lc" 'ledger-occur
+    ))
+
 (use-package linum-relative
   :config
   (linum-relative-global-mode))
