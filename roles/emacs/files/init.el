@@ -55,9 +55,6 @@
 (setq erc-autojoin-channels-alist '(("freenode.net" "#emacs")))
 (setq erc-prompt-for-password nil)
 
-; Flymake
-(setq flymake-start-syntax-check-on-newline nil)
-
 ; Org Mode
 (require 'org)
 (setq org-image-actual-width nil)
@@ -76,6 +73,8 @@
 ; =============================> Packages
 
 (use-package company
+  :init
+  (setq company-dabbrev-downcase nil)
   :config
   (define-key company-active-map (kbd "M-n") nil)
   (define-key company-active-map (kbd "M-p") nil)
@@ -234,6 +233,9 @@
   (flymake-cursor-mode))
 
 (use-package go-mode)
+
+(use-package gotests
+  :load-path "~/.emacs.d/packages/GoTests-Emacs")
 
 (use-package highlight-indent-guides
   :init
