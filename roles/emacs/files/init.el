@@ -55,6 +55,13 @@
 (setq erc-autojoin-channels-alist '(("freenode.net" "#emacs")))
 (setq erc-prompt-for-password nil)
 
+; EDiff
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+(custom-set-faces
+ '(ediff-current-diff-Ancestor ((t (:background "#223448" :foreground "#4db5bd"))))
+ '(ediff-current-diff-B ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "#50a14f"))))
+ '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
+
 ; Org Mode
 (require 'org)
 (setq org-image-actual-width nil)
@@ -155,7 +162,7 @@
 (use-package evil-collection
   :after evil
   :config
-  (evil-collection-init 'term))
+  (evil-collection-init '(ediff term)))
 
 (use-package evil-commentary
   :after evil
@@ -248,6 +255,14 @@
 (use-package kubel)
 (load-file "~/.emacs.d/kubel-evil.el")
 (require 'kubel-evil)
+
+(use-package ledger-mode
+  :config
+  (evil-leader/set-key-for-mode 'ledger-mode
+    "lr" 'ledger-reconcile
+    "la" 'ledger-add-transaction
+    "lc" 'ledger-occur
+    ))
 
 (use-package linum-relative
   :config
