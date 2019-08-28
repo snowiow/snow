@@ -232,9 +232,6 @@ nnoremap ,, ,
 "Make Y behave in a sane manner
 nnoremap Y y$
 
-"Window splitting
-noremap <leader>v :vsplit<CR>:Explore<CR>
-noremap <leader>x :split<CR>:Explore<CR>
 "copy paste from clipboard
 vnoremap <Leader>y "+y
 nnoremap <Leader>yy "+yy
