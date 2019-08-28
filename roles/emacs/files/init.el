@@ -58,6 +58,10 @@
 ; EDiff
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 (custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
  '(ediff-current-diff-Ancestor ((t (:background "#223448" :foreground "#4db5bd"))))
  '(ediff-current-diff-B ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "#50a14f"))))
  '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
@@ -118,15 +122,17 @@
   (define-key ivy-minibuffer-map (kbd "C-y") 'ivy-immediate-done)
   (define-key ivy-switch-buffer-map (kbd "C-d") 'ivy-switch-buffer-kill)
   (define-key ivy-switch-buffer-map (kbd "C-k") 'ivy-previous-line)
+  (defhydra hydra-info (:color blue)
+    "Info Menu"
+    ("v" counsel-describe-variable "Describe Variable")
+    ("f" counsel-describe-function "Describe Function")
+    ("k" describe-key "Describe Key")
+    ("a" info-apropos "Info Apropos")
+    ("i" info "Info"))
+  (evil-leader/set-key "h" 'hydra-info/body)
   (evil-leader/set-key
     "b"   'ivy-switch-buffer
-    "hv"  'counsel-describe-variable
-    "hf"  'counsel-describe-function
-    "hk"  'describe-key
-    "hia" 'info-apropos
-    "hii" 'info
-    ":"   'counsel-M-x
-    ))
+    ":"   'counsel-M-x))
 
 (use-package dashboard
   :init
@@ -248,6 +254,7 @@
   :config
   (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
 
+(use-package hydra)
 (use-package jsonnet-mode)
 
 (use-package kubel)
@@ -256,11 +263,13 @@
 
 (use-package ledger-mode
   :config
-  (evil-leader/set-key-for-mode 'ledger-mode
-    "lr" 'ledger-reconcile
-    "la" 'ledger-add-transaction
-    "lc" 'ledger-occur
-    ))
+  (defhydra hydra-ledger (:color blue)
+    "ledger mode"
+    ("r" ledger-reconcile "reconcile")
+    ("a" ledger-add-transaction "add transaction")
+    ("c" ledger-occur "occur")
+    ("p" ledger-report "reports"))
+  (evil-leader/set-key-for-mode 'ledger-mode "l" 'hydra-ledger/body))
 
 (use-package linum-relative
   :config
@@ -271,11 +280,12 @@
   (go-mode . lsp)
   (python-mode . lsp)
   :config
-  (evil-leader/set-key
-    "ld"   'lsp-find-definition
-    "lr"   'lsp-find-references
-    "lf"   'lsp-format-buffer
-    ))
+  (defhydra hydra-lsp (:color blue)
+    "Language Server Protocol Mode"
+    ("d" lsp-find-definition "Definition")
+    ("f" lsp-format-buffer "Format Buffer")
+    ("r" lsp-find-references "References"))
+  (evil-leader/set-key "l" 'hydra-lsp/body))
 
 (use-package magit)
 
@@ -302,11 +312,14 @@
   (setq projectile-completion-system 'ivy)
   :config
   (projectile-mode +1)
+  (defhydra hydra-projectile (:color blue)
+    "Projectile"
+    ("o" projectile-switch-project "Switch Project")
+    ("t" projectile-run-term "Terminal"))
+  (evil-leader/set-key "p" 'hydra-projectile/body)
   (evil-leader/set-key
     "o" 'projectile-find-file
-    "7" 'projectile-ripgrep
-    "po" 'projectile-switch-project
-    "pt" 'projectile-run-term))
+    "7" 'projectile-ripgrep))
 
 (use-package yaml-mode
   :config
