@@ -100,6 +100,8 @@
 
 (use-package company-lsp
   :after company
+  :init
+  (setq lsp-log-io t)
   :config
   (push 'company-lsp company-backends))
 
@@ -289,7 +291,9 @@
     "Language Server Protocol Mode"
     ("d" lsp-find-definition "Definition")
     ("f" lsp-format-buffer "Format Buffer")
-    ("r" lsp-find-references "References"))
+    ("r" lsp-find-references "References")
+    ("i" lsp-organize-imports "Organize Imports")
+    ("t" imenu "Tags"))
   (evil-leader/set-key "l" 'hydra-lsp/body))
 
 (use-package magit)
@@ -373,12 +377,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (go-tag emacs-go-tag company-lsp lsp-mode go-mode dockerfile-mode exec-path-from-shell jsonnet-mode magit markdown-mode ripgrep yasnippet use-package))))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+    '(use-package))))
+
 (put 'erase-buffer 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
