@@ -170,7 +170,7 @@
 (use-package evil-collection
   :after evil
   :config
-  (evil-collection-init '(ediff eshell term)))
+  (evil-collection-init '(calc ediff eshell term)))
 
 (use-package evil-commentary
   :after evil
@@ -214,8 +214,12 @@
 (use-package evil-magit
   :after (evil-leader magit)
   :config
-  (evil-leader/set-key
-    "gg" 'magit))
+  (defhydra hydra-magit (:color blue)
+    "Language Server Protocol Mode"
+    ("g" magit "Status")
+    ("b" magit-blame "Blame")
+    ("d" magit-diff "Diff"))
+  (evil-leader/set-key "g" 'hydra-magit/body))
 
 (use-package evil-org
   :after evil
