@@ -173,7 +173,7 @@
 (use-package evil-collection
   :after evil
   :config
-  (evil-collection-init '(ediff term)))
+  (evil-collection-init '(ediff eshell term)))
 
 (use-package evil-commentary
   :after evil
@@ -324,7 +324,8 @@
   (defhydra hydra-projectile (:color blue)
     "Projectile"
     ("o" projectile-switch-project "Switch Project")
-    ("t" projectile-run-term "Terminal"))
+    ("t" projectile-run-term "Terminal")
+    ("s" projectile-run-eshell "EShell"))
   (evil-leader/set-key "p" 'hydra-projectile/body)
   (evil-leader/set-key
     "o" 'projectile-find-file
@@ -375,9 +376,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   (quote
-    '(use-package))))
+ '(package-selected-packages (quote (quote (use-package)))))
 
 (put 'erase-buffer 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
