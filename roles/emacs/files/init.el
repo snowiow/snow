@@ -73,7 +73,9 @@
 (setq org-agenda-files
 	(file-expand-wildcards (concat org-directory "/*.org")))
 (setq org-default-notes-file (concat org-directory "/capture.org"))
-
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((shell . t)))
 
 ; Whitspace Column
 (setq-default
@@ -332,6 +334,8 @@
     "o" 'projectile-find-file
     "7" 'projectile-ripgrep))
 
+(use-package pyvenv)
+
 (use-package yaml-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
@@ -377,7 +381,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (quote (use-package)))))
+ '(package-selected-packages (quote (pyvenv pyenv evil-numbers quote (use-package)))))
 
 (put 'erase-buffer 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)

@@ -23,11 +23,10 @@ call minpac#add('chrisbra/Colorizer')
 call minpac#add('JamshedVesuna/vim-markdown-preview')
 call minpac#add('BurningEther/iron.nvim', {'do': ':UpdateRemotePlugins'})
 call minpac#add('phpactor/phpactor', {'do': 'silent! !composer install', 'branch': 'master'})
-" call minpac#add('autozimu/LanguageClient-neovim', {'branch': 'next', 'do': './install.sh'})
+call minpac#add('autozimu/LanguageClient-neovim', {'do': '!./install.sh', 'branch': 'next'})
 call minpac#add('justmao945/vim-clang')
 call minpac#add('tpope/vim-unimpaired')
-call minpac#add('NerdyPepper/agila.vim')
-
+call minpac#add('andreypopp/vim-colors-plain')
 "--- Optional Packages -------------------------------------------------------"
 call minpac#add('ElmCast/elm-vim', {'type': 'opt'})
 call minpac#add('fatih/vim-go')
@@ -35,7 +34,6 @@ call minpac#add('buoto/gotests-vim')
 call minpac#add('google/vim-jsonnet')
 call minpac#add('shime/vim-livedown', {'type': 'opt'})
 call minpac#add('racer-rust/vim-racer', {'type': 'opt'})
-call minpac#add('davidhalter/jedi-vim', {'type': 'opt'})
 call minpac#add('eagletmt/neco-ghc', {'type': 'opt'})
 call minpac#add('parsonsmatt/intero-neovim', {'type': 'opt'})
 call minpac#add('alx741/vim-hindent', {'type': 'opt'})
@@ -76,7 +74,7 @@ augroup cursorline                      "Highlight the current line of the curso
     autocmd WinLeave * set nocursorline
 augroup END
 
-colorscheme base16-tomorrow-night
+colorscheme plain
 
 "--- Statusline --------------------------------------------------------------"
 function! MyGitStatus()
@@ -354,7 +352,8 @@ command! SIronRepl call MyHorizontalIron()
 "---------------------------------Fugitive------------------------------------"
 nnoremap <leader>gs :Gstatus<CR>
 nnoremap <leader>gcc :Gcommit<CR>
-nnoremap <leader>gcb :Git checkout -b
+nnoremap <leader>gcb :Git checkout -b 
+nnoremap <leader>gcm :Git checkout master<CR>
 nnoremap <leader>gco :Git checkout 
 nnoremap <leader>gp :Gpush<CR>
 nnoremap <leader>gd :Gdiff<CR>
@@ -370,10 +369,10 @@ nnoremap <leader>ft :Tags<cr>
 nnoremap <leader>t :BTags<cr>
 nnoremap <leader>f/ :History/<cr>
 nnoremap <leader>f: :History:<cr>
-nnoremap <leader>fm :Marks<cr>
 nnoremap <leader>fw :Windows<cr>
 nnoremap <leader>fh :Helptags<cr>
 nnoremap <leader>fc :Colors<cr>
+nnoremap ' :Marks<cr>
 
 "-------------------------------------Gutentags-------------------------------"
 let g:gutentags_resolve_symlinks=1
@@ -388,17 +387,23 @@ let g:jedi#completions_enabled=0
 let g:jedi#documentation_command='<localleader>k'
 
 "---------------------------Language Client-----------------------------------"
-" nnoremap K :call LanguageClient_textDocument_hover()<CR>
-" nnoremap gd :call LanguageClient_textDocument_definition()<CR>
-" nnoremap <Leader>s :call LanguageClient_textDocument_rename()<CR>
-" let g:LanguageClient_serverCommands = {
-"     \ 'php': ['php', 'php-language-server.php'],
-"     \ }
-" nnoremap <leader>d :Denite documentSymbol<CR>
-" nnoremap <leader>z :Denite references<CR>
+function! LC_maps()
+  if has_key(g:LanguageClient_serverCommands, &filetype)
+    nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
+    nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
+    nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+    nnoremap <buffer> <Leader>m :call LanguageClient_contextMenu()<CR>
+  endif
+endfunction
 
-" autocmd FileType php LanguageClientStart
+autocmd! FileType python call LC_maps()
+autocmd! FileType php call LC_maps()
 
+let g:LanguageClient_diagnosticsEnable=1
+let g:LanguageClient_serverCommands = {
+    \ 'php': ['php-language-server.php'],
+    \ 'python': ['pyls']
+    \ }
 
 "--- Neco GHC ----------------------------------------------------------------"
 let g:haskellmode_completion_ghc = 0
