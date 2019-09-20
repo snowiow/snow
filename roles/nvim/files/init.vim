@@ -29,7 +29,6 @@ call minpac#add('tpope/vim-unimpaired')
 call minpac#add('andreypopp/vim-colors-plain')
 "--- Optional Packages -------------------------------------------------------"
 call minpac#add('ElmCast/elm-vim', {'type': 'opt'})
-call minpac#add('fatih/vim-go')
 call minpac#add('buoto/gotests-vim')
 call minpac#add('google/vim-jsonnet')
 call minpac#add('shime/vim-livedown', {'type': 'opt'})
@@ -74,7 +73,7 @@ augroup cursorline                      "Highlight the current line of the curso
     autocmd WinLeave * set nocursorline
 augroup END
 
-colorscheme plain
+colorscheme base16-tomorrow-night
 
 "--- Statusline --------------------------------------------------------------"
 function! MyGitStatus()
@@ -393,16 +392,19 @@ function! LC_maps()
     nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
     nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
     nnoremap <buffer> <Leader>m :call LanguageClient_contextMenu()<CR>
+    vnoremap <buffer> <Leader>m :call LanguageClient_contextMenu()<CR>
   endif
 endfunction
 
 autocmd! FileType python call LC_maps()
 autocmd! FileType php call LC_maps()
+autocmd! FileType go call LC_maps()
 
 let g:LanguageClient_diagnosticsEnable=1
 let g:LanguageClient_serverCommands = {
     \ 'php': ['php-language-server.php'],
-    \ 'python': ['pyls']
+    \ 'python': ['pyls'],
+    \ 'go': ['gopls'],
     \ }
 
 "--- Neco GHC ----------------------------------------------------------------"
