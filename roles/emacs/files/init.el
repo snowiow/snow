@@ -44,6 +44,7 @@
 ; Tab width
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
+
 ; ============================> BuiltIn Packages
 ; Auto Fill Mode
 (setq-default fill-column 80)
@@ -95,6 +96,7 @@
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
   (define-key company-active-map (kbd "C-d") 'company-show-doc-buffer)
+  (define-key evil-insert-state-map (kbd "C-o") 'company-complete)
   :hook (after-init . global-company-mode))
 
 (use-package company-lsp
@@ -155,7 +157,7 @@
 	doom-themes-enable-italic t)
   :config
   (load-theme 'doom-one-light t)
-  (load-theme 'doom-vibrant t)
+  (load-theme 'doom-tomorrow-night t)
   )
 
 (use-package go-tag)
@@ -193,7 +195,7 @@
     (lambda ()
       (interactive)
       (find-file "~/.emacs.d/init.el")))
-  (evil-leader/set-key "ga" 'org-agenda)
+  (evil-leader/set-key "$a" 'org-agenda)
   ; Dired
   (evil-define-key 'normal dired-mode-map (kbd "h")
     (lambda ()
@@ -211,7 +213,13 @@
     "it" 'org-toggle-inline-images
     "li" 'org-insert-link
     "lo" 'org-agenda-open-link
-    "SPC" 'org-ctrl-c-ctrl-c))
+    "SPC" 'org-ctrl-c-ctrl-c)
+  ; Frame Management
+  (defhydra hydra-frames (:color blue)
+    ("o" make-frame-command "Make a new frame")
+    ("d" delete-frame "Delete Frame")
+    ("n" other-frame "Other Frame"))
+    (evil-leader/set-key "w" 'hydra-frames/body))
 
 (use-package evil-magit
   :after (evil-leader magit)
@@ -240,8 +248,18 @@
   :hook (org-mode . evil-org-mode))
 
 (use-package evil-surround
+  :after evil
   :config
   (global-evil-surround-mode 1))
+
+(use-package evil-tabs
+  :init
+ (set-face-attribute 'header-line nil
+		      :box nil
+		      :overline nil
+		      :underline nil) 
+  :config
+  (evil-tabs-mode t))
 
 (use-package exec-path-from-shell
   :config
@@ -332,7 +350,8 @@
   (evil-leader/set-key "p" 'hydra-projectile/body)
   (evil-leader/set-key
     "o" 'projectile-find-file
-    "7" 'projectile-ripgrep))
+    "7" 'projectile-ripgrep
+    "8" 'ripgrep-regexp))
 
 (use-package pyvenv)
 
@@ -372,6 +391,12 @@
   (interactive)
   (projectile-run-term "zsh"))
 
+(defun create-tags (dir-name)
+    "Create tags file."
+    (interactive "DDirectory: ")
+    (shell-command
+        (format "%s -f TAGS -e -R %s" "ctags" (directory-file-name dir-name)))
+)
 (defun snow/jsonnet-reformat-buffer ()
   "Reformat entire buffer using the Jsonnet format utility."
   (interactive)
@@ -381,7 +406,10 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(package-selected-packages (quote (pyvenv pyenv evil-numbers quote (use-package)))))
+ '(package-selected-packages
+   (quote
+    (pyvenv pyenv evil-numbers quote
+                  (use-package)))))
 
 (put 'erase-buffer 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)

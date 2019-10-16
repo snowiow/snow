@@ -253,6 +253,7 @@ nnoremap <c-space> <c-^>
 " nnoremap <leader>o :find<space>
 " nnoremap <leader>b :ls<cr>:buffer<space>
 nnoremap <leader>7 :silent grep<space>
+nnoremap <leader>8 :silent grep  %:h/*<left><left><left><left><left><left>
 " Autocomplete
 " Keyword
 " inoremap <c-k> <c-x><c-n>
