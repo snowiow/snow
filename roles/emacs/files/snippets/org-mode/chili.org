@@ -1,0 +1,18 @@
+# -*- mode: snippet -*-
+# name: Chilli con Carne
+# key: chili
+# --
+- [ ] Rapsöl
+- [ ] 800g Rinderhackfleisch
+- [ ] 2 rote Zwiebeln
+- [ ] 2 Knoblauchzehen
+- [ ] 1kg stückige Tomaten aus der Dose
+- [ ] 2 EL Tomatenmark
+- [ ] Gemüse- oder Rinderbrühe
+- [ ] 1 Habanero-Chili
+- [ ] 1 rote Chili-Schote
+- [ ] 1 rote Paprika
+- [ ] 2 Dosen Kidney-Bohnen
+- [ ] 2 Dosen Mais
+- [ ] Salz, Pfeffer, gemahlenen Kreuzkümmel und Zimt
+- [ ] 1 Stück Zartbitter-Schokolade (mindestens 70% Kakaogehalt)

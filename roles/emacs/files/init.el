@@ -71,9 +71,22 @@
 (require 'org)
 (setq org-image-actual-width nil)
 (setq org-directory "~/Seafile/My Library/notes")
+(setq org-journal-dir "~/Seafile/My Library/notes/journal")
 (setq org-agenda-files
 	(file-expand-wildcards (concat org-directory "/*.org")))
 (setq org-default-notes-file (concat org-directory "/capture.org"))
+(defun get-journal-file-this-year ()
+  "Return filename for today's journal entry."
+  (let ((yearly-name (concat "/" (format-time-string "%Y%m") ".org")))
+    (expand-file-name (concat org-journal-dir yearly-name))))
+(setq org-capture-templates
+      '(("t" "Todo" entry (file+headline (lambda () (concat org-directory "/todos.org")) "Allgemein")
+         "* TODO %?")
+        ("m" "Todo MOIA" entry (file+headline (lambda () (concat org-directory "/moia.org")) "Todos")
+         "* TODO %?")
+        ("j" "Journal Note"
+         entry (file+datetree (lambda () (get-journal-file-this-year)))
+         "* %U %?")))
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((shell . t)))
@@ -195,7 +208,10 @@
     (lambda ()
       (interactive)
       (find-file "~/.emacs.d/init.el")))
-  (evil-leader/set-key "$a" 'org-agenda)
+  (defhydra hydra-org (:color blue)
+    ("a" org-agenda "Agenda")
+    ("c" org-capture "Capture Templates"))
+    (evil-leader/set-key "$" 'hydra-org/body)
   ; Dired
   (evil-define-key 'normal dired-mode-map (kbd "h")
     (lambda ()
@@ -251,15 +267,6 @@
   :after evil
   :config
   (global-evil-surround-mode 1))
-
-(use-package evil-tabs
-  :init
- (set-face-attribute 'header-line nil
-		      :box nil
-		      :overline nil
-		      :underline nil) 
-  :config
-  (evil-tabs-mode t))
 
 (use-package exec-path-from-shell
   :config
@@ -354,6 +361,7 @@
     "8" 'ripgrep-regexp))
 
 (use-package pyvenv)
+(use-package package-lint)
 
 (use-package yaml-mode
   :config
@@ -408,9 +416,8 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (pyvenv pyenv evil-numbers quote
-                  (use-package)))))
+    (kubel-evil package-lint pyvenv pyenv evil-numbers quote
+                (use-package)))))
 
 (put 'erase-buffer 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
-
