@@ -77,7 +77,7 @@
 (setq org-default-notes-file (concat org-directory "/capture.org"))
 (defun get-journal-file-this-year ()
   "Return filename for today's journal entry."
-  (let ((yearly-name (concat "/" (format-time-string "%Y%m") ".org")))
+  (let ((yearly-name (concat "/" (format-time-string "%Y") ".org")))
     (expand-file-name (concat org-journal-dir yearly-name))))
 (setq org-capture-templates
       '(("t" "Todo" entry (file+headline (lambda () (concat org-directory "/todos.org")) "Allgemein")
