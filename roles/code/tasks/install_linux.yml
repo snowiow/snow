@@ -1,0 +1,5 @@
+- name: install code on linux
+  package:
+    name: code
+    state: present
+  become: yes

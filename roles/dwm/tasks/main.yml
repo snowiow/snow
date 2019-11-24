@@ -1,15 +1,16 @@
 - name: install dwm dependencies
   become: yes
   package:
-    name: xorg-server,
-          xorg-xinit,
-          xorg-xsetroot,
-          freetype2,
-          libx11,
-          libxft,
-          libxinerama,
-          xclip,
-          feh
+    name:
+      - xorg-server
+      - xorg-xinit
+      - xorg-xsetroot
+      - freetype2
+      - libx11
+      - libxft
+      - libxinerama
+      - xclip
+      - feh
     state: present
 
 - name: clone dwm

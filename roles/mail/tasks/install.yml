@@ -1,11 +1,12 @@
 - name: install mail software
   become: yes
   package:
-    name: msmtp,
-          neomutt,
-          offlineimap,
-          stack,
-          notmuch
+    name:
+      - msmtp
+      - neomutt
+      - offlineimap
+      - stack
+      - notmuch
     state: present
 
 - name: create neomutt config directory

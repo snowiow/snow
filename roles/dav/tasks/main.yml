@@ -2,9 +2,10 @@
 - name: install vdirsyncer, khal and khard
   become: yes
   package:
-    name: vdirsyncer,
-          khal,
-          khard
+    name:
+      - vdirsyncer
+      - khal
+      - khard
     state: present
 
 - name: create vdirsyncer config directory

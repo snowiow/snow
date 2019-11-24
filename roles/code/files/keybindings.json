@@ -1,0 +1,38 @@
+// Place your key bindings in this file to overwrite the defaults
+[
+    {
+        "key": "l",
+        "command": "list.toggleExpand",
+        "when": "listFocus"
+    },
+    {
+        "key": "o",
+        "command": "-list.toggleExpand",
+        "when": "listFocus"
+    },
+    {
+        "key": "space",
+        "command": "-list.toggleExpand",
+        "when": "listFocus"
+    },
+    {
+        "key": "l",
+        "command": "list.select",
+        "when": "listFocus"
+    },
+    {
+        "key": "enter",
+        "command": "-list.select",
+        "when": "listFocus"
+    },
+    {
+        "key": "ctrl+l",
+        "command": "editor.action.showHover",
+        "when": "editorTextFocus"
+    },
+    {
+        "key": "ctrl+k ctrl+i",
+        "command": "-editor.action.showHover",
+        "when": "editorTextFocus"
+    }
+]

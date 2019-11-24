@@ -1,0 +1,4 @@
+- name: install code on darwin
+  homebrew_cask:
+    name: visual-studio-code
+    state: present

@@ -1,0 +1,16 @@
+- name: create emacs.d config directory
+  file:
+    path: ~/.config/Code/User
+    state: directory
+
+- name: symlink files
+  file:
+    src: "{{ ansible_env.PWD }}/roles/code/files/{{ item }}"
+    path: "~/.config/Code/User{{ item }}"
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - keybindings.json
+    - settings.json
+    - snippets
