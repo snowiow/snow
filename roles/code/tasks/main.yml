@@ -2,5 +2,3 @@
   when: ansible_facts['os_family'] == "Darwin"
 - import_tasks: install_linux.yml
   when: ansible_facts['os_family'] == "ArchLinux"
-- import_tasks: config.yml
-

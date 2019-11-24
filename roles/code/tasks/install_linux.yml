@@ -3,3 +3,14 @@
     name: code
     state: present
   become: yes
+
+- name: symlink files on linux
+  file:
+    src: "{{ ansible_env.PWD }}/roles/code/files/{{ item }}"
+    path: "~/.config/Code - OSS/User/{{ item }}"
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - keybindings.json
+    - settings.json

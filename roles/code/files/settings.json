@@ -1,135 +1,27 @@
 {
-    "editor.fontFamily": "'Fira Code'",
-    "editor.fontLigatures": true,
-    "editor.fontSize": 13,
-    "editor.wordWrap": "on",
-    "editor.fontWeight": "600",
+    "dart.flutterSdkPath": "~/flutter",
     "editor.lineNumbers": "relative",
-    "php.suggest.basic": false,
+    "editor.minimap.enabled": false,
     "keyboard.dispatch": "keyCode",
-    "workbench.colorTheme": "Base16 OneDark",
-    "workbench.iconTheme": "vscode-icons",
-    "workbench.colorCustomizations": {
-        "statusBar.background": "#61afef",
-        "statusBar.noFolderBackground": "#61afef",
-        "statusBar.debuggingBackground": "#61afef"
-    },
-    "vim.autoindent": true,
     "vim.enableNeovim": true,
-    "vim.neovimPath": "nvim",
     "vim.hlsearch": true,
     "vim.incsearch": true,
-    "vim.easymotion": true,
-    "vim.surround": true,
-    "vim.leader": "<Space>",
-    "vim.otherModesKeyBindingsNonRecursive": [
-        {
-            "before":["leader", "m"],
-            "after":[],
-            "commands": [
-                {
-                "command": "workbench.action.showErrorsWarnings",
-                "key": ""
-                }
-            ]
-        },
-        {
-            "before":["leader", "l"],
-            "after":[],
-            "commands": [
-                {
-                "command": "workbench.action.moveActiveEditorGroupRight",
-                "args": []
-                }
-            ]
-        },
-        {
-            "before":["leader", "t"],
-            "after":[],
-            "commands": [
-                {
-                "command": "workbench.action.terminal.focus",
-                "args": []
-                }
-            ]
-        },
-        {
-            "before":["leader", "h"],
-            "after":[],
-            "commands": [
-                {
-                "command": "workbench.action.moveActiveEditorGroupLeft",
-                "args": []
-                }
-            ]
-        },
-        {
-            "before":["C-b"],
-            "after":[],
-            "commands": [
-                {
-                "command": "workbench.action.toggleSidebarVisibility",
-                "args": []
-                }
-            ]
-        },
-        {
-            "before":["leader", "q"],
-            "after":[],
-            "commands": [
-                {
-                    "command": "workbench.action.closeActiveEditor",
-                    "args": []
-                }
-            ]
-        },
-        {
-            "before":["leader", "v"],
-            "after":[],
-            "commands": [
-                {
-                    "command": "workbench.action.splitEditor",
-                    "args": []
-                }
-            ]
-        },
-        {
-            "before":["leader", "x"],
-            "after":[],
-            "commands": [
-                {
-                "command": "workbench.action.toggleEditorGroupLayout",
-                "args": []
-                }
-            ]
-        },
-        {
-            "before":["leader", "r"],
-            "after":[],
-            "commands": [
-                {
-                    "command": ":nohl",
-                    "args": []
-                }
-            ]
-        },
-        {
-            "before": ["leader", "w"],
-            "after": [],
-            "commands": [
-                {
-                    "command": "workbench.action.files.save",
-                    "args": []
-                }
-            ]
-        }
-    ],
-    "vim.showcmd": true,
-    "vim.smartcase": true,
-    "vim.statusBarColorControl": false,
+    "vim.leader": "<space>",
+    "vim.neovimPath": "/usr/bin/nvim",
     "vim.useSystemClipboard": true,
-    "vim.useCtrlKeys": true,
-    "window.zoomLevel": 0,
-    "workbench.activityBar.visible": false,
-    "window.menuBarVisibility": "default"
+    "vim.normalModeKeyBindingsNonRecursive": [
+        {
+            "before": ["<leader>", "t"],
+            "commands": [
+                "workbench.action.toggleMaximizedPanel"
+            ]
+        },
+        {
+            "before": ["<leader>", "e"],
+            "commands": [
+                "workbench.action.toggleSidebarVisibility"
+            ]
+        },
+    ],
+    "workbench.colorTheme": "Base16 Tomorrow Night",
 }
