@@ -102,6 +102,7 @@
 (use-package company
   :init
   (setq company-dabbrev-downcase nil)
+  (setq company-selection-wrap-around t)
   :config
   (define-key company-active-map (kbd "M-n") nil)
   (define-key company-active-map (kbd "M-p") nil)

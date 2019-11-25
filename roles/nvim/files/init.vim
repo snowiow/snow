@@ -403,9 +403,9 @@ autocmd! FileType go call LC_maps()
 
 let g:LanguageClient_diagnosticsEnable=1
 let g:LanguageClient_serverCommands = {
+    \ 'go': ['gopls'],
     \ 'php': ['php-language-server.php'],
     \ 'python': ['pyls'],
-    \ 'go': ['gopls'],
     \ }
 
 "--- Neco GHC ----------------------------------------------------------------"
