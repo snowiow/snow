@@ -6,7 +6,7 @@
 - name: symlink files on darwin
   file:
     src: "{{ ansible_env.PWD }}/roles/code/files/{{ item }}"
-    path: "~/.config/Code/User/{{ item }}"
+    path: "~/Library/Application Support/Code/User/{{ item }}"
     state: link
     follow: false
     force: yes
