@@ -2,6 +2,7 @@
   hosts: localhost
   roles:
     - ctags
+    - git
     - zsh
     - nvim
     - emacs

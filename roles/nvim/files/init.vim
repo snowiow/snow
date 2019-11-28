@@ -391,7 +391,7 @@ function! LC_maps()
   if has_key(g:LanguageClient_serverCommands, &filetype)
     nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
     nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
-    nnoremap <buffer> <silent> <F2> :call LanguageClient#textDocument_rename()<CR>
+    nnoremap <buffer> <silent> lr :call LanguageClient#textDocument_rename()<CR>
     nnoremap <buffer> <Leader>m :call LanguageClient_contextMenu()<CR>
     vnoremap <buffer> <Leader>m :call LanguageClient_contextMenu()<CR>
   endif
@@ -406,6 +406,7 @@ let g:LanguageClient_serverCommands = {
     \ 'go': ['gopls'],
     \ 'php': ['php-language-server.php'],
     \ 'python': ['pyls'],
+    \ 'typescript': ['typescript-language-server', '--stdio', '--tsserver-path', 'node_modules/.bin/tsserver'],
     \ }
 
 "--- Neco GHC ----------------------------------------------------------------"
@@ -517,3 +518,4 @@ set keywordprg=:DD "Set the keywordprg to be opened in devdocs
 
 "=========================== Custom Commands ================================="
 command! Bd :buffer #|bd #
+command! Tt :tabedit|terminal
