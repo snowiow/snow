@@ -23,6 +23,7 @@
     review-one = !nvim -p +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
 	co = checkout
 	s = status
+    st = stash
     p = push
     l = pull
     aa = add --all
