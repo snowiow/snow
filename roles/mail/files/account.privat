@@ -7,6 +7,6 @@ set record = ~/Mail/Privat/Sent
 set trash = ~/Mail/Privat/Trash
 
 unmailboxes *
-source mailboxes_Privat
+source ~/.config/mutt/mailboxes_Privat
 
 # vim: syntax=muttrc
