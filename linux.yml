@@ -8,7 +8,8 @@
     - dunst
     - dwm
     - dmenu
-    - zsh
+    # - zsh
+    - fish
     - st
     - ctags
     - nvim

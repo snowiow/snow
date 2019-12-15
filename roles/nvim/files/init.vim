@@ -178,7 +178,6 @@ set so=5                                        "show number of lines above or
 set tags=./tags,tags                            "Sources for tag files
 autocmd! bufwritepost init.vim source %         "Automatically reload vimrc
                                                 "after save
-set shell=/bin/zsh                              "Set ZSH as standard shell
 set rnu                                         "relative numbers
 
 set spelllang=de                                "Default spelling language
