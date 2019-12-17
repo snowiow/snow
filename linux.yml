@@ -6,8 +6,9 @@
     - arch
     - gnupg
     - dunst
-    - dwm
-    - dmenu
+    # - dwm
+    - bspwm
+    # - dmenu
     # - zsh
     - fish
     - st

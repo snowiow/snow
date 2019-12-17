@@ -1,6 +1,8 @@
 - name: make sure yabai is installed
   package:
-    name: yabai
+    name:
+      - yabai
+      - skhd
     state: present
 
 - name: symlink dotfiles
@@ -12,3 +14,4 @@
     force: yes
   loop:
     - yabairc
+    - skhdrc

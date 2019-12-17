@@ -1,0 +1,64 @@
+- name: make sure bspwm is installed
+  package:
+    name:
+      - bspwm
+      - sxhkd
+    state: present
+
+- name: download polybar
+  git:
+    repo: https://aur.archlinux.org/polybar.git
+    dest: ~/workspace/polybar
+
+- name: check if polybar was downloaded
+  stat:
+    path: ~/workspace/polybar
+  register: polybar
+
+- name: install polybar
+  command: makepkg -si --noconfirm
+  args:
+    chdir: ~/workspace/polybar
+  when: polybar.stat.exists
+
+- name: symlink dotfile
+  file:
+    src: "{{ ansible_env.PWD }}/roles/bspwm/files/bspwmrc"
+    path: ~/.config/bspwm/bspwmrc
+    state: link
+    follow: false
+    force: yes
+
+- name: symlink bar script
+  file:
+    src: "{{ ansible_env.PWD }}/roles/bspwm/files/bar"
+    path: ~/.local/bin/bar
+    state: link
+    follow: false
+    force: yes
+
+- name: symlink polybar config
+  file:
+    src: "{{ ansible_env.PWD }}/roles/bspwm/files/config"
+    path: ~/.config/polybar/config
+    state: link
+    follow: false
+    force: yes
+
+- name: symlink arch update count script
+  file:
+    src: "{{ ansible_env.PWD }}/roles/bspwm/files/arch-updates.sh"
+    path: ~/.local/bin/arch-updates.sh
+    state: link
+    follow: false
+    force: yes
+
+- name: symlink shxkdrc
+  file:
+    src: "{{ ansible_env.PWD }}/roles/bspwm/files/sxhkdrc"
+    path: ~/.config/sxhkd/sxhkdrc
+    state: link
+    follow: false
+    force: yes
+
+

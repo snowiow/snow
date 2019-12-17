@@ -2,7 +2,6 @@
   hosts: localhost
   roles:
     - yabai
-    - skhd
     - ctags
     - git
     - fish
