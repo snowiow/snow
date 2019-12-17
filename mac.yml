@@ -1,6 +1,8 @@
 - name: Setup local environment
   hosts: localhost
   roles:
+    - yabai
+    - skhd
     - ctags
     - git
     - fish

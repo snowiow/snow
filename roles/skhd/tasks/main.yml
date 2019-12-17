@@ -1,0 +1,14 @@
+- name: make sure skhd is installed
+  package:
+    name: skhd
+    state: present
+
+- name: symlink dotfiles
+  file:
+    src: "{{ ansible_env.PWD }}/roles/skhd/files/{{ item }}"
+    path: ~/.{{ item }}
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - skhdrc

@@ -1,0 +1,14 @@
+- name: make sure yabai is installed
+  package:
+    name: yabai
+    state: present
+
+- name: symlink dotfiles
+  file:
+    src: "{{ ansible_env.PWD }}/roles/yabai/files/{{ item }}"
+    path: ~/.{{ item }}
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - yabairc
