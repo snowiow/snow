@@ -3,7 +3,8 @@
   roles:
     - ctags
     - git
-    - zsh
+    - fish
+    # - zsh
     - nvim
     - emacs
     - ranger
