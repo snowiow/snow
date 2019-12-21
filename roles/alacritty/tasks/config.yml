@@ -1,0 +1,9 @@
+- name: symlink files
+  file:
+    src: "{{ ansible_env.PWD }}/roles/alacritty/files/{{ item }}"
+    path: "~/.config/alacritty/{{ item }}"
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - alacritty.yml

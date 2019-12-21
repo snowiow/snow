@@ -5,7 +5,9 @@ fish_vi_key_bindings
 set fish_greeting
 
 # Aliases
+alias ave='aws-vault exec'
 alias g="git"
+alias k='kubectl'
 alias poweroff="systemctl poweroff"
 alias r="ranger"
 alias reboot="systemctl reboot"
@@ -13,9 +15,13 @@ alias v="nvim"
 alias vimdiff="nvim -d"
 alias weather="curl wttr.in"
 
-# Keybingings
+# Keybindings
 bind -M insert \cr fzf_cmd_history
 bind -M insert \cl accept-autosuggestion
 bind \cl accept-autosuggestion
+
 # Source additional stuff
 source ~/workspace/fzf-marks/fzf-marks.plugin.fish
+
+# Set env variables
+set -gx PATH $HOME/go/bin $HOME/.local/bin $HOME/flutter/bin $PATH
