@@ -22,6 +22,8 @@ set -g __fish_git_prompt_color_untrackedfiles $fish_color_normal
 set -g __fish_git_prompt_color_cleanstate green
 
 function fish_prompt
+    echo -n (prompt_kubernetes)
+    echo -n (prompt_aws_vault)
     set_color magenta
     echo -n (whoami)
     set_color normal
