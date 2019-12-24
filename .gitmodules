@@ -1,9 +1,3 @@
-[submodule "roles/nvim/files/pack/snow/opt/fzf.vim"]
-	path = roles/nvim/files/pack/snow/opt/fzf.vim
-	url = https://github.com/junegunn/fzf.vim
-[submodule "roles/nvim/files/pack/snow/opt/ultisnips"]
-	path = roles/nvim/files/pack/snow/opt/ultisnips
-	url = https://github.com/sirver/ultisnips
 [submodule "roles/nvim/files/pack/snow/opt/vim-commentary"]
 	path = roles/nvim/files/pack/snow/opt/vim-commentary
 	url = https://github.com/tpope/vim-commentary
@@ -37,3 +31,9 @@
 [submodule "roles/nvim/files/pack/snow/start/vim-fugitive"]
 	path = roles/nvim/files/pack/snow/start/vim-fugitive
 	url = https://github.com/tpope/vim-fugitive
+[submodule "roles/nvim/files/pack/snow/opt/UltiSnips"]
+	path = roles/nvim/files/pack/snow/opt/UltiSnips
+	url = https://github.com/sirver/UltiSnips
+[submodule "roles/nvim/files/pack/snow/opt/fzf.vim"]
+	path = roles/nvim/files/pack/snow/opt/fzf.vim
+	url = https://github.com/junegunn/fzf.vim
