@@ -20,6 +20,7 @@ while getopts ':p:w:d:g:h' opt; do
             ;;
         h)
             help
+            exit
             ;;
         ?)
             echo "Invalid Parameter given. $(help)"
