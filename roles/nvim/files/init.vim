@@ -1,51 +1,31 @@
-"=============================== minpac ===================================="
-packadd minpac
-call minpac#init()
+"================================= pack ======================================"
 
-call minpac#add('k-takata/minpac', {'type': 'opt'})
+packadd fzf.vim
+packadd ultisnips
+packadd vim-commentary
+packadd vim-gutentags
+packadd LanguageClient-neovim
+packadd vim-sandwich
 
-call minpac#add('chriskempson/base16-vim')
-call minpac#add('junegunn/fzf', { 'do': '!./install --all'})
-call minpac#add('junegunn/fzf.vim')
-call minpac#add('majutsushi/tagbar')
-call minpac#add('vimwiki/vimwiki')
-call minpac#add('sirver/UltiSnips')
-call minpac#add('tpope/vim-commentary')
-call minpac#add('tpope/vim-fugitive')
-call minpac#add('airblade/vim-gitgutter')
-call minpac#add('ludovicchabant/vim-gutentags')
-call minpac#add('sheerun/vim-polyglot')
-call minpac#add('tpope/vim-repeat')
-call minpac#add('tpope/vim-rhubarb')
-call minpac#add('tpope/vim-surround')
-call minpac#add('mattn/emmet-vim')
-call minpac#add('chrisbra/Colorizer')
-call minpac#add('JamshedVesuna/vim-markdown-preview')
-call minpac#add('BurningEther/iron.nvim', {'do': ':UpdateRemotePlugins'})
-call minpac#add('phpactor/phpactor', {'do': 'silent! !composer install', 'branch': 'master'})
-call minpac#add('autozimu/LanguageClient-neovim', {'do': '!./install.sh', 'branch': 'next'})
-call minpac#add('justmao945/vim-clang')
-call minpac#add('tpope/vim-unimpaired')
-call minpac#add('andreypopp/vim-colors-plain')
-"--- Optional Packages -------------------------------------------------------"
-call minpac#add('ElmCast/elm-vim', {'type': 'opt'})
-call minpac#add('buoto/gotests-vim')
-call minpac#add('google/vim-jsonnet')
-call minpac#add('shime/vim-livedown', {'type': 'opt'})
-call minpac#add('racer-rust/vim-racer', {'type': 'opt'})
-call minpac#add('eagletmt/neco-ghc', {'type': 'opt'})
-call minpac#add('parsonsmatt/intero-neovim', {'type': 'opt'})
-call minpac#add('alx741/vim-hindent', {'type': 'opt'})
-call minpac#add('lervag/vimtex', {'type': 'opt'})
+" call minpac#add('tpope/vim-repeat')
+" call minpac#add('tpope/vim-rhubarb')
+" call minpac#add('tpope/vim-surround')
+" call minpac#add('tpope/vim-unimpaired')
+" "--- Optional Packages -------------------------------------------------------"
+" call minpac#add('racer-rust/vim-racer', {'type': 'opt'})
+" call minpac#add('eagletmt/neco-ghc', {'type': 'opt'})
+" call minpac#add('parsonsmatt/intero-neovim', {'type': 'opt'})
+" call minpac#add('alx741/vim-hindent', {'type': 'opt'})
 
-command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
-command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
+" command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
+" command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
 
 "=== Neovim Settings ========================================================="
 if has('nvim')
     hi! link TermCursor Cursor
     hi! TermCursorNC ctermfg=15 guifg=#fdf6e3 ctermbg=14 guibg=#93a1a1 cterm=NONE gui=NONE
 endif
+
 set guicursor=n-v-c:block-nCursor
   \,i-ci-ve:ver25-iCursor",r-cr:hor20-iCursor,o:hor50-iCursor
   \,sm:block-blinkwait175-blinkoff150-blinkon175
@@ -83,7 +63,6 @@ function! MyGitStatus()
     endif
     return '%#SignifySignAdd# ' . branch . ' '
 endfunction
-
 
 function! MyMode()
     let mode = mode()
@@ -255,7 +234,6 @@ nnoremap <leader>7 :silent grep<space>
 nnoremap <leader>8 :silent grep  %:h/*<left><left><left><left><left><left>
 " Autocomplete
 " Keyword
-" inoremap <c-k> <c-x><c-n>
 " Omni
 inoremap <c-o> <c-x><c-o>
 " Line
@@ -265,7 +243,6 @@ inoremap <c-f> <c-x><c-f>
 " Include
 inoremap <c-c> <c-x><c-i>
 " Thesaurus
-" inoremap <c-t> <c-x><c-t>
 " Tags
 inoremap <c-t> <c-x><c-]>
 " Dictionary
@@ -275,6 +252,17 @@ if (has("nvim"))
     tnoremap <C-n> <C-\><C-n>
 endif
 noremap <c-space> <c-^>
+
+" unimpaired stuff
+noremap [q :cprevious
+noremap ]q :cnext
+noremap [Q :cfirst
+noremap ]Q :clast
+
+noremap [b :bprevious
+noremap ]b :bnext
+noremap [B :bfirst
+noremap ]B :blast
 
 "===============================Autocommands=================================="
 
@@ -488,23 +476,6 @@ let g:hindent_on_save = 1
 
 "--- Vimtex ------------------------------------------------------------------"
 let g:vimtex_view_method = 'mupdf'
-
-"---------------------------------VimWiki-------------------------------------"
-let g:vimwiki_list = [{
-      \ 'path': '~/Seafile/My Library/vimwiki',
-      \ 'template_ext': '.html',
-      \ 'auto_export': 0,
-      \ 'syntax': 'markdown',
-      \ 'ext': '.md'
-      \ }]
-
-let wiki = {}
-let wiki.nested_syntaxes = {
-    \ 'python': 'python',
-    \ 'c++': 'cpp',
-    \ 'scala': 'scala',
-    \ 'zsh': 'zsh',
-    \ }
 
 "===========================Custom Functions=================================="
 "-----Function and Command for opening the current keyword in devdocs---"

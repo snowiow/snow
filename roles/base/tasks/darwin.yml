@@ -1,0 +1,6 @@
+- name: make sure packages are installed
+  package:
+    name:
+      - fzf
+      - iosevka
+    state: present

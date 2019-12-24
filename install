@@ -12,9 +12,6 @@ while getopts ':p:w:d:g:h' opt; do
         p)
             private_pw=$OPTARG
             ;;
-        w)
-            work_pw=$OPTARG
-            ;;
         d)
             dav_pw=$OPTARG
             ;;

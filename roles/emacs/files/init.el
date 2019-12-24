@@ -89,7 +89,8 @@
          "* %U %?")))
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((shell . t)))
+ '((shell . t)
+   (ledger . t)))
 
 ; Whitspace Column
 (setq-default
@@ -415,6 +416,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(org-agenda-files
+   (quote
+    ("~/Seafile/My Library/notes/2019.org" "~/Seafile/My Library/notes/Rezepte.org" "~/Seafile/My Library/notes/Spanisch.org" "~/Seafile/My Library/notes/aws.org" "~/Seafile/My Library/notes/container_days2019.org" "~/Seafile/My Library/notes/emacs.org" "~/Seafile/My Library/notes/fantasy.org" "~/Seafile/My Library/notes/finanzen.org" "~/Seafile/My Library/notes/linux.org" "~/Seafile/My Library/notes/moia.org" "~/Seafile/My Library/notes/private_projekte.org" "~/Seafile/My Library/notes/raspberry.org" "~/Seafile/My Library/notes/todos.org" "~/Seafile/My Library/notes/unterhaltung.org" "~/Seafile/My Library/notes/vim.org")))
  '(package-selected-packages
    (quote
     (kubel-evil package-lint pyvenv pyenv evil-numbers quote

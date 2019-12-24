@@ -1,0 +1,14 @@
+#!/usr/bin/env sh
+
+if [ -z $2 ]
+then
+    tput setaf 1; echo "No package type given. Pass 'start' or 'opt'." 1>&2
+    exit 1
+fi
+
+package=$(echo $1 | cut -d'/' -f2)
+path=roles/nvim/files/pack/snow/$2/$package
+git submodule add https://github.com/$1 $path
+git add .gitmodules $path
+
+echo "$package successfully added!"

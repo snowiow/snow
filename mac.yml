@@ -1,6 +1,7 @@
 - name: Setup local environment
   hosts: localhost
   roles:
+    - base
     - yabai
     - alacritty
     - ctags

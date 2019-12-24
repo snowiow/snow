@@ -1,0 +1,39 @@
+[submodule "roles/nvim/files/pack/snow/start/base16-vim"]
+	path = roles/nvim/files/pack/snow/start/base16-vim
+	url = https://github.com/chriskempson/base16-vim/
+[submodule "roles/nvim/files/pack/snow/start/vim-fugitive"]
+	path = roles/nvim/files/pack/snow/start/vim-fugitive
+	url = https://github.com/tpope/vim-fugitive
+[submodule "roles/nvim/files/pack/snow/start/tagbar"]
+	path = roles/nvim/files/pack/snow/start/tagbar
+	url = https://github.com/majutsushi/tagbar
+[submodule "roles/nvim/files/pack/snow/opt/fzf.vim"]
+	path = roles/nvim/files/pack/snow/opt/fzf.vim
+	url = https://github.com/junegunn/fzf.vim
+[submodule "roles/nvim/files/pack/snow/opt/ultisnips"]
+	path = roles/nvim/files/pack/snow/opt/ultisnips
+	url = https://github.com/sirver/ultisnips
+[submodule "roles/nvim/files/pack/snow/opt/vim-commentary"]
+	path = roles/nvim/files/pack/snow/opt/vim-commentary
+	url = https://github.com/tpope/vim-commentary
+[submodule "roles/nvim/files/pack/snow/opt/vim-gutentags"]
+	path = roles/nvim/files/pack/snow/opt/vim-gutentags
+	url = https://github.com/ludovicchabant/vim-gutentags
+[submodule "roles/nvim/files/pack/snow/start/vim-polyglot"]
+	path = roles/nvim/files/pack/snow/start/vim-polyglot
+	url = https://github.com/sheerun/vim-polyglot
+[submodule "roles/nvim/files/pack/snow/opt/LanguageClient-neovim"]
+	path = roles/nvim/files/pack/snow/opt/LanguageClient-neovim
+	url = https://github.com/autozimu/LanguageClient-neovim
+[submodule "roles/nvim/files/pack/snow/opt/vim-sandwich"]
+	path = roles/nvim/files/pack/snow/opt/vim-sandwich
+	url = https://github.com/machakann/vim-sandwich
+[submodule "roles/nvim/files/pack/snow/opt/gotests-vim"]
+	path = roles/nvim/files/pack/snow/opt/gotests-vim
+	url = https://github.com/buoto/gotests-vim
+[submodule "roles/nvim/files/pack/snow/opt/vim-jsonnet"]
+	path = roles/nvim/files/pack/snow/opt/vim-jsonnet
+	url = https://github.com/google/vim-jsonnet
+[submodule "roles/nvim/files/pack/snow/opt/vimtex"]
+	path = roles/nvim/files/pack/snow/opt/vimtex
+	url = https://github.com/lervag/vimtex

@@ -1,9 +1,9 @@
 - name: Setup local environment
   hosts: localhost
   roles:
+    - base
     - locale
     - git
-    - arch
     - gnupg
     - dunst
     # - dwm
@@ -11,7 +11,8 @@
     # - dmenu
     # - zsh
     - fish
-    - st
+    - alacritty
+    # - st
     - ctags
     - nvim
     - emacs

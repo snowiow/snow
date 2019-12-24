@@ -21,15 +21,16 @@
     stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
     review = !nvim -p $(git files | grep -v composer.lock) +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
     review-one = !nvim -p +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
-	co = checkout
+    aa = add --all
 	cb = checkout -b
     cm = checkout master
+    cmsg = commit -m
+	co = checkout
     d  = diff
+    l  = pull
+    m = merge
+    p  = push
 	s  = status
     st = stash
-    p  = push
-    l  = pull
-    aa = add --all
-    cmsg = commit -m
 [rerere]
 	enabled = 1
