@@ -1,7 +1,7 @@
 "================================= pack ======================================"
 
 packadd fzf.vim
-packadd ultisnips
+packadd UltiSnips
 packadd vim-commentary
 packadd vim-gutentags
 packadd LanguageClient-neovim

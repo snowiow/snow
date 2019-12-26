@@ -1,0 +1,62 @@
+#!/bin/sh
+
+ProgName=$(basename $0)
+
+sub_help(){
+    echo "Usage: $ProgName <subcommand> [options]\n"
+    echo "Subcommands:"
+    echo "    add       add a vim package as a submodule.
+              First parameter is owner/repo-name
+              Second parameter is opt/start type"
+    echo "    remove    remove the vim package and all deps to submodules.
+              First parameter is package name.
+              Second parameter is opt/start type"
+    echo ""
+    echo "For help with each subcommand run:"
+    echo "$ProgName <subcommand> -h|--help"
+    echo ""
+}
+
+sub_add(){
+    if [ -z $3 ]
+    then
+        tput setaf 1; echo "No package type given. Pass 'start' or 'opt'." 1>&2
+        exit 1
+    fi
+
+    package=$(echo $2 | cut -d'/' -f2)
+    path=roles/nvim/files/pack/snow/$3/$package
+    git submodule add https://github.com/$2 $path
+    git add .gitmodules $path
+
+    echo "$package successfully added!"
+}
+
+sub_remove() {
+    if [ -z $3 ]
+    then
+        tput setaf 1; echo "No package type given. Pass 'start' or 'opt'." 1>&2
+        exit 1
+    fi
+    git submodule deinit roles/nvim/files/pack/snow/$3/$2
+    git rm roles/nvim/files/pack/snow/$3/$2
+    rm -Rf .git/modules/roles/nvim/files/pack/snow/$3/$2
+
+    echo "$package successfully removed!"
+}
+
+subcommand=$1
+case $subcommand in
+    "" | "-h" | "--help")
+        sub_help
+        ;;
+    *)
+        shift
+        sub_${subcommand} $@
+        if [ $? = 127 ]; then
+            echo "Error: '$subcommand' is not a known subcommand." >&2
+            echo "       Run '$ProgName --help' for a list of known subcommands." >&2
+            exit 1
+        fi
+        ;;
+esac
