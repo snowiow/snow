@@ -1,0 +1,10 @@
+- name: make sure fish is installed
+  package:
+    name: fish
+    state: present
+
+- name: set fish as default shell
+  user:
+    name: "{{ ansible_env.USER }}"
+    shell: /usr/local/bin/fish
+  become: yes
