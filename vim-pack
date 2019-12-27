@@ -11,6 +11,7 @@ sub_help(){
     echo "    remove    remove the vim package and all deps to submodules.
               First parameter is package name.
               Second parameter is opt/start type"
+    echo "    update    update all vim packages"
     echo ""
     echo "For help with each subcommand run:"
     echo "$ProgName <subcommand> -h|--help"
@@ -43,6 +44,12 @@ sub_remove() {
     rm -Rf .git/modules/roles/nvim/files/pack/snow/$3/$2
 
     echo "$package successfully removed!"
+}
+
+sub_update() {
+    git submodule update --remote
+
+    echo "All packages updated successfully!"
 }
 
 subcommand=$1

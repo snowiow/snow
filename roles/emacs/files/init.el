@@ -74,6 +74,11 @@
 (setq org-journal-dir "~/Seafile/My Library/notes/journal")
 (setq org-agenda-files
 	(file-expand-wildcards (concat org-directory "/*.org")))
+(setq org-agenda-window-setup 'current-window)
+(setq org-agenda-custom-commands
+      '(("c" "Simple agenda view"
+         ((agenda "")
+          (alltodo "")))))
 (setq org-default-notes-file (concat org-directory "/capture.org"))
 (defun get-journal-file-this-year ()
   "Return filename for today's journal entry."
@@ -360,9 +365,12 @@
             :order 0)
      (:name "Work"
             :category "MOIA")
+     (:name "To Read"
+            :category "Read"
+            :order 100)
      (:name "Waiting"
             :todo "WAITING"
-            :order 10)
+            :order 101)
      )))
 
 (use-package ripgrep)
