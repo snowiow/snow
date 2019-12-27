@@ -87,6 +87,9 @@
         ("j" "Journal Note"
          entry (file+datetree (lambda () (get-journal-file-this-year)))
          "* %U %?")))
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
+        (sequence "|" "CANCELLED(c)")))
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((shell . t)
@@ -343,6 +346,25 @@
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
 
+(use-package org-super-agenda
+  :config
+  (org-super-agenda-mode)
+  (setq
+   org-super-agenda-groups
+   '(
+     (:name "Today"
+            :time-grid t
+            :todo "TODAY")
+     (:name "High Priority"
+            :priority "A"
+            :order 0)
+     (:name "Work"
+            :category "MOIA")
+     (:name "Waiting"
+            :todo "WAITING"
+            :order 10)
+     )))
+
 (use-package ripgrep)
 
 (use-package projectile
@@ -421,8 +443,8 @@
     ("~/Seafile/My Library/notes/2019.org" "~/Seafile/My Library/notes/Rezepte.org" "~/Seafile/My Library/notes/Spanisch.org" "~/Seafile/My Library/notes/aws.org" "~/Seafile/My Library/notes/container_days2019.org" "~/Seafile/My Library/notes/emacs.org" "~/Seafile/My Library/notes/fantasy.org" "~/Seafile/My Library/notes/finanzen.org" "~/Seafile/My Library/notes/linux.org" "~/Seafile/My Library/notes/moia.org" "~/Seafile/My Library/notes/private_projekte.org" "~/Seafile/My Library/notes/raspberry.org" "~/Seafile/My Library/notes/todos.org" "~/Seafile/My Library/notes/unterhaltung.org" "~/Seafile/My Library/notes/vim.org")))
  '(package-selected-packages
    (quote
-    (kubel-evil package-lint pyvenv pyenv evil-numbers quote
-                (use-package)))))
+    (org-super-agenda kubel-evil package-lint pyvenv pyenv evil-numbers quote
+                      (use-package)))))
 
 (put 'erase-buffer 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
