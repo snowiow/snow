@@ -19,29 +19,35 @@ sub_help(){
 }
 
 sub_add(){
-    if [ -z $3 ]
+    if [ -z $2 ]
     then
         tput setaf 1; echo "No package type given. Pass 'start' or 'opt'." 1>&2
         exit 1
     fi
 
-    package=$(echo $2 | cut -d'/' -f2)
-    path=roles/nvim/files/pack/snow/$3/$package
-    git submodule add https://github.com/$2 $path
+    package=$(echo $1 | cut -d'/' -f2)
+    path=roles/nvim/files/pack/snow/$2/$package
+    if [ -z $3 ]
+    then
+        git submodule add -b $3 https://github.com/$1 $path
+    else
+        git submodule add https://github.com/$1 $path
+    fi
+
     git add .gitmodules $path
 
     echo "$package successfully added!"
 }
 
 sub_remove() {
-    if [ -z $3 ]
+    if [ -z $2 ]
     then
         tput setaf 1; echo "No package type given. Pass 'start' or 'opt'." 1>&2
         exit 1
     fi
-    git submodule deinit roles/nvim/files/pack/snow/$3/$2
-    git rm roles/nvim/files/pack/snow/$3/$2
-    rm -Rf .git/modules/roles/nvim/files/pack/snow/$3/$2
+    git submodule deinit -f roles/nvim/files/pack/snow/$2/$1
+    git rm roles/nvim/files/pack/snow/$2/$1
+    rm -Rf .git/modules/roles/nvim/files/pack/snow/$2/$1
 
     echo "$package successfully removed!"
 }

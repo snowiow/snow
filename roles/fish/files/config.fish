@@ -24,4 +24,4 @@ bind \cl accept-autosuggestion
 source ~/workspace/fzf-marks/fzf-marks.plugin.fish
 
 # Set env variables
-set -gx PATH $HOME/go/bin $HOME/.local/bin $HOME/flutter/bin $PATH
+set -gx PATH $HOME/go/bin $HOME/.local/bin $HOME/flutter/bin $HOME/flutter/bin/cache/dart-sdk/bin/ $HOME/.pub-cache/bin $PATH

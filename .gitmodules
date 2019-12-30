@@ -4,9 +4,6 @@
 [submodule "roles/nvim/files/pack/snow/opt/vim-gutentags"]
 	path = roles/nvim/files/pack/snow/opt/vim-gutentags
 	url = https://github.com/ludovicchabant/vim-gutentags
-[submodule "roles/nvim/files/pack/snow/opt/LanguageClient-neovim"]
-	path = roles/nvim/files/pack/snow/opt/LanguageClient-neovim
-	url = https://github.com/autozimu/LanguageClient-neovim
 [submodule "roles/nvim/files/pack/snow/opt/vim-sandwich"]
 	path = roles/nvim/files/pack/snow/opt/vim-sandwich
 	url = https://github.com/machakann/vim-sandwich
@@ -37,3 +34,6 @@
 [submodule "roles/nvim/files/pack/snow/opt/fzf.vim"]
 	path = roles/nvim/files/pack/snow/opt/fzf.vim
 	url = https://github.com/junegunn/fzf.vim
+[submodule "roles/nvim/files/pack/snow/opt/LanguageClient-neovim"]
+	path = roles/nvim/files/pack/snow/opt/LanguageClient-neovim
+	url = https://github.com/autozimu/LanguageClient-neovim
