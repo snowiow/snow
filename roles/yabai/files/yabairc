@@ -43,4 +43,7 @@ yabai -m config left_padding                 2
 yabai -m config right_padding                2
 yabai -m config window_gap                   2
 
+# application settings
+yabai -m rule --add label=emacs app=Emacs manage=on
+
 echo "yabai configuration loaded.."

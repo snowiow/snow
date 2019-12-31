@@ -6,6 +6,8 @@ packadd vim-commentary
 packadd vim-gutentags
 packadd LanguageClient-neovim
 packadd vim-sandwich
+packadd vim-lion
+packadd vim-jsonnet
 
 " call minpac#add('tpope/vim-repeat')
 " call minpac#add('tpope/vim-rhubarb')
@@ -350,6 +352,7 @@ nnoremap <leader>gw :Gbrowse<CR>
 nnoremap <leader>gl :Gpull<CR>
 
 "--------------------------------------FZF------------------------------------"
+set rtp+=/usr/local/opt/fzf
 nnoremap <leader>o :Files<cr>
 nnoremap <leader>b :Buffers<cr>
 nnoremap <leader>ft :Tags<cr>

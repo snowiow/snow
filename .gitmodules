@@ -37,3 +37,6 @@
 [submodule "roles/nvim/files/pack/snow/opt/LanguageClient-neovim"]
 	path = roles/nvim/files/pack/snow/opt/LanguageClient-neovim
 	url = https://github.com/autozimu/LanguageClient-neovim
+[submodule "roles/nvim/files/pack/snow/opt/vim-lion"]
+	path = roles/nvim/files/pack/snow/opt/vim-lion
+	url = https://github.com/tommcdo/vim-lion

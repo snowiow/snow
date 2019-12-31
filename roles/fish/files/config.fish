@@ -25,3 +25,4 @@ source ~/workspace/fzf-marks/fzf-marks.plugin.fish
 
 # Set env variables
 set -gx PATH $HOME/go/bin $HOME/.local/bin $HOME/flutter/bin $HOME/flutter/bin/cache/dart-sdk/bin/ $HOME/.pub-cache/bin $PATH
+set -gx FISH_KUBECTL_COMPLETION_TIMEOUT 30s
