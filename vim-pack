@@ -1,0 +1,75 @@
+#!/bin/sh
+
+ProgName=$(basename $0)
+
+sub_help(){
+    echo "Usage: $ProgName <subcommand> [options]\n"
+    echo "Subcommands:"
+    echo "    add       add a vim package as a submodule.
+              First parameter is owner/repo-name
+              Second parameter is opt/start type"
+    echo "    remove    remove the vim package and all deps to submodules.
+              First parameter is package name.
+              Second parameter is opt/start type"
+    echo "    update    update all vim packages"
+    echo ""
+    echo "For help with each subcommand run:"
+    echo "$ProgName <subcommand> -h|--help"
+    echo ""
+}
+
+sub_add(){
+    if [ -z $2 ]
+    then
+        tput setaf 1; echo "No package type given. Pass 'start' or 'opt'." 1>&2
+        exit 1
+    fi
+
+    package=$(echo $1 | cut -d'/' -f2)
+    path=roles/nvim/files/pack/snow/$2/$package
+    if [ -z $3 ]
+    then
+        git submodule add -b $3 https://github.com/$1 $path
+    else
+        git submodule add https://github.com/$1 $path
+    fi
+
+    git add .gitmodules $path
+
+    echo "$package successfully added!"
+}
+
+sub_remove() {
+    if [ -z $2 ]
+    then
+        tput setaf 1; echo "No package type given. Pass 'start' or 'opt'." 1>&2
+        exit 1
+    fi
+    git submodule deinit -f roles/nvim/files/pack/snow/$2/$1
+    git rm roles/nvim/files/pack/snow/$2/$1
+    rm -Rf .git/modules/roles/nvim/files/pack/snow/$2/$1
+
+    echo "$package successfully removed!"
+}
+
+sub_update() {
+    git submodule update --remote
+
+    echo "All packages updated successfully!"
+}
+
+subcommand=$1
+case $subcommand in
+    "" | "-h" | "--help")
+        sub_help
+        ;;
+    *)
+        shift
+        sub_${subcommand} $@
+        if [ $? = 127 ]; then
+            echo "Error: '$subcommand' is not a known subcommand." >&2
+            echo "       Run '$ProgName --help' for a list of known subcommands." >&2
+            exit 1
+        fi
+        ;;
+esac

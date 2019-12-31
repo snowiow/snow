@@ -1,16 +1,5 @@
-- name: make sure fish is installed
-  package:
-    name: fish
-    state: present
-
-- name: symlink dotfiles
-  file:
-    src: "{{ ansible_env.PWD }}/roles/fish/files/{{ item }}"
-    path: ~/.config/fish/{{ item }}
-    state: link
-    follow: false
-    force: yes
-  loop:
-    - config.fish
-    - fish_variables
-    - functions
+- import_tasks: install_darwin.yml
+  when: ansible_facts['os_family'] == "Darwin"
+- import_tasks: install_linux.yml
+  when: ansible_facts['os_family'] == "Archlinux"
+- import_tasks: config.yml

@@ -1,7 +1,7 @@
 "================================= pack ======================================"
 
 packadd fzf.vim
-packadd ultisnips
+packadd UltiSnips
 packadd vim-commentary
 packadd vim-gutentags
 packadd LanguageClient-neovim
@@ -387,9 +387,11 @@ endfunction
 autocmd! FileType python call LC_maps()
 autocmd! FileType php call LC_maps()
 autocmd! FileType go call LC_maps()
+autocmd! FileType dart call LC_maps()
 
 let g:LanguageClient_diagnosticsEnable=1
 let g:LanguageClient_serverCommands = {
+    \ 'dart': ['dart', '~/flutter/bin/cache/dart-sdk/bin/snapshots/analysis_server.dart.snapshot', '--lsp'],
     \ 'go': ['gopls'],
     \ 'php': ['php-language-server.php'],
     \ 'python': ['pyls'],

@@ -7,6 +7,8 @@
 (package-initialize)
 (require 'use-package)
 (setq use-package-always-ensure t)
+(use-package use-package-ensure-system-package
+  :ensure t)
 ; =============================> BuiltIns
 ; Increase/Decrease Text size
 (global-set-key (kbd "C-+") 'text-scale-increase)
@@ -31,7 +33,7 @@
 (electric-pair-mode 1)
 ; Set default font
 (set-face-attribute 'default nil
-		    :family "Iosevka Term"
+                    :family "Iosevka Term"
                     :height 120
                     :weight 'normal
                     :width 'normal)
@@ -74,23 +76,68 @@
 (setq org-journal-dir "~/Seafile/My Library/notes/journal")
 (setq org-agenda-files
 	(file-expand-wildcards (concat org-directory "/*.org")))
+(setq org-agenda-window-setup 'current-window)
 (setq org-default-notes-file (concat org-directory "/capture.org"))
 (defun get-journal-file-this-year ()
   "Return filename for today's journal entry."
   (let ((yearly-name (concat "/" (format-time-string "%Y") ".org")))
     (expand-file-name (concat org-journal-dir yearly-name))))
 (setq org-capture-templates
-      '(("t" "Todo" entry (file+headline (lambda () (concat org-directory "/todos.org")) "Allgemein")
+      '(("t" "Todo" entry (file+headline
+                           (lambda ()
+                             (concat org-directory "/todos.org"))
+                           "Allgemein")
          "* TODO %?")
-        ("m" "Todo MOIA" entry (file+headline (lambda () (concat org-directory "/moia.org")) "Todos")
+        ("m" "Todo MOIA" entry (file+headline
+                                (lambda ()
+                                  (concat org-directory "/moia.org"))
+                                "Todos")
          "* TODO %?")
         ("j" "Journal Note"
          entry (file+datetree (lambda () (get-journal-file-this-year)))
          "* %U %?")))
+(setq org-todo-keywords
+      '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
+        (sequence "|" "CANCELLED(c)")))
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((shell . t)
    (ledger . t)))
+
+(setq solar-n-hemi-seasons
+      '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
+
+(setq holiday-general-holidays
+      '((holiday-fixed 1 1 "Neujahr")
+        (holiday-fixed 5 1 "1. Mai")
+        (holiday-fixed 10 3 "Tag der Deutschen Einheit")))
+
+(setq holiday-christian-holidays
+      '((holiday-float 12 0 -4 "1. Advent" 24)
+        (holiday-float 12 0 -3 "2. Advent" 24)
+        (holiday-float 12 0 -2 "3. Advent" 24)
+        (holiday-float 12 0 -1 "4. Advent" 24)
+        (holiday-fixed 12 25 "1. Weihnachtstag")
+        (holiday-fixed 12 26 "2. Weihnachtstag")
+        (holiday-fixed 1 6 "Heilige Drei Könige")
+        (holiday-easter-etc -48 "Rosenmontag")
+        (holiday-easter-etc -3 "Gründonnerstag")
+        (holiday-easter-etc  -2 "Karfreitag")
+        (holiday-easter-etc   0 "Ostersonntag")
+        (holiday-easter-etc  +1 "Ostermontag")
+        (holiday-easter-etc +39 "Christi Himmelfahrt")
+        (holiday-easter-etc +49 "Pfingstsonntag")
+        (holiday-easter-etc +50 "Pfingstmontag")
+        (holiday-easter-etc +60 "Fronleichnam")
+        (holiday-fixed 8 15 "Mariae Himmelfahrt")
+        (holiday-fixed 11 1 "Allerheiligen")
+        (holiday-float 11 3 1 "Buss- und Bettag" 16)
+        (holiday-float 11 0 1 "Totensonntag" 20)))
+
+(setq holiday-hebrew-holidays nil)
+(setq holiday-islamic-holidays nil)
+(setq holiday-bahai-holidays nil)
+(setq holiday-oriental-holidays nil)
 
 ; Whitspace Column
 (setq-default
@@ -104,6 +151,8 @@
   :init
   (setq company-dabbrev-downcase nil)
   (setq company-selection-wrap-around t)
+  (setq company-idle-delay 0)
+  (setq company-minimum-prefix-length 2)
   :config
   (define-key company-active-map (kbd "M-n") nil)
   (define-key company-active-map (kbd "M-p") nil)
@@ -112,7 +161,8 @@
   (define-key company-active-map (kbd "C-p") 'company-select-previous)
   (define-key company-active-map (kbd "C-d") 'company-show-doc-buffer)
   (define-key evil-insert-state-map (kbd "C-o") 'company-complete)
-  :hook (after-init . global-company-mode))
+  :hook
+  (after-init . global-company-mode))
 
 (use-package company-lsp
   :after company
@@ -154,6 +204,13 @@
     "b"   'ivy-switch-buffer
     ":"   'counsel-M-x))
 
+(use-package dart-mode
+  :ensure-system-package
+  (dart_language_server . "pub global activate dart_language_server")
+  :custom
+  (dart-format-on-save t)
+  (dart-sdk-path "~/flutter/bin/cache/dart-sdk/"))
+
 (use-package dashboard
   :init
   (setq dashboard-startup-banner 'logo)
@@ -168,14 +225,11 @@
 
 (use-package doom-themes
   :init
-  (setq doom-themes-enable-bold t    
+  (setq doom-themes-enable-bold t
 	doom-themes-enable-italic t)
   :config
   (load-theme 'doom-one-light t)
-  (load-theme 'doom-tomorrow-night t)
-  )
-
-(use-package go-tag)
+  (load-theme 'doom-tomorrow-night t))
 
 (use-package evil
   :init
@@ -249,21 +303,29 @@
     ("d" magit-diff "Diff"))
   (evil-leader/set-key "g" 'hydra-magit/body))
 
-(use-package evil-org
+(use-package evil-numbers
   :after evil
   :config
-  (evil-org-set-key-theme '(
-			    navigation
-			    insert
-			    textobjects
-			    additional
-			    calendar
-			    todo
-			    heading))
+  (define-key evil-normal-state-map (kbd "C-c +") 'evil-numbers/inc-at-pt)
+  (define-key evil-normal-state-map (kbd "C-c -") 'evil-numbers/dec-at-pt))
 
+(use-package evil-org
+  :ensure t
+  :after org
+  :config
+  (add-hook 'org-mode-hook 'evil-org-mode)
+  (add-hook 'evil-org-mode-hook
+            (lambda ()
+              (evil-org-set-key-theme
+               '(textobjects
+                 insert
+                 navigation
+                 additional
+                 shift
+                 todo
+                 heading))))
   (require 'evil-org-agenda)
-  (evil-org-agenda-set-keys)
-  :hook (org-mode . evil-org-mode))
+  (evil-org-agenda-set-keys))
 
 (use-package evil-surround
   :after evil
@@ -275,12 +337,21 @@
   (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize)))
 
+(use-package flutter
+  :after dart-mode
+  :bind (:map dart-mode-map
+              ("C-M-x" . #'flutter-run-or-hot-reload))
+  :custom
+  (flutter-sdk-path "~/flutter/"))
+
 (use-package flymake-cursor
   :load-path "~/.emacs.d/packages/emacs-flymake-cursor"
   :config
   (flymake-cursor-mode))
 
 (use-package go-mode)
+
+(use-package go-tag)
 
 (use-package gotests
   :load-path "~/.emacs.d/packages/GoTests-Emacs")
@@ -295,8 +366,7 @@
 (use-package jsonnet-mode)
 
 (use-package kubel)
-(load-file "~/.emacs.d/kubel-evil.el")
-(require 'kubel-evil)
+(load-file "~/.emacs.d/kubel/kubel-evil.el")
 
 (use-package ledger-mode
   :config
@@ -316,6 +386,7 @@
   :hook
   (go-mode . lsp)
   (python-mode . lsp)
+  (dart-mode . lsp)
   :config
   (defhydra hydra-lsp (:color blue)
     "Language Server Protocol Mode"
@@ -342,6 +413,34 @@
 
 (use-package org-bullets
   :hook (org-mode . org-bullets-mode))
+
+(use-package org-super-agenda
+  :config
+  (org-super-agenda-mode)
+  (setq org-super-agenda-header-map (make-sparse-keymap))
+  (setq
+   org-super-agenda-groups
+   '(
+     (:name "Today"
+            :time-grid t
+            :todo "TODAY")
+     (:name "High Priority"
+            :priority "A"
+            :order 0)
+     (:name "Work"
+            :category "MOIA")
+     (:name "Blog"
+            :category "Blog")
+     (:name "To Read"
+            :category "Read"
+            :order 100)
+     (:name "Geburtstage und Feiertage"
+            :category ("Geburtstage" "Feiertage")
+            :order 101)
+     (:name "Waiting"
+            :todo "WAITING"
+            :order 102)
+     )))
 
 (use-package ripgrep)
 
@@ -416,13 +515,15 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(dart-format-on-save t t)
+ '(dart-sdk-path "~/flutter/bin/cache/dart-sdk/" t)
  '(org-agenda-files
    (quote
     ("~/Seafile/My Library/notes/2019.org" "~/Seafile/My Library/notes/Rezepte.org" "~/Seafile/My Library/notes/Spanisch.org" "~/Seafile/My Library/notes/aws.org" "~/Seafile/My Library/notes/container_days2019.org" "~/Seafile/My Library/notes/emacs.org" "~/Seafile/My Library/notes/fantasy.org" "~/Seafile/My Library/notes/finanzen.org" "~/Seafile/My Library/notes/linux.org" "~/Seafile/My Library/notes/moia.org" "~/Seafile/My Library/notes/private_projekte.org" "~/Seafile/My Library/notes/raspberry.org" "~/Seafile/My Library/notes/todos.org" "~/Seafile/My Library/notes/unterhaltung.org" "~/Seafile/My Library/notes/vim.org")))
  '(package-selected-packages
    (quote
-    (kubel-evil package-lint pyvenv pyenv evil-numbers quote
-                (use-package)))))
+    (dart-mode org-super-agenda kubel-evil package-lint pyvenv pyenv evil-numbers quote
+               (use-package)))))
 
 (put 'erase-buffer 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
