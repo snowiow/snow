@@ -1,4 +1,1 @@
-- import_tasks: darwin.yml
-  when: ansible_facts['os_family'] == "Darwin"
-- import_tasks: linux.yml
-  when: ansible_facts['os_family'] == "Archlinux"
+- include_tasks: "{{ ansible_os_family }}.yml"

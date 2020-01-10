@@ -5,7 +5,8 @@ packadd UltiSnips
 packadd vim-commentary
 packadd vim-gutentags
 packadd LanguageClient-neovim
-packadd vim-sandwich
+packadd vim-surround
+packadd vim-unimpaired
 packadd vim-lion
 packadd vim-jsonnet
 
@@ -401,6 +402,9 @@ let g:LanguageClient_serverCommands = {
     \ 'typescript': ['typescript-language-server', '--stdio', '--tsserver-path', 'node_modules/.bin/tsserver'],
     \ }
 
+let g:LanguageClient_rootMarkers = {
+    \ 'dart': ['pubspec.yaml'],
+    \ }
 "--- Neco GHC ----------------------------------------------------------------"
 let g:haskellmode_completion_ghc = 0
 autocmd FileType haskell setlocal omnifunc=necoghc#omnifunc
@@ -428,7 +432,7 @@ endfunction
 
 let g:netrw_banner=0
 let g:netrw_liststyle=1
-let g:netrw_localrmdir='rm -r'
+let g:netrw_localrmdir='rm -rf'
 
 "-------------------------------------PHPActor--------------------------------"
 augroup phpactor

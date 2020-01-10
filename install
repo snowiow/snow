@@ -39,7 +39,7 @@ elif [ "$os" = "Linux" ]; then
     DAV_PW=$dav_pw \
     MAIL_PRIVATE_PW=$private_pw \
     GITHUB_PW=$github_pw \
-    ansible-playbook --ask-become-pass -i hosts linux.yml
+    ansible-playbook -vvv --ask-become-pass -i hosts linux.yml
 else
    echo "Unknow OS: $os"
    exit 1
