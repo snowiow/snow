@@ -383,6 +383,7 @@ function! LC_maps()
     nnoremap <buffer> <silent> K :call LanguageClient#textDocument_hover()<cr>
     nnoremap <buffer> <silent> gd :call LanguageClient#textDocument_definition()<CR>
     nnoremap <buffer> <silent> lr :call LanguageClient#textDocument_rename()<CR>
+    nnoremap <buffer> <silent> lf :call LanguageClient#textDocument_formatting()<CR>
     nnoremap <buffer> <Leader>m :call LanguageClient_contextMenu()<CR>
     vnoremap <buffer> <Leader>m :call LanguageClient_contextMenu()<CR>
   endif

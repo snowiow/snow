@@ -22,6 +22,7 @@
     review = !nvim -p $(git files | grep -v composer.lock) +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
     review-one = !nvim -p +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
     aa = add --all
+    bd = branch -d
 	cb = checkout -b
     cm = checkout master
     cmsg = commit -m
