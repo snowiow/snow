@@ -130,7 +130,7 @@ alt - x : yabai -m space --mirror x-axis
 alt + shift - a : yabai -m space --toggle padding; yabai -m space --toggle gap
 
 # toggle window parent zoom
-alt - d : yabai -m window --toggle zoom-parent
+# alt - d : yabai -m window --toggle zoom-parent
 
 # toggle window fullscreen zoom
 alt - f : yabai -m window --toggle zoom-fullscreen

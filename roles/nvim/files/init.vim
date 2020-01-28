@@ -7,7 +7,6 @@ packadd vim-gutentags
 packadd LanguageClient-neovim
 packadd vim-surround
 packadd vim-unimpaired
-packadd vim-lion
 packadd vim-jsonnet
 
 " call minpac#add('tpope/vim-repeat')
@@ -257,15 +256,15 @@ endif
 noremap <c-space> <c-^>
 
 " unimpaired stuff
-noremap [q :cprevious
-noremap ]q :cnext
-noremap [Q :cfirst
-noremap ]Q :clast
+noremap [q :cprevious<CR>
+noremap ]q :cnext<CR>
+noremap [Q :cfirst<CR>
+noremap ]Q :clast<CR>
 
-noremap [b :bprevious
-noremap ]b :bnext
-noremap [B :bfirst
-noremap ]B :blast
+noremap [b :bprevious<CR>
+noremap ]b :bnext<CR>
+noremap [B :bfirst<CR>
+noremap ]B :blast<CR>
 
 "===============================Autocommands=================================="
 
