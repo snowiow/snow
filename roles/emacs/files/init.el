@@ -31,6 +31,8 @@
 (global-visual-line-mode t)
 ; Always create closing bracket
 (electric-pair-mode 1)
+; always answer questions with y/n
+(defalias 'yes-or-no-p 'y-or-n-p)
 ; Set default font
 (set-face-attribute 'default nil
                     :family "Iosevka Term"
@@ -72,6 +74,9 @@
 ; Org Mode
 (require 'org)
 (setq org-image-actual-width nil)
+(setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+(setq org-agenda-skip-deadline-if-done t)
+(setq org-agenda-skip-scheduled-if-done t)
 (setq org-directory "~/Seafile/My Library/notes")
 (setq org-journal-dir "~/Seafile/My Library/notes/journal")
 (setq org-agenda-files
@@ -102,7 +107,8 @@
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((shell . t)
-   (ledger . t)))
+   (ledger . t)
+   (gnuplot . t)))
 
 (setq solar-n-hemi-seasons
       '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
@@ -139,6 +145,13 @@
 (setq holiday-bahai-holidays nil)
 (setq holiday-oriental-holidays nil)
 
+(defun org-summary-todo (n-done n-not-done)
+  "Switch entry to DONE when all subentries are done, to TODO otherwise."
+  (let (org-log-done org-log-states)   ; turn off logging
+    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+(add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
+
 ; Whitspace Column
 (setq-default
  whitespace-line-column 80
@@ -151,7 +164,7 @@
   :init
   (setq company-dabbrev-downcase nil)
   (setq company-selection-wrap-around t)
-  (setq company-idle-delay 0)
+  ;; (setq company-idle-delay 0)
   (setq company-minimum-prefix-length 2)
   :config
   (define-key company-active-map (kbd "M-n") nil)
@@ -356,6 +369,7 @@
 (use-package gotests
   :load-path "~/.emacs.d/packages/GoTests-Emacs")
 
+(use-package gnuplot-mode)
 (use-package highlight-indent-guides
   :init
   (setq highlight-indent-guides-method 'character)
@@ -423,22 +437,29 @@
    '(
      (:name "Today"
             :time-grid t
-            :todo "TODAY")
+            :todo "TODAY"
+            :deadline today)
      (:name "High Priority"
             :priority "A"
+            :deadline past
             :order 0)
+     (:name "With Deadline"
+            :deadline future)
      (:name "Work"
             :category "MOIA")
      (:name "Blog"
             :category "Blog")
+     (:name "Waiting"
+            :todo "WAITING"
+            :order 99)
      (:name "To Read"
             :category "Read"
             :order 100)
+     (:name "To Watch"
+            :category "Watch"
+            :order 101)
      (:name "Geburtstage und Feiertage"
             :category ("Geburtstage" "Feiertage")
-            :order 101)
-     (:name "Waiting"
-            :todo "WAITING"
             :order 102)
      )))
 
@@ -519,11 +540,11 @@
  '(dart-sdk-path "~/flutter/bin/cache/dart-sdk/" t)
  '(org-agenda-files
    (quote
-    ("~/Seafile/My Library/notes/2019.org" "~/Seafile/My Library/notes/Rezepte.org" "~/Seafile/My Library/notes/Spanisch.org" "~/Seafile/My Library/notes/aws.org" "~/Seafile/My Library/notes/container_days2019.org" "~/Seafile/My Library/notes/emacs.org" "~/Seafile/My Library/notes/fantasy.org" "~/Seafile/My Library/notes/finanzen.org" "~/Seafile/My Library/notes/linux.org" "~/Seafile/My Library/notes/moia.org" "~/Seafile/My Library/notes/private_projekte.org" "~/Seafile/My Library/notes/raspberry.org" "~/Seafile/My Library/notes/todos.org" "~/Seafile/My Library/notes/unterhaltung.org" "~/Seafile/My Library/notes/vim.org")))
+    ("~/Seafile/My Library/notes/Rezepte.org" "~/Seafile/My Library/notes/Spanisch.org" "~/Seafile/My Library/notes/aws.org" "~/Seafile/My Library/notes/container_days2019.org" "~/Seafile/My Library/notes/emacs.org" "~/Seafile/My Library/notes/finanzen.org" "~/Seafile/My Library/notes/linux.org" "~/Seafile/My Library/notes/moia.org" "~/Seafile/My Library/notes/private_projekte.org" "~/Seafile/My Library/notes/raspberry.org" "~/Seafile/My Library/notes/todos.org" "~/Seafile/My Library/notes/unterhaltung.org" "~/Seafile/My Library/notes/vim.org")))
  '(package-selected-packages
    (quote
-    (dart-mode org-super-agenda kubel-evil package-lint pyvenv pyenv evil-numbers quote
-               (use-package)))))
+    (gnuplot-mode dart-mode org-super-agenda kubel-evil package-lint pyvenv pyenv evil-numbers quote
+                  (use-package)))))
 
 (put 'erase-buffer 'disabled nil)
 (put 'dired-find-alternate-file 'disabled nil)
