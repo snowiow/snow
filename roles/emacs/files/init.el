@@ -48,6 +48,9 @@
 ; Tab width
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
+; custom-file
+(setq custom-file "~/.emacs.d/custom.el")
+(load custom-file)
 
 ; ============================> BuiltIn Packages
 ; Auto Fill Mode
@@ -531,20 +534,3 @@
   "Reformat entire buffer using the Jsonnet format utility."
   (interactive)
   (call-process-region (point-min) (point-max) "jsonnetfmt" t t nil "-"))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(dart-format-on-save t t)
- '(dart-sdk-path "~/flutter/bin/cache/dart-sdk/" t)
- '(org-agenda-files
-   (quote
-    ("~/Seafile/My Library/notes/Rezepte.org" "~/Seafile/My Library/notes/Spanisch.org" "~/Seafile/My Library/notes/aws.org" "~/Seafile/My Library/notes/container_days2019.org" "~/Seafile/My Library/notes/emacs.org" "~/Seafile/My Library/notes/finanzen.org" "~/Seafile/My Library/notes/linux.org" "~/Seafile/My Library/notes/moia.org" "~/Seafile/My Library/notes/private_projekte.org" "~/Seafile/My Library/notes/raspberry.org" "~/Seafile/My Library/notes/todos.org" "~/Seafile/My Library/notes/unterhaltung.org" "~/Seafile/My Library/notes/vim.org")))
- '(package-selected-packages
-   (quote
-    (gnuplot-mode dart-mode org-super-agenda kubel-evil package-lint pyvenv pyenv evil-numbers quote
-                  (use-package)))))
-
-(put 'erase-buffer 'disabled nil)
-(put 'dired-find-alternate-file 'disabled nil)
