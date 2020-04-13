@@ -441,6 +441,8 @@
             :order 0)
      (:name "With Deadline"
             :deadline future)
+     (:name "Haushalt"
+            :category "Haushalt")
      (:name "Work"
             :category "MOIA")
      (:name "Blog"
@@ -528,3 +530,4 @@
   "Reformat entire buffer using the Jsonnet format utility."
   (interactive)
   (call-process-region (point-min) (point-max) "jsonnetfmt" t t nil "-"))
+(put 'dired-find-alternate-file 'disabled nil)
