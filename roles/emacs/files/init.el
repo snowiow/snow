@@ -109,9 +109,10 @@
         (sequence "|" "CANCELLED(c)")))
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((shell . t)
+ '((gnuplot . t)
    (ledger . t)
-   (gnuplot . t)))
+   (python . t)
+   (shell . t)))
 
 (setq solar-n-hemi-seasons
       '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
@@ -162,6 +163,11 @@
 
 (add-hook 'emacs-lisp-mode-hook 'whitespace-mode)
 ; =============================> Packages
+(use-package cider)
+(use-package clojure-mode
+  :hook
+  (clojure-mode . rainbow-delimiters-mode)
+  )
 
 (use-package company
   :init
@@ -219,13 +225,6 @@
   (evil-leader/set-key
     "b"   'ivy-switch-buffer
     ":"   'counsel-M-x))
-
-(use-package dart-mode
-  :ensure-system-package
-  (dart_language_server . "pub global activate dart_language_server")
-  :custom
-  (dart-format-on-save t)
-  (dart-sdk-path "~/flutter/bin/cache/dart-sdk/"))
 
 (use-package dashboard
   :init
@@ -353,13 +352,6 @@
   (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize)))
 
-(use-package flutter
-  :after dart-mode
-  :bind (:map dart-mode-map
-              ("C-M-x" . #'flutter-run-or-hot-reload))
-  :custom
-  (flutter-sdk-path "~/flutter/"))
-
 (use-package flymake-cursor
   :load-path "~/.emacs.d/packages/emacs-flymake-cursor"
   :config
@@ -426,6 +418,7 @@
   (markdown-mode . auto-fill-mode)
   (markdown-mode . whitespace-mode))
 
+(use-package ob-async)
 (use-package python-mode)
 
 (use-package org-bullets
@@ -466,6 +459,7 @@
             :order 102)
      )))
 
+(use-package rainbow-delimiters)
 (use-package ripgrep)
 
 (use-package projectile
@@ -504,12 +498,12 @@
 (defun snow/switch-theme ()
     "switches between dark and light theme"
     (interactive)
-  (if (eq (car custom-enabled-themes) 'doom-vibrant)
+  (if (eq (car custom-enabled-themes) 'doom-tomorrow-night)
       (progn
-	(disable-theme 'doom-vibrant)
+	(disable-theme 'doom-tomorrow-night)
 	(load "~/.emacs.d/modeline-light.el"))
     (progn
-      (enable-theme 'doom-vibrant)
+      (enable-theme 'doom-tomorrow-night)
 	(load "~/.emacs.d/modeline-dark.el"))))
 
 ; ERC
