@@ -27,6 +27,8 @@
 (show-paren-mode t)
 ; Always show this many lines above or below cursor
 (setq scroll-margin 5)
+; turn off annoying bell sound
+(setq ring-bell-function 'ignore)
 ; Automatically wrap lines
 (global-visual-line-mode t)
 ; Always create closing bracket
@@ -76,6 +78,7 @@
 
 ; Org Mode
 (require 'org)
+(bind-key "C-c g" 'org-plot/gnuplot)
 (setq org-image-actual-width nil)
 (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
 (setq org-agenda-skip-deadline-if-done t)
@@ -103,7 +106,10 @@
          "* TODO %?")
         ("j" "Journal Note"
          entry (file+datetree (lambda () (get-journal-file-this-year)))
-         "* %U %?")))
+         "* %U %?")
+        ("w" "Gewicht Eintrag" table-line
+         (id "weight-table")
+         "| %u | %^{Gewicht} |" :immediate-finish t)))
 (setq org-todo-keywords
       '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
         (sequence "|" "CANCELLED(c)")))
@@ -364,7 +370,7 @@
 (use-package gotests
   :load-path "~/.emacs.d/packages/GoTests-Emacs")
 
-(use-package gnuplot-mode)
+(use-package gnuplot)
 (use-package highlight-indent-guides
   :init
   (setq highlight-indent-guides-method 'character)
