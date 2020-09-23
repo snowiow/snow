@@ -38,7 +38,7 @@
 ; Set default font
 (set-face-attribute 'default nil
                     :family "Iosevka Term"
-                    :height 120
+                    :height 140
                     :weight 'normal
                     :width 'normal)
 
@@ -50,10 +50,13 @@
 ; Tab width
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
-; custom-file
+; Custom-file
 (setq custom-file "~/.emacs.d/custom.el")
 (load custom-file)
 
+;number of bytes between consing. Mainly increased for lsp-mode
+(setq gc-cons-threshold 100000000)
+(setq read-process-output-max (* 1024 1024)) ;; 1mb
 ; ============================> BuiltIn Packages
 ; Auto Fill Mode
 (setq-default fill-column 80)
@@ -170,17 +173,17 @@
 (add-hook 'emacs-lisp-mode-hook 'whitespace-mode)
 ; =============================> Packages
 (use-package cider)
+
 (use-package clojure-mode
   :hook
-  (clojure-mode . rainbow-delimiters-mode)
-  )
+  (clojure-mode . rainbow-delimiters-mode))
 
 (use-package company
   :init
   (setq company-dabbrev-downcase nil)
   (setq company-selection-wrap-around t)
-  ;; (setq company-idle-delay 0)
-  (setq company-minimum-prefix-length 2)
+  (setq company-idle-delay 0.0)
+  (setq company-minimum-prefix-length 1)
   :config
   (define-key company-active-map (kbd "M-n") nil)
   (define-key company-active-map (kbd "M-p") nil)
@@ -191,13 +194,6 @@
   (define-key evil-insert-state-map (kbd "C-o") 'company-complete)
   :hook
   (after-init . global-company-mode))
-
-(use-package company-lsp
-  :after company
-  :init
-  (setq lsp-log-io t)
-  :config
-  (push 'company-lsp company-backends))
 
 (use-package counsel
   :after evil-leader
@@ -256,6 +252,7 @@
   :init
   (setq evil-want-C-u-scroll t)
   (setq evil-want-keybinding nil)
+  (setq evil-want-Y-yank-to-eol t)
   :config
   (evil-mode)
   (evil-define-key 'visual emacs-lisp-mode-map
@@ -401,7 +398,9 @@
   :hook
   (go-mode . lsp)
   (python-mode . lsp)
-  (dart-mode . lsp)
+  (typescript-mode . lsp)
+  :init
+  (setq lsp-headerline-breadcrumb-enable t)
   :config
   (defhydra hydra-lsp (:color blue)
     "Language Server Protocol Mode"
@@ -451,8 +450,8 @@
             :category "Haushalt")
      (:name "Work"
             :category "MOIA")
-     (:name "Blog"
-            :category "Blog")
+     (:name "Freizeit Coding"
+            :category "Freizeit Coding")
      (:name "Waiting"
             :todo "WAITING"
             :order 99)
@@ -490,6 +489,10 @@
 (use-package pyvenv)
 (use-package package-lint)
 
+(use-package typescript-mode
+  :init
+  (setq typescript-indent-level 2)
+  )
 (use-package yaml-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
@@ -526,12 +529,6 @@
   (interactive)
   (projectile-run-term "zsh"))
 
-(defun create-tags (dir-name)
-    "Create tags file."
-    (interactive "DDirectory: ")
-    (shell-command
-        (format "%s -f TAGS -e -R %s" "ctags" (directory-file-name dir-name)))
-)
 (defun snow/jsonnet-reformat-buffer ()
   "Reformat entire buffer using the Jsonnet format utility."
   (interactive)
