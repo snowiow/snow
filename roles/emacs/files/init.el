@@ -2,6 +2,7 @@
 (require 'package)
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
+        ("org" . "https://orgmode.org/elpa/")
         ("melpa" . "https://melpa.org/packages/")))
 
 (package-initialize)
@@ -9,12 +10,9 @@
 (setq use-package-always-ensure t)
 (use-package use-package-ensure-system-package
   :ensure t)
-; =============================> BuiltIns
-; Increase/Decrease Text size
-(global-set-key (kbd "C-+") 'text-scale-increase)
-(global-set-key (kbd "C--") 'text-scale-decrease)
-(global-set-key (kbd "C-k") 'previous-line)
 
+
+; =============================> BuiltIns
 (setq backup-directory-alist `(("." . "~/tmp")))
 
 ; Hide scrollbar
@@ -35,7 +33,7 @@
 (electric-pair-mode 1)
 ; always answer questions with y/n
 (defalias 'yes-or-no-p 'y-or-n-p)
-; Set default font
+; Set fonts
 (set-face-attribute 'default nil
                     :family "Iosevka Term"
                     :height 140
@@ -79,104 +77,15 @@
  '(ediff-current-diff-B ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "#50a14f"))))
  '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
 
-; Org Mode
-(require 'org)
-(bind-key "C-c g" 'org-plot/gnuplot)
-(setq org-image-actual-width nil)
-(setq org-agenda-skip-scheduled-if-deadline-is-shown t)
-(setq org-agenda-skip-deadline-if-done t)
-(setq org-agenda-skip-scheduled-if-done t)
-(setq org-directory "~/Seafile/My Library/notes")
-(setq org-journal-dir "~/Seafile/My Library/notes/journal")
-(setq org-agenda-files
-	(file-expand-wildcards (concat org-directory "/*.org")))
-(setq org-agenda-window-setup 'current-window)
-(setq org-default-notes-file (concat org-directory "/capture.org"))
-(defun get-journal-file-this-year ()
-  "Return filename for today's journal entry."
-  (let ((yearly-name (concat "/" (format-time-string "%Y") ".org")))
-    (expand-file-name (concat org-journal-dir yearly-name))))
-(setq org-capture-templates
-      '(("t" "Todo" entry (file+headline
-                           (lambda ()
-                             (concat org-directory "/todos.org"))
-                           "Allgemein")
-         "* TODO %?")
-        ("m" "Todo MOIA" entry (file+headline
-                                (lambda ()
-                                  (concat org-directory "/moia.org"))
-                                "Todos")
-         "* TODO %?")
-        ("j" "Journal Note"
-         entry (file+datetree (lambda () (get-journal-file-this-year)))
-         "* %U %?")
-        ("w" "Gewicht Eintrag" table-line
-         (id "weight-table")
-         "| %u | %^{Gewicht} |" :immediate-finish t)))
-(setq org-todo-keywords
-      '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
-        (sequence "|" "CANCELLED(c)")))
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((gnuplot . t)
-   (ledger . t)
-   (python . t)
-   (shell . t)))
-
-(setq solar-n-hemi-seasons
-      '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
-
-(setq holiday-general-holidays
-      '((holiday-fixed 1 1 "Neujahr")
-        (holiday-fixed 5 1 "1. Mai")
-        (holiday-fixed 10 3 "Tag der Deutschen Einheit")))
-
-(setq holiday-christian-holidays
-      '((holiday-float 12 0 -4 "1. Advent" 24)
-        (holiday-float 12 0 -3 "2. Advent" 24)
-        (holiday-float 12 0 -2 "3. Advent" 24)
-        (holiday-float 12 0 -1 "4. Advent" 24)
-        (holiday-fixed 12 25 "1. Weihnachtstag")
-        (holiday-fixed 12 26 "2. Weihnachtstag")
-        (holiday-fixed 1 6 "Heilige Drei Könige")
-        (holiday-easter-etc -48 "Rosenmontag")
-        (holiday-easter-etc -3 "Gründonnerstag")
-        (holiday-easter-etc  -2 "Karfreitag")
-        (holiday-easter-etc   0 "Ostersonntag")
-        (holiday-easter-etc  +1 "Ostermontag")
-        (holiday-easter-etc +39 "Christi Himmelfahrt")
-        (holiday-easter-etc +49 "Pfingstsonntag")
-        (holiday-easter-etc +50 "Pfingstmontag")
-        (holiday-easter-etc +60 "Fronleichnam")
-        (holiday-fixed 8 15 "Mariae Himmelfahrt")
-        (holiday-fixed 11 1 "Allerheiligen")
-        (holiday-float 11 3 1 "Buss- und Bettag" 16)
-        (holiday-float 11 0 1 "Totensonntag" 20)))
-
-(setq holiday-hebrew-holidays nil)
-(setq holiday-islamic-holidays nil)
-(setq holiday-bahai-holidays nil)
-(setq holiday-oriental-holidays nil)
-
-(defun org-summary-todo (n-done n-not-done)
-  "Switch entry to DONE when all subentries are done, to TODO otherwise."
-  (let (org-log-done org-log-states)   ; turn off logging
-    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-
-(add-hook 'org-after-todo-statistics-hook 'org-summary-todo)
-
 ; Whitspace Column
 (setq-default
  whitespace-line-column 80
  whitespace-style '(face lines-tail))
 
-(add-hook 'emacs-lisp-mode-hook 'whitespace-mode)
 ; =============================> Packages
 (use-package cider)
 
-(use-package clojure-mode
-  :hook
-  (clojure-mode . rainbow-delimiters-mode))
+(use-package clojure-mode)
 
 (use-package company
   :init
@@ -185,56 +94,24 @@
   (setq company-idle-delay 0.0)
   (setq company-minimum-prefix-length 1)
   :config
-  (define-key company-active-map (kbd "M-n") nil)
-  (define-key company-active-map (kbd "M-p") nil)
-  (define-key company-active-map (kbd "C-n") 'company-select-next)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (define-key company-active-map (kbd "C-p") 'company-select-previous)
-  (define-key company-active-map (kbd "C-d") 'company-show-doc-buffer)
-  (define-key evil-insert-state-map (kbd "C-o") 'company-complete)
   :hook
-  (after-init . global-company-mode))
+  (after-init . global-company-mode)
+  :bind (:map company-active-map
+   ("M-n" . nil)
+   ("M-p" . nil)
+   ("C-n" . company-select-next)
+   ("C-p" . company-select-previous)
+   ("C-p" . company-select-previous)
+   ("C-d" . company-show-doc-buffer)))
 
-(use-package counsel
-  :after evil-leader
-  :init
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-wrap t)
-  (setq ivy-initial-inputs-alist nil)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-display-style nil)
-  (setq ivy-re-builders-alist
-      '((t . ivy--regex-ignore-order)))
-  :config
-  (ivy-mode 1)
-  (define-key ivy-minibuffer-map (kbd "C-j") 'ivy-next-line)
-  (define-key ivy-minibuffer-map (kbd "C-k") 'ivy-previous-line)
-  (define-key ivy-minibuffer-map (kbd "C-S-k") 'ivy-beginning-of-buffer)
-  (define-key ivy-minibuffer-map (kbd "C-S-j") 'ivy-end-of-buffer)
-  (define-key ivy-minibuffer-map (kbd "C-d") 'ivy-scroll-up-command)
-  (define-key ivy-minibuffer-map (kbd "C-u") 'ivy-scroll-down-command)
-  (define-key ivy-minibuffer-map (kbd "C-y") 'ivy-immediate-done)
-  (define-key ivy-switch-buffer-map (kbd "C-d") 'ivy-switch-buffer-kill)
-  (define-key ivy-switch-buffer-map (kbd "C-k") 'ivy-previous-line)
-  (defhydra hydra-info (:color blue)
-    "Info Menu"
-    ("v" counsel-describe-variable "Describe Variable")
-    ("f" counsel-describe-function "Describe Function")
-    ("k" describe-key "Describe Key")
-    ("a" info-apropos "Info Apropos")
-    ("i" info "Info"))
-  (evil-leader/set-key "h" 'hydra-info/body)
-  (evil-leader/set-key
-    "b"   'ivy-switch-buffer
-    ":"   'counsel-M-x))
+(use-package counsel)
 
 (use-package dashboard
   :init
   (setq dashboard-startup-banner 'logo)
-  (setq dashboard-items '((projects . 5)
-			  (recents  . 5)
-			  (bookmarks . 5)
-			  (agenda . 5)))
+  (setq dashboard-items '((agenda . 5)
+                          (projects . 5)
+                          (recents  . 5)))
   :config
   (dashboard-setup-startup-hook))
 
@@ -253,95 +130,41 @@
   (setq evil-want-C-u-scroll t)
   (setq evil-want-keybinding nil)
   (setq evil-want-Y-yank-to-eol t)
+  (setq evil-search-module 'evil-search)
   :config
-  (evil-mode)
-  (evil-define-key 'visual emacs-lisp-mode-map
-    "e" 'eval-region))
+  (evil-mode))
 
 (use-package evil-collection
   :after evil
   :config
-  (evil-collection-init '(calc ediff eshell term)))
+  (evil-collection-init '(calc
+                          calendar
+                          dashboard
+                          ediff
+                          eshell
+                          helpful
+                          minibuffer
+                          term)))
 
 (use-package evil-commentary
   :after evil
   :config
   (evil-commentary-mode))
 
-(use-package evil-leader
-  :after evil
-  :config
-  (global-evil-leader-mode)
-  (evil-leader/set-leader "SPC")
-  ; Global
-  (evil-leader/set-key "e"
-    (lambda ()
-      (interactive)
-      (dired default-directory)))
-  (evil-leader/set-key "c"
-    (lambda ()
-      (interactive)
-      (find-file "~/.emacs.d/init.el")))
-  (defhydra hydra-org (:color blue)
-    ("a" org-agenda "Agenda")
-    ("c" org-capture "Capture Templates"))
-    (evil-leader/set-key "$" 'hydra-org/body)
-  ; Dired
-  (evil-define-key 'normal dired-mode-map (kbd "h")
-    (lambda ()
-      (interactive)
-      (find-alternate-file "..")))
-  (evil-define-key 'normal dired-mode-map (kbd "l") 'dired-find-alternate-file)
-  (evil-define-key 'normal dired-mode-map (kbd "c") 'find-file)
-  (evil-define-key 'normal dired-mode-map (kbd "d") 'dired-create-directory)
-  (evil-define-key 'normal dired-mode-map (kbd "m") 'dired-mark)
-  (evil-define-key 'normal dired-mode-map (kbd "D") 'dired-do-delete)
-  (evil-define-key 'normal dired-mode-map (kbd "R") 'dired-do-rename)
-  ; Org Mode
-  (evil-leader/set-key-for-mode 'org-mode
-    "RET" 'org-open-at-point
-    "it" 'org-toggle-inline-images
-    "li" 'org-insert-link
-    "lo" 'org-agenda-open-link
-    "SPC" 'org-ctrl-c-ctrl-c)
-  ; Frame Management
-  (defhydra hydra-frames (:color blue)
-    ("o" make-frame-command "Make a new frame")
-    ("d" delete-frame "Delete Frame")
-    ("n" other-frame "Other Frame"))
-    (evil-leader/set-key "w" 'hydra-frames/body))
-
 (use-package evil-magit
-  :after (evil-leader magit)
-  :config
-  (defhydra hydra-magit (:color blue)
-    "Language Server Protocol Mode"
-    ("g" magit "Status")
-    ("b" magit-blame "Blame")
-    ("d" magit-diff "Diff"))
-  (evil-leader/set-key "g" 'hydra-magit/body))
+  :after (evil magit))
 
 (use-package evil-numbers
-  :after evil
-  :config
-  (define-key evil-normal-state-map (kbd "C-c +") 'evil-numbers/inc-at-pt)
-  (define-key evil-normal-state-map (kbd "C-c -") 'evil-numbers/dec-at-pt))
+  :after evil)
 
 (use-package evil-org
-  :ensure t
   :after org
+  :hook
+  (org-mode . evil-org-mode)
   :config
-  (add-hook 'org-mode-hook 'evil-org-mode)
   (add-hook 'evil-org-mode-hook
             (lambda ()
-              (evil-org-set-key-theme
-               '(textobjects
-                 insert
-                 navigation
-                 additional
-                 shift
-                 todo
-                 heading))))
+              (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))))
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 
@@ -360,6 +183,137 @@
   :config
   (flymake-cursor-mode))
 
+(use-package general
+  :config
+  (general-evil-setup t)
+  (general-define-key
+   "C-+" 'text-scale-increase
+   "C--" 'text-scale-decrease
+   ;; "C-k" 'previous-line
+   )
+
+  ;; general normal mappings
+  (general-nmap
+    "C-c +" 'evil-numbers/inc-at-pt
+    "C-c -" 'evil-numbers/dec-at-pt)
+
+  ;; org-agenda-mode mappings
+  (general-define-key
+   :keymaps 'org-agenda-mode-map
+   "<"  'org-agenda-earlier
+   ">"  'org-agenda-later)
+
+  ;; evil-insert-state mappings
+  (general-define-key
+   :keymaps 'evil-insert-state-map
+   "C-o" 'company-complete)
+  (general-define-key
+   :states 'normal
+   :keymaps 'dired-mode-map
+   "h" (lambda ()
+         (interactive)
+         (find-alternate-file ".."))
+   "l" 'dired-find-alternate-file
+   "c" 'find-file
+   "d" 'dired-create-directory
+   "m" 'dired-mark
+   "D" 'dired-do-delete
+   "R" 'dired-do-rename)
+
+  ;; emacs-lisp-mode mappings
+  (general-define-key
+   :states 'visual
+   :keymaps 'emacs-lisp-mode-map
+    "e" 'eval-region)
+
+  ;; leader key mappings
+  (general-create-definer snow/leader-keys
+    :keymaps '(normal emacs)
+    :prefix "SPC")
+
+  (snow/leader-keys
+    ;; general
+    "b" 'ivy-switch-buffer
+    "c" (lambda ()
+          (interactive)
+          (find-file "~/.emacs.d/init.el"))
+    "e" (lambda ()
+          (interactive)
+          (dired default-directory))
+    ;; git
+    "g"  '(:ignore t :which-key "Git")
+    "gg" 'magit
+    "gb" 'magit-blame
+    "gd" 'magit-diff
+
+    ":" 'counsel-M-x
+
+    ;; help
+    "h" '(:ignore t :which-key "Help")
+    "ha" 'info-apropos
+    "hf" 'counsel-describe-function
+    "hk" 'describe-key
+    "hi" 'info
+    "hs" 'counsel-describe-symbol
+    "hv" 'counsel-describe-variable
+
+    ;; language-server-protocol
+    "l" '(:ignore t :which-key "LSP")
+    "ld" 'lsp-find-definition
+    "lf" 'lsp-format-buffer
+    "li" 'lsp-organize-imports
+    "lr" 'lsp-find-references
+    "ls" 'lsp-describe-session
+    "lt" 'imenu
+
+    ;; projectile
+    "p" '(:ignore t :which-key "Projectile")
+    "p7" 'projectile-ripgrep
+    "p8" 'ripgrep-regexp
+    "po" 'projectile--find-file
+    "pp" 'projectile-switch-project
+    "pt" 'projectile-run-term
+
+    ;; org mode
+    "$" '(:ignore t :which-key "Org Mode")
+    "$a" 'org-agenda
+    "$c" 'org-capture
+    )
+
+  ;; local-leader key mappings
+  (general-create-definer snow/local-leader-keys
+    ;; :keymaps '(override normal emacs)
+    :prefix ",")
+
+  ;; emacs-lisp-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'emacs-lisp-mode-map
+    "b" 'eval-buffer
+    "e" 'eval-last-sexp
+    )
+
+  ;; ledger-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'ledger-mode-map
+    "r" 'ledger-reconcile
+    "a" 'ledger-add-transaction
+    "c" 'ledger-occur
+    "p" 'ledger-report
+    )
+
+  ;; org-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'org-mode-map
+    "RET" 'org-open-at-point
+    "i" 'org-toggle-inline-images
+    "l" 'org-insert-link
+    "o" 'org-agenda-open-link
+    "," 'org-ctrl-c-ctrl-c
+    ))
+
 (use-package go-mode)
 
 (use-package go-tag)
@@ -368,6 +322,12 @@
   :load-path "~/.emacs.d/packages/GoTests-Emacs")
 
 (use-package gnuplot)
+
+(use-package helpful
+  :config
+  (setq counsel-describe-function-function #'helpful-callable)
+  (setq counsel-describe-variable-function #'helpful-variable))
+
 (use-package highlight-indent-guides
   :init
   (setq highlight-indent-guides-method 'character)
@@ -375,20 +335,38 @@
   (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
 
 (use-package hydra)
+
+(use-package ivy
+  :init
+  (setq ivy-use-virtual-buffers t)
+  (setq ivy-wrap t)
+  (setq ivy-initial-inputs-alist nil)
+  (setq ivy-count-format "(%d/%d) ")
+  (setq ivy-display-style nil)
+  (setq ivy-re-builders-alist
+      '((t . ivy--regex-ignore-order)))
+  :config
+  (ivy-mode 1)
+  :bind
+  ;; ivy-minibuffer mappings
+  (:map ivy-minibuffer-map
+   ("C-j" . ivy-next-line)
+   ("C-k" . ivy-previous-line)
+   ("C-S-k" . ivy-beginning-of-buffer)
+   ("C-S-j" . ivy-end-of-buffer)
+   ("C-d" . ivy-scroll-up-command)
+   ("C-u" . ivy-scroll-down-command)
+   ("C-y" . ivy-immediate-done)
+   :map ivy-switch-buffer-map
+   ("C-d" . ivy-switch-buffer-kill)
+   ("C-k" . ivy-previous-line)))
+
 (use-package jsonnet-mode)
 
 (use-package kubel)
 (load-file "~/.emacs.d/kubel/kubel-evil.el")
 
-(use-package ledger-mode
-  :config
-  (defhydra hydra-ledger (:color blue)
-    "ledger mode"
-    ("r" ledger-reconcile "reconcile")
-    ("a" ledger-add-transaction "add transaction")
-    ("c" ledger-occur "occur")
-    ("p" ledger-report "reports"))
-  (evil-leader/set-key-for-mode 'ledger-mode "l" 'hydra-ledger/body))
+(use-package ledger-mode)
 
 (use-package linum-relative
   :config
@@ -400,16 +378,7 @@
   (python-mode . lsp)
   (typescript-mode . lsp)
   :init
-  (setq lsp-headerline-breadcrumb-enable t)
-  :config
-  (defhydra hydra-lsp (:color blue)
-    "Language Server Protocol Mode"
-    ("d" lsp-find-definition "Definition")
-    ("f" lsp-format-buffer "Format Buffer")
-    ("r" lsp-find-references "References")
-    ("i" lsp-organize-imports "Organize Imports")
-    ("t" imenu "Tags"))
-  (evil-leader/set-key "l" 'hydra-lsp/body))
+  (setq lsp-headerline-breadcrumb-enable t))
 
 (use-package magit)
 
@@ -420,79 +389,137 @@
   :init (setq markdown-command "multimarkdown")
   :hook
   (markdown-mode . flyspell-mode)
-  (markdown-mode . auto-fill-mode)
-  (markdown-mode . whitespace-mode))
+  (markdown-mode . auto-fill-mode))
 
 (use-package ob-async)
 (use-package python-mode)
 
+(use-package org
+  :hook
+  (org-after-todo-statistics . org-summary-todo)
+  :config
+  (progn
+    (setq org-image-actual-width nil)
+    (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+    (setq org-agenda-skip-deadline-if-done t)
+    (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
+    (setq org-agenda-skip-scheduled-if-done t)
+    (setq org-ellipsis " ▾")
+    (setq org-directory "~/Seafile/My Library/notes")
+    (setq org-journal-dir "~/Seafile/My Library/notes/journal")
+    (setq org-agenda-files
+        (file-expand-wildcards (concat org-directory "/*.org")))
+    (setq org-agenda-window-setup 'current-window)
+    (setq org-default-notes-file (concat org-directory "/capture.org"))
+    (setq org-babel-python-command "python3")
+    (setq org-agenda-custom-commands
+        '(("w" "Work Todos"
+           ((agenda "" ((org-agenda-span 1)))
+            (todo ""
+                ((org-agenda-overriding-header "\nUnscheduled TODOs")
+                 (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
+           ((org-agenda-compact-blocks t)
+            (org-agenda-files '("~/Seafile/My Library/notes/work.org"))
+            ))))
+    (setq org-capture-templates
+        '(("t" "Todo" entry (file+headline
+                            (lambda ()
+                                (concat org-directory "/todos.org"))
+                            "Allgemein")
+            "* TODO %?")
+            ("m" "Todo Work" entry (file+headline
+                                    (lambda ()
+                                    (concat org-directory "/work.org"))
+                                    "Todos")
+            "* TODO %?")
+            ("j" "Journal Note"
+            entry (file+datetree (lambda () (get-journal-file-this-year)))
+            "* %U %?")
+            ("w" "Gewicht Eintrag" table-line
+            (id "weight-table")
+            "| %u | %^{Gewicht} |" :immediate-finish t)))
+    (setq org-todo-keywords
+        '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
+            (sequence "|" "CANCELLED(c)")))
+    (setq solar-n-hemi-seasons
+        '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
+
+    (setq holiday-general-holidays
+        '((holiday-fixed 1 1 "Neujahr")
+            (holiday-fixed 5 1 "1. Mai")
+            (holiday-fixed 10 3 "Tag der Deutschen Einheit")))
+
+    (setq holiday-christian-holidays
+        '((holiday-float 12 0 -4 "1. Advent" 24)
+            (holiday-float 12 0 -3 "2. Advent" 24)
+            (holiday-float 12 0 -2 "3. Advent" 24)
+            (holiday-float 12 0 -1 "4. Advent" 24)
+            (holiday-fixed 12 25 "1. Weihnachtstag")
+            (holiday-fixed 12 26 "2. Weihnachtstag")
+            (holiday-fixed 1 6 "Heilige Drei Könige")
+            (holiday-easter-etc -48 "Rosenmontag")
+            (holiday-easter-etc -3 "Gründonnerstag")
+            (holiday-easter-etc  -2 "Karfreitag")
+            (holiday-easter-etc   0 "Ostersonntag")
+            (holiday-easter-etc  +1 "Ostermontag")
+            (holiday-easter-etc +39 "Christi Himmelfahrt")
+            (holiday-easter-etc +49 "Pfingstsonntag")
+            (holiday-easter-etc +50 "Pfingstmontag")
+            (holiday-easter-etc +60 "Fronleichnam")
+            (holiday-fixed 8 15 "Mariae Himmelfahrt")
+            (holiday-fixed 11 1 "Allerheiligen")
+            (holiday-float 11 3 1 "Buss- und Bettag" 16)
+            (holiday-float 11 0 1 "Totensonntag" 20)))
+
+    (setq holiday-hebrew-holidays nil)
+    (setq holiday-islamic-holidays nil)
+    (setq holiday-bahai-holidays nil)
+    (setq holiday-oriental-holidays nil))
+  :bind
+  (("C-c g" . org-plot/gnuplot)))
+
+(defun get-journal-file-this-year ()
+  "Return filename for today's journal entry."
+  (let ((yearly-name (concat "/" (format-time-string "%Y") ".org")))
+    (expand-file-name (concat org-journal-dir yearly-name))))
+
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((gnuplot . t)
+   (ledger . t)
+   (python . t)
+   (shell . t)))
+
 (use-package org-bullets
+  :after org
   :hook (org-mode . org-bullets-mode))
 
-(use-package org-super-agenda
-  :config
-  (org-super-agenda-mode)
-  (setq org-super-agenda-header-map (make-sparse-keymap))
-  (setq
-   org-super-agenda-groups
-   '(
-     (:name "Today"
-            :time-grid t
-            :todo "TODAY"
-            :deadline today)
-     (:name "High Priority"
-            :priority "A"
-            :deadline past
-            :order 0)
-     (:name "With Deadline"
-            :deadline future)
-     (:name "Haushalt"
-            :category "Haushalt")
-     (:name "Work"
-            :category "MOIA")
-     (:name "Freizeit Coding"
-            :category "Freizeit Coding")
-     (:name "Waiting"
-            :todo "WAITING"
-            :order 99)
-     (:name "To Read"
-            :category "Read"
-            :order 100)
-     (:name "To Watch"
-            :category "Watch"
-            :order 101)
-     (:name "Geburtstage und Feiertage"
-            :category ("Geburtstage" "Feiertage")
-            :order 102)
-     )))
+(use-package rainbow-delimiters
+  :hook
+  (clojure-mode . rainbow-delimiters-mode)
+  (emacs-lisp-mode . rainbow-delimiters-mode))
 
-(use-package rainbow-delimiters)
 (use-package ripgrep)
 
+(use-package package-lint)
+
 (use-package projectile
-  :after evil-leader
   :init
   (setq projectile-completion-system 'ivy)
   :config
-  (projectile-mode +1)
-  (defhydra hydra-projectile (:color blue)
-    "Projectile"
-    ("o" projectile-switch-project "Switch Project")
-    ("t" projectile-run-term "Terminal")
-    ("s" projectile-run-eshell "EShell"))
-  (evil-leader/set-key "p" 'hydra-projectile/body)
-  (evil-leader/set-key
-    "o" 'projectile-find-file
-    "7" 'projectile-ripgrep
-    "8" 'ripgrep-regexp))
+  (projectile-mode +1))
 
 (use-package pyvenv)
-(use-package package-lint)
 
 (use-package typescript-mode
   :init
-  (setq typescript-indent-level 2)
-  )
+  (setq typescript-indent-level 2))
+
+(use-package which-key
+  :init (which-key-mode)
+  :config
+  (setq which-key-idle-delay 0.3))
+
 (use-package yaml-mode
   :config
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
@@ -506,6 +533,8 @@
 (load "~/.emacs.d/modeline-dark.el")
 
 ; Custom Functions
+
+; dark/light theme switch
 (defun snow/switch-theme ()
     "switches between dark and light theme"
     (interactive)
@@ -527,10 +556,15 @@
 (defun snow/term ()
   "Opens term without asking which shell to run"
   (interactive)
-  (projectile-run-term "zsh"))
+  (projectile-run-term "fish"))
 
 (defun snow/jsonnet-reformat-buffer ()
   "Reformat entire buffer using the Jsonnet format utility."
   (interactive)
   (call-process-region (point-min) (point-max) "jsonnetfmt" t t nil "-"))
 (put 'dired-find-alternate-file 'disabled nil)
+
+(defun org-summary-todo (n-done n-not-done)
+  "Switch entry to DONE when all subentries are done, to TODO otherwise."
+  (let (org-log-done org-log-states)   ; turn off logging
+    (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
