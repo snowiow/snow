@@ -34,11 +34,13 @@
 ; always answer questions with y/n
 (defalias 'yes-or-no-p 'y-or-n-p)
 ; Set fonts
-(set-face-attribute 'default nil
-                    :family "Iosevka Term"
-                    :height 140
-                    :weight 'normal
-                    :width 'normal)
+(if (eq system-type 'gnu/linux)
+    (set-face-attribute 'default nil
+                        :family "Iosevka Term"
+                        :height 120)
+  (set-face-attribute 'default nil
+                      :family "Iosevka Term"
+                      :height 140))
 
 ; Mac OSX Settings make command meta
 (setq mac-option-modifier 'super)
@@ -364,7 +366,6 @@
 (use-package jsonnet-mode)
 
 (use-package kubel)
-(load-file "~/.emacs.d/kubel/kubel-evil.el")
 
 (use-package ledger-mode)
 
