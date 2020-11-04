@@ -133,6 +133,7 @@
   (setq evil-want-keybinding nil)
   (setq evil-want-Y-yank-to-eol t)
   (setq evil-search-module 'evil-search)
+  (setq evil-undo-system 'undo-tree)
   :config
   (evil-mode))
 
@@ -256,6 +257,7 @@
     "hf" 'counsel-describe-function
     "hk" 'describe-key
     "hi" 'info
+    "hp" 'describe-package
     "hs" 'counsel-describe-symbol
     "hv" 'counsel-describe-variable
 
@@ -274,7 +276,10 @@
     "p8" 'ripgrep-regexp
     "po" 'projectile--find-file
     "pp" 'projectile-switch-project
-    "pt" 'projectile-run-term
+    "pt" '(:ignore t :which-key "Terminal")
+    "pte" 'projectile-run-eshell
+    "ptt" 'projectile-run-term
+    "ptv" 'projectile-run-vterm
 
     ;; org mode
     "$" '(:ignore t :which-key "Org Mode")
@@ -314,7 +319,14 @@
     "l" 'org-insert-link
     "o" 'org-agenda-open-link
     "," 'org-ctrl-c-ctrl-c
-    ))
+    )
+  ;; vterm-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'vterm-mode-map
+    "p" 'vterm-yank
+    )
+  )
 
 (use-package go-mode)
 
@@ -340,17 +352,16 @@
 
 (use-package ivy
   :init
+  (ivy-mode 1)
+  :config
   (setq ivy-use-virtual-buffers t)
   (setq ivy-wrap t)
   (setq ivy-initial-inputs-alist nil)
   (setq ivy-count-format "(%d/%d) ")
   (setq ivy-display-style nil)
   (setq ivy-re-builders-alist
-      '((t . ivy--regex-ignore-order)))
-  :config
-  (ivy-mode 1)
+        '((t . ivy--regex-ignore-order)))
   :bind
-  ;; ivy-minibuffer mappings
   (:map ivy-minibuffer-map
    ("C-j" . ivy-next-line)
    ("C-k" . ivy-previous-line)
@@ -512,9 +523,19 @@
 
 (use-package pyvenv)
 
+(use-package terraform-mode
+  :hook
+  (terraform-mode . terraform-format-on-save-mode))
+
 (use-package typescript-mode
   :init
   (setq typescript-indent-level 2))
+
+(use-package undo-tree
+  :config
+  (global-undo-tree-mode))
+
+(use-package vterm)
 
 (use-package which-key
   :init (which-key-mode)
