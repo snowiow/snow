@@ -9,18 +9,6 @@ packadd vim-surround
 packadd vim-unimpaired
 packadd vim-jsonnet
 
-" call minpac#add('tpope/vim-repeat')
-" call minpac#add('tpope/vim-rhubarb')
-" call minpac#add('tpope/vim-surround')
-" call minpac#add('tpope/vim-unimpaired')
-" "--- Optional Packages -------------------------------------------------------"
-" call minpac#add('racer-rust/vim-racer', {'type': 'opt'})
-" call minpac#add('eagletmt/neco-ghc', {'type': 'opt'})
-" call minpac#add('parsonsmatt/intero-neovim', {'type': 'opt'})
-" call minpac#add('alx741/vim-hindent', {'type': 'opt'})
-
-" command! PackUpdate packadd minpac | source $MYVIMRC | call minpac#update()
-" command! PackClean  packadd minpac | source $MYVIMRC | call minpac#clean()
 
 "=== Neovim Settings ========================================================="
 if has('nvim')

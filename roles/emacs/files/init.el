@@ -146,7 +146,6 @@
                           ediff
                           eshell
                           helpful
-                          minibuffer
                           term)))
 
 (use-package evil-commentary
@@ -249,7 +248,6 @@
     "gb" 'magit-blame
     "gd" 'magit-diff
 
-    ":" 'counsel-M-x
 
     ;; help
     "h" '(:ignore t :which-key "Help")
@@ -271,20 +269,15 @@
     "lt" 'imenu
 
     ;; projectile
-    "p" '(:ignore t :which-key "Projectile")
-    "p7" 'projectile-ripgrep
-    "p8" 'ripgrep-regexp
-    "po" 'projectile--find-file
-    "pp" 'projectile-switch-project
-    "pt" '(:ignore t :which-key "Terminal")
-    "pte" 'projectile-run-eshell
-    "ptt" 'projectile-run-term
-    "ptv" 'projectile-run-vterm
+    "p" 'projectile-command-map
 
     ;; org mode
     "$" '(:ignore t :which-key "Org Mode")
     "$a" 'org-agenda
     "$c" 'org-capture
+
+    ":" 'counsel-M-x
+    "/" 'swiper
     )
 
   ;; local-leader key mappings
@@ -377,6 +370,7 @@
 (use-package jsonnet-mode)
 
 (use-package kubel)
+(use-package kubel-evil)
 
 (use-package ledger-mode)
 
