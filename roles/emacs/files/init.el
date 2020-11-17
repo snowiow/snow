@@ -84,6 +84,42 @@
  whitespace-line-column 80
  whitespace-style '(face lines-tail))
 
+; set holidays
+(setq solar-n-hemi-seasons
+    '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
+
+(setq holiday-general-holidays
+    '((holiday-fixed 1 1 "Neujahr")
+        (holiday-fixed 5 1 "1. Mai")
+        (holiday-fixed 10 3 "Tag der Deutschen Einheit")))
+
+(setq holiday-christian-holidays
+    '((holiday-float 12 0 -4 "1. Advent" 24)
+        (holiday-float 12 0 -3 "2. Advent" 24)
+        (holiday-float 12 0 -2 "3. Advent" 24)
+        (holiday-float 12 0 -1 "4. Advent" 24)
+        (holiday-fixed 12 25 "1. Weihnachtstag")
+        (holiday-fixed 12 26 "2. Weihnachtstag")
+        (holiday-fixed 1 6 "Heilige Drei Könige")
+        (holiday-easter-etc -48 "Rosenmontag")
+        (holiday-easter-etc -3 "Gründonnerstag")
+        (holiday-easter-etc  -2 "Karfreitag")
+        (holiday-easter-etc   0 "Ostersonntag")
+        (holiday-easter-etc  +1 "Ostermontag")
+        (holiday-easter-etc +39 "Christi Himmelfahrt")
+        (holiday-easter-etc +49 "Pfingstsonntag")
+        (holiday-easter-etc +50 "Pfingstmontag")
+        (holiday-easter-etc +60 "Fronleichnam")
+        (holiday-fixed 8 15 "Mariae Himmelfahrt")
+        (holiday-fixed 11 1 "Allerheiligen")
+        (holiday-float 11 3 1 "Buss- und Bettag" 16)
+        (holiday-float 11 0 1 "Totensonntag" 20)))
+
+(setq holiday-hebrew-holidays nil)
+(setq holiday-islamic-holidays nil)
+(setq holiday-bahai-holidays nil)
+(setq holiday-oriental-holidays nil)
+
 ; =============================> Packages
 (use-package cider)
 
@@ -268,13 +304,13 @@
     "ls" 'lsp-describe-session
     "lt" 'imenu
 
+    ;; org mode
+    "o" '(:ignore t :which-key "Org Mode")
+    "oa" 'org-agenda
+    "oc" 'org-capture
+
     ;; projectile
     "p" 'projectile-command-map
-
-    ;; org mode
-    "$" '(:ignore t :which-key "Org Mode")
-    "$a" 'org-agenda
-    "$c" 'org-capture
 
     ":" 'counsel-M-x
     "/" 'swiper
@@ -416,6 +452,7 @@
     (setq org-agenda-files
         (file-expand-wildcards (concat org-directory "/*.org")))
     (setq org-agenda-window-setup 'current-window)
+    (setq org-archive-location "%s_archive::datetree/* Archived Tasks")
     (setq org-default-notes-file (concat org-directory "/capture.org"))
     (setq org-babel-python-command "python3")
     (setq org-agenda-custom-commands
@@ -428,12 +465,13 @@
             (org-agenda-files '("~/Seafile/My Library/notes/work.org"))
             ))))
     (setq org-capture-templates
-        '(("t" "Todo" entry (file+headline
+          '(("t" "Todos")
+             ("tt" "Todo" entry (file+headline
                             (lambda ()
                                 (concat org-directory "/todos.org"))
                             "Allgemein")
             "* TODO %?")
-            ("m" "Todo Work" entry (file+headline
+            ("tw" "Todo Work" entry (file+headline
                                     (lambda ()
                                     (concat org-directory "/work.org"))
                                     "Todos")
@@ -447,40 +485,8 @@
     (setq org-todo-keywords
         '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
             (sequence "|" "CANCELLED(c)")))
-    (setq solar-n-hemi-seasons
-        '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
-
-    (setq holiday-general-holidays
-        '((holiday-fixed 1 1 "Neujahr")
-            (holiday-fixed 5 1 "1. Mai")
-            (holiday-fixed 10 3 "Tag der Deutschen Einheit")))
-
-    (setq holiday-christian-holidays
-        '((holiday-float 12 0 -4 "1. Advent" 24)
-            (holiday-float 12 0 -3 "2. Advent" 24)
-            (holiday-float 12 0 -2 "3. Advent" 24)
-            (holiday-float 12 0 -1 "4. Advent" 24)
-            (holiday-fixed 12 25 "1. Weihnachtstag")
-            (holiday-fixed 12 26 "2. Weihnachtstag")
-            (holiday-fixed 1 6 "Heilige Drei Könige")
-            (holiday-easter-etc -48 "Rosenmontag")
-            (holiday-easter-etc -3 "Gründonnerstag")
-            (holiday-easter-etc  -2 "Karfreitag")
-            (holiday-easter-etc   0 "Ostersonntag")
-            (holiday-easter-etc  +1 "Ostermontag")
-            (holiday-easter-etc +39 "Christi Himmelfahrt")
-            (holiday-easter-etc +49 "Pfingstsonntag")
-            (holiday-easter-etc +50 "Pfingstmontag")
-            (holiday-easter-etc +60 "Fronleichnam")
-            (holiday-fixed 8 15 "Mariae Himmelfahrt")
-            (holiday-fixed 11 1 "Allerheiligen")
-            (holiday-float 11 3 1 "Buss- und Bettag" 16)
-            (holiday-float 11 0 1 "Totensonntag" 20)))
-
-    (setq holiday-hebrew-holidays nil)
-    (setq holiday-islamic-holidays nil)
-    (setq holiday-bahai-holidays nil)
-    (setq holiday-oriental-holidays nil))
+    (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
+    (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers))
   :bind
   (("C-c g" . org-plot/gnuplot)))
 
