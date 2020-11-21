@@ -440,53 +440,56 @@
   :hook
   (org-after-todo-statistics . org-summary-todo)
   :config
-  (progn
-    (setq org-image-actual-width nil)
-    (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
-    (setq org-agenda-skip-deadline-if-done t)
-    (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
-    (setq org-agenda-skip-scheduled-if-done t)
-    (setq org-ellipsis " ▾")
-    (setq org-directory "~/Seafile/My Library/notes")
-    (setq org-journal-dir "~/Seafile/My Library/notes/journal")
-    (setq org-agenda-files
-        (file-expand-wildcards (concat org-directory "/*.org")))
-    (setq org-agenda-window-setup 'current-window)
-    (setq org-archive-location "%s_archive::datetree/* Archived Tasks")
-    (setq org-default-notes-file (concat org-directory "/capture.org"))
-    (setq org-babel-python-command "python3")
-    (setq org-agenda-custom-commands
+  (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
+  (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
+  (setq org-agenda-custom-commands
         '(("w" "Work Todos"
            ((agenda "" ((org-agenda-span 1)))
             (todo ""
-                ((org-agenda-overriding-header "\nUnscheduled TODOs")
-                 (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
+                  ((org-agenda-overriding-header "\nUnscheduled TODOs")
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
            ((org-agenda-compact-blocks t)
-            (org-agenda-files '("~/Seafile/My Library/notes/work.org"))
-            ))))
-    (setq org-capture-templates
-          '(("t" "Todos")
-             ("tt" "Todo" entry (file+headline
-                            (lambda ()
+            (org-agenda-files '("~/Seafile/My Library/notes/work.org"))))))
+
+  (setq org-directory "~/Seafile/My Library/notes")
+  (setq org-agenda-files
+        (file-expand-wildcards (concat org-directory "/*.org")))
+
+  (setq org-agenda-skip-deadline-if-done t)
+  (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
+  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
+  (setq org-agenda-skip-scheduled-if-done t)
+  (setq org-agenda-window-setup 'current-window)
+  (setq org-archive-location "%s_archive::datetree/* Archived Tasks")
+  (setq org-confirm-babel-evaluate nil)
+  (setq org-babel-python-command "python3")
+
+  (setq org-capture-templates
+        '(("t" "Todos")
+          ("tt" "Todo" entry (file+headline
+                              (lambda ()
                                 (concat org-directory "/todos.org"))
-                            "Allgemein")
-            "* TODO %?")
-            ("tw" "Todo Work" entry (file+headline
-                                    (lambda ()
-                                    (concat org-directory "/work.org"))
-                                    "Todos")
-            "* TODO %?")
-            ("j" "Journal Note"
-            entry (file+datetree (lambda () (get-journal-file-this-year)))
-            "* %U %?")
-            ("w" "Gewicht Eintrag" table-line
-            (id "weight-table")
-            "| %u | %^{Gewicht} |" :immediate-finish t)))
-    (setq org-todo-keywords
+                              "Allgemein")
+           "* TODO %?")
+          ("tw" "Todo Work" entry (file+headline
+                                   (lambda ()
+                                     (concat org-directory "/work.org"))
+                                   "Todos")
+           "* TODO %?")
+          ("j" "Journal Note"
+           entry (file+datetree (lambda () (get-journal-file-this-year)))
+           "* %U %?")
+          ("w" "Gewicht Eintrag" table-line
+           (id "weight-table")
+           "| %u | %^{Gewicht} |" :immediate-finish t)))
+
+  (setq org-default-notes-file (concat org-directory "/capture.org"))
+  (setq org-ellipsis " ▾")
+  (setq org-image-actual-width nil)
+  (setq org-journal-dir "~/Seafile/My Library/notes/journal")
+  (setq org-todo-keywords
         '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
-            (sequence "|" "CANCELLED(c)")))
-    (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
-    (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers))
+          (sequence "|" "CANCELLED(c)")))
   :bind
   (("C-c g" . org-plot/gnuplot)))
 
