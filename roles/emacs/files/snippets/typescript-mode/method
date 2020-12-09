@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: method
+# key: m
+# --
+${1:private} ${2:name}($3)$4 {
+  $5
+}

@@ -57,6 +57,9 @@
 ;number of bytes between consing. Mainly increased for lsp-mode
 (setq gc-cons-threshold 100000000)
 (setq read-process-output-max (* 1024 1024)) ;; 1mb
+
+;set spelling program
+(setq ispell-program-name "aspell")
 ; ============================> BuiltIn Packages
 ; Auto Fill Mode
 (setq-default fill-column 80)
@@ -144,6 +147,10 @@
 
 (use-package counsel)
 
+(use-package dart-mode
+  :hook
+  (dart-mode . flutter-test-mode))
+
 (use-package dashboard
   :init
   (setq dashboard-startup-banner 'logo)
@@ -216,10 +223,19 @@
   (when (memq window-system '(mac ns x))
   (exec-path-from-shell-initialize)))
 
-(use-package flymake-cursor
-  :load-path "~/.emacs.d/packages/emacs-flymake-cursor"
+(use-package flutter
+  :after dart-mode
+  :custom
+  (flutter-sdk-path "~/flutter/"))
+
+(use-package flutter-l10n-flycheck
+  :after flutter
   :config
-  (flymake-cursor-mode))
+  (flutter-l10n-flycheck-setup))
+
+(use-package flycheck
+  :init
+  (global-flycheck-mode))
 
 (use-package general
   :config
@@ -284,7 +300,6 @@
     "gb" 'magit-blame
     "gd" 'magit-diff
 
-
     ;; help
     "h" '(:ignore t :which-key "Help")
     "ha" 'info-apropos
@@ -300,6 +315,7 @@
     "ld" 'lsp-find-definition
     "lf" 'lsp-format-buffer
     "li" 'lsp-organize-imports
+    "ln" 'lsp-rename
     "lr" 'lsp-find-references
     "ls" 'lsp-describe-session
     "lt" 'imenu
@@ -312,6 +328,7 @@
     ;; projectile
     "p" 'projectile-command-map
 
+    "w" 'hydra-scale-window/body
     ":" 'counsel-M-x
     "/" 'swiper
     )
@@ -321,6 +338,13 @@
     ;; :keymaps '(override normal emacs)
     :prefix ",")
 
+  ;; dart-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'dart-mode-map
+    "h" 'flutter-run-or-hot-reload
+    "r" 'flutter-hot-restart
+    )
   ;; emacs-lisp-mode
   (snow/local-leader-keys
     :states 'normal
@@ -348,7 +372,9 @@
     "l" 'org-insert-link
     "o" 'org-agenda-open-link
     "," 'org-ctrl-c-ctrl-c
+    "0" 'snow/org-start-presentation
     )
+
   ;; vterm-mode
   (snow/local-leader-keys
     :states 'normal
@@ -378,6 +404,12 @@
   (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
 
 (use-package hydra)
+
+(defhydra hydra-scale-window (:timeout 4)
+  "scale text"
+  ("l" enlarge-window-horizontally "+")
+  ("h" shrink-window-horizontally "-")
+  ("q" nil "finished" :exit t))
 
 (use-package ivy
   :init
@@ -422,6 +454,10 @@
   :init
   (setq lsp-headerline-breadcrumb-enable t))
 
+(use-package lsp-dart
+  :hook
+  (dart-mode . lsp))
+
 (use-package magit)
 
 (use-package markdown-mode
@@ -434,11 +470,13 @@
   (markdown-mode . auto-fill-mode))
 
 (use-package ob-async)
+(use-package ob-typescript)
 (use-package python-mode)
 
 (use-package org
   :hook
   (org-after-todo-statistics . org-summary-todo)
+  (org-mode . flyspell-mode)
   :config
   (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
   (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
@@ -503,11 +541,33 @@
  '((gnuplot . t)
    (ledger . t)
    (python . t)
-   (shell . t)))
+   (shell . t)
+   (typescript . t)))
 
 (use-package org-bullets
   :after org
   :hook (org-mode . org-bullets-mode))
+
+(defun snow/org-start-presentation ()
+  (interactive)
+  (org-tree-slide-mode 1)
+  (setq text-scale-mode-amount 1)
+  (text-scale-mode 1))
+
+(defun snow/org-end-presentation ()
+  (interactive)
+  (text-scale-mode 0)
+  (org-tree-slide-mode 0))
+
+(use-package org-tree-slide
+  :defer t
+  :after org
+  :commands org-tree-slide-mode
+  :config
+  (evil-define-key 'normal org-tree-slide-mode-map
+    (kbd "q") 'snow/org-end-presentation
+    (kbd "]") 'org-tree-slide-move-next-tree
+    (kbd "[") 'org-tree-slide-move-previous-tree))
 
 (use-package rainbow-delimiters
   :hook
