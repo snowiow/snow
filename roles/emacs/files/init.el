@@ -60,6 +60,7 @@
 
 ;set spelling program
 (setq ispell-program-name "aspell")
+
 ; ============================> BuiltIn Packages
 ; Auto Fill Mode
 (setq-default fill-column 80)
@@ -158,7 +159,8 @@
                           (projects . 5)
                           (recents  . 5)))
   :config
-  (dashboard-setup-startup-hook))
+  (dashboard-setup-startup-hook)
+  (setq tab-bar-new-tab-choice "*dashboard*"))
 
 (use-package dockerfile-mode)
 
@@ -169,6 +171,19 @@
   :config
   (load-theme 'doom-one-light t)
   (load-theme 'doom-tomorrow-night t))
+
+(defun snow/eshell-config ()
+  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history))
+
+(use-package eshell
+  :hook
+  (eshell-first-time-mode . snow/eshell-config)
+  (eshell-pre-command . eshell-save-some-history))
+
+(use-package eshell-syntax-highlighting
+  :after esh-mode
+  :config
+  (eshell-syntax-highlighting-global-mode +1))
 
 (use-package evil
   :init
@@ -235,7 +250,9 @@
 
 (use-package flycheck
   :init
-  (global-flycheck-mode))
+  (global-flycheck-mode)
+  :config
+  (setq flycheck-check-syntax-automatically '(save new-line mode-enabled)))
 
 (use-package general
   :config
@@ -257,10 +274,7 @@
    "<"  'org-agenda-earlier
    ">"  'org-agenda-later)
 
-  ;; evil-insert-state mappings
-  (general-define-key
-   :keymaps 'evil-insert-state-map
-   "C-o" 'company-complete)
+  ;; dired mode
   (general-define-key
    :states 'normal
    :keymaps 'dired-mode-map
@@ -278,7 +292,13 @@
   (general-define-key
    :states 'visual
    :keymaps 'emacs-lisp-mode-map
-    "e" 'eval-region)
+   "e" 'eval-region)
+
+  ;; evil-insert-state mappings
+  (general-define-key
+   :keymaps 'evil-insert-state-map
+   "C-o" 'company-complete)
+
 
   ;; leader key mappings
   (general-create-definer snow/leader-keys
@@ -328,6 +348,13 @@
     ;; projectile
     "p" 'projectile-command-map
 
+    ;;tab-bar-mode
+    "t" '(:ignore t :which-key "Tabs")
+    "tc" 'tab-close
+    "tn" 'tab-new
+    "tr" 'tab-bar-rename-tab
+    "tt" 'tab-bar-select-tab-by-name
+
     "w" 'hydra-scale-window/body
     ":" 'counsel-M-x
     "/" 'swiper
@@ -335,7 +362,6 @@
 
   ;; local-leader key mappings
   (general-create-definer snow/local-leader-keys
-    ;; :keymaps '(override normal emacs)
     :prefix ",")
 
   ;; dart-mode
@@ -345,6 +371,7 @@
     "h" 'flutter-run-or-hot-reload
     "r" 'flutter-hot-restart
     )
+
   ;; emacs-lisp-mode
   (snow/local-leader-keys
     :states 'normal
@@ -360,9 +387,14 @@
     "r" 'ledger-reconcile
     "a" 'ledger-add-transaction
     "c" 'ledger-occur
-    "p" 'ledger-report
     )
 
+  ;; lisp-interaction-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'lisp-interaction-mode-map
+    "e" 'eval-print-last-sexp
+    )
   ;; org-mode
   (snow/local-leader-keys
     :states 'normal
@@ -373,6 +405,7 @@
     "o" 'org-agenda-open-link
     "," 'org-ctrl-c-ctrl-c
     "0" 'snow/org-start-presentation
+    "$" 'org-archive-subtree
     )
 
   ;; vterm-mode
@@ -450,9 +483,12 @@
   :hook
   (go-mode . lsp)
   (python-mode . lsp)
+  (terraform-mode . lsp)
   (typescript-mode . lsp)
   :init
-  (setq lsp-headerline-breadcrumb-enable t))
+  (setq lsp-headerline-breadcrumb-enable t)
+  :config
+  (setq lsp-file-watch-threshold 5000))
 
 (use-package lsp-dart
   :hook
@@ -487,7 +523,10 @@
                   ((org-agenda-overriding-header "\nUnscheduled TODOs")
                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
            ((org-agenda-compact-blocks t)
-            (org-agenda-files '("~/Seafile/My Library/notes/work.org"))))))
+            (org-agenda-files '("~/Seafile/My Library/notes/work.org"))))
+          ("f" "Freizeit"
+           (tags-todo "Freizeit")
+           ((org-agenda-files '("~/Seafile/My Library/notes/todos.org"))))))
 
   (setq org-directory "~/Seafile/My Library/notes")
   (setq org-agenda-files
@@ -503,7 +542,18 @@
   (setq org-babel-python-command "python3")
 
   (setq org-capture-templates
-        '(("t" "Todos")
+        '(("a" "Appointments")
+          ("ap" "Private" entry (file+headline
+                              (lambda ()
+                                (concat org-directory "/todos.org"))
+                              "Termine")
+           "* %?")
+          ("aw" "Work" entry (file+headline
+                                   (lambda ()
+                                     (concat org-directory "/work.org"))
+                                   "Appointments")
+           "* %?")
+          ("t" "Todos")
           ("tt" "Todo" entry (file+headline
                               (lambda ()
                                 (concat org-directory "/todos.org"))
@@ -637,19 +687,8 @@
     (interactive)
     (erc :server "irc.freenode.net" :port "6667" :nick "snowiow"))
 
-; Term Mode
-(defun snow/term ()
-  "Opens term without asking which shell to run"
-  (interactive)
-  (projectile-run-term "fish"))
-
-(defun snow/jsonnet-reformat-buffer ()
-  "Reformat entire buffer using the Jsonnet format utility."
-  (interactive)
-  (call-process-region (point-min) (point-max) "jsonnetfmt" t t nil "-"))
-(put 'dired-find-alternate-file 'disabled nil)
-
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."
   (let (org-log-done org-log-states)   ; turn off logging
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+(put 'dired-find-alternate-file 'disabled nil)

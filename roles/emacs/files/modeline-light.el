@@ -23,8 +23,13 @@
        '(:eval (propertize
 		" " 'display
 		`((space :align-to (- (+ right right-fringe right-margin)
-				      ,(+ 3 (string-width mode-name)))))))
-       (propertize " %m " 'face 'font-lock-string-face)))
+				              ,(+ 5
+                                  (string-width mode-name)
+                                  (string-width (number-to-string (tab-bar--current-tab-index)))))))))
+       (propertize " %m " 'face 'font-lock-string-face)
+       '(:eval (propertize
+             (concat "T" (number-to-string (tab-bar--current-tab-index)) " ")
+             'face 'font-lock-constant-face))))
 
 (set-face-attribute 'mode-line nil
                     :background "#f2f2f2"

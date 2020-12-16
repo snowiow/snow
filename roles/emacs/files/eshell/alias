@@ -1,0 +1,1 @@
+alias ave aws-vault exec $*

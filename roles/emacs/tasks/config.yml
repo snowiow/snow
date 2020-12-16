@@ -3,6 +3,11 @@
     path: ~/.emacs.d
     state: directory
 
+- name: create eshell config directory
+  file:
+    path: ~/.emacs.d/eshell
+    state: directory
+
 - name: symlink files
   file:
     src: "{{ ansible_env.PWD }}/roles/emacs/files/{{ item }}"
@@ -15,3 +20,4 @@
     - modeline-dark.el
     - modeline-light.el
     - snippets
+    - eshell/alias
