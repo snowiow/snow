@@ -1,1 +1,11 @@
 - include_tasks: "{{ ansible_os_family }}.yml"
+
+- name: symlink .local bin
+  file:
+    src: "{{ ansible_env.PWD }}/roles/base/files/bin/{{ item }}"
+    path: "~/.local/bin/{{ item }}"
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - bank-to-ledger

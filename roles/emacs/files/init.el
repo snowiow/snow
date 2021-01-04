@@ -387,6 +387,7 @@
     "r" 'ledger-reconcile
     "a" 'ledger-add-transaction
     "c" 'ledger-occur
+    "p" 'ledger-report
     )
 
   ;; lisp-interaction-mode
@@ -483,7 +484,7 @@
   :hook
   (go-mode . lsp)
   (python-mode . lsp)
-  (terraform-mode . lsp)
+  ;; (terraform-mode . lsp) ;; currently not working properly
   (typescript-mode . lsp)
   :init
   (setq lsp-headerline-breadcrumb-enable t)
@@ -523,11 +524,7 @@
                   ((org-agenda-overriding-header "\nUnscheduled TODOs")
                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
            ((org-agenda-compact-blocks t)
-            (org-agenda-files '("~/Seafile/My Library/notes/work.org"))))
-          ("f" "Freizeit"
-           (tags-todo "Freizeit")
-           ((org-agenda-files '("~/Seafile/My Library/notes/todos.org"))))))
-
+            (org-agenda-files '("~/Seafile/My Library/notes/work.org"))))))
   (setq org-directory "~/Seafile/My Library/notes")
   (setq org-agenda-files
         (file-expand-wildcards (concat org-directory "/*.org")))
@@ -569,7 +566,7 @@
            "* %U %?")
           ("w" "Gewicht Eintrag" table-line
            (id "weight-table")
-           "| %u | %^{Gewicht} |" :immediate-finish t)))
+           "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)))
 
   (setq org-default-notes-file (concat org-directory "/capture.org"))
   (setq org-ellipsis " ▾")
