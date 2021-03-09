@@ -65,8 +65,6 @@
 ; Auto Fill Mode
 (setq-default fill-column 80)
 
-; Dired
-(require 'dired)
 
 ; ERC
 (setq erc-autojoin-channels-alist '(("freenode.net" "#emacs")))
@@ -125,6 +123,11 @@
 (setq holiday-oriental-holidays nil)
 
 ; =============================> Packages
+(use-package all-the-icons)
+(use-package all-the-icons-dired
+  :hook
+  (dired-mode . all-the-icons-dired-mode))
+
 (use-package cider)
 
 (use-package clojure-mode)
@@ -162,6 +165,7 @@
   (dashboard-setup-startup-hook)
   (setq tab-bar-new-tab-choice "*dashboard*"))
 
+(use-package dired-single)
 (use-package dockerfile-mode)
 
 (use-package doom-themes
@@ -201,6 +205,7 @@
   (evil-collection-init '(calc
                           calendar
                           dashboard
+                          dired
                           ediff
                           eshell
                           helpful
@@ -268,25 +273,17 @@
     "C-c +" 'evil-numbers/inc-at-pt
     "C-c -" 'evil-numbers/dec-at-pt)
 
+  ;; org-mode mappings
+  (general-define-key
+   :keymaps 'org-mode-map
+   :states 'normal
+   "RET"  'org-open-at-point)
+
   ;; org-agenda-mode mappings
   (general-define-key
    :keymaps 'org-agenda-mode-map
    "<"  'org-agenda-earlier
    ">"  'org-agenda-later)
-
-  ;; dired mode
-  (general-define-key
-   :states 'normal
-   :keymaps 'dired-mode-map
-   "h" (lambda ()
-         (interactive)
-         (find-alternate-file ".."))
-   "l" 'dired-find-alternate-file
-   "c" 'find-file
-   "d" 'dired-create-directory
-   "m" 'dired-mark
-   "D" 'dired-do-delete
-   "R" 'dired-do-rename)
 
   ;; emacs-lisp-mode mappings
   (general-define-key
@@ -302,7 +299,8 @@
 
   ;; leader key mappings
   (general-create-definer snow/leader-keys
-    :keymaps '(normal emacs)
+    :states '(normal motion)
+    :keymaps 'override
     :prefix "SPC")
 
   (snow/leader-keys
@@ -311,9 +309,7 @@
     "c" (lambda ()
           (interactive)
           (find-file "~/.emacs.d/init.el"))
-    "e" (lambda ()
-          (interactive)
-          (dired default-directory))
+    "e" 'dired-jump
     ;; git
     "g"  '(:ignore t :which-key "Git")
     "gg" 'magit
@@ -356,6 +352,7 @@
     "tt" 'tab-bar-select-tab-by-name
 
     "w" 'hydra-scale-window/body
+    "7"  'ripgrep-regexp
     ":" 'counsel-M-x
     "/" 'swiper
     )
@@ -372,6 +369,12 @@
     "r" 'flutter-hot-restart
     )
 
+  ;; jsonnet-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'jsonnet-mode-map
+    "f" 'jsonnet-reformat-buffer
+  )
   ;; emacs-lisp-mode
   (snow/local-leader-keys
     :states 'normal
@@ -401,9 +404,11 @@
     :states 'normal
     :keymaps 'org-mode-map
     "RET" 'org-open-at-point
+    "g" 'org-plot/gnuplot
     "i" 'org-toggle-inline-images
     "l" 'org-insert-link
     "o" 'org-agenda-open-link
+    "t" 'org-set-tags-command
     "," 'org-ctrl-c-ctrl-c
     "0" 'snow/org-start-presentation
     "$" 'org-archive-subtree
@@ -449,6 +454,7 @@
   :init
   (ivy-mode 1)
   :config
+
   (setq ivy-use-virtual-buffers t)
   (setq ivy-wrap t)
   (setq ivy-initial-inputs-alist nil)
@@ -508,12 +514,21 @@
 
 (use-package ob-async)
 (use-package ob-typescript)
+(use-package openwith
+  :config
+  (setq openwith-associations
+        (list
+         (list (openwith-make-extension-regexp
+                '("pdf"))
+                "open"
+                '(file))))
+  (openwith-mode t))
 (use-package python-mode)
 
 (use-package org
   :hook
   (org-after-todo-statistics . org-summary-todo)
-  (org-mode . flyspell-mode)
+  ;; (org-mode . flyspell-mode)
   :config
   (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
   (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
@@ -524,8 +539,8 @@
                   ((org-agenda-overriding-header "\nUnscheduled TODOs")
                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
            ((org-agenda-compact-blocks t)
-            (org-agenda-files '("~/Seafile/My Library/notes/work.org"))))))
-  (setq org-directory "~/Seafile/My Library/notes")
+            (org-agenda-files '("~/Sync/notes/work.org"))))))
+  (setq org-directory "~/Sync/notes")
   (setq org-agenda-files
         (file-expand-wildcards (concat org-directory "/*.org")))
 
@@ -564,19 +579,22 @@
           ("j" "Journal Note"
            entry (file+datetree (lambda () (get-journal-file-this-year)))
            "* %U %?")
-          ("w" "Gewicht Eintrag" table-line
+          ("f" "Fitness")
+          ("fj" "Workout Journal Entry"
+           entry (file+datetree (lambda () (concat org-directory "/fitness.org"))
+                                "Gym" "Workout Journal")
+           "* %U %?")
+          ("fw" "Gewicht Eintrag" table-line
            (id "weight-table")
            "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)))
 
   (setq org-default-notes-file (concat org-directory "/capture.org"))
   (setq org-ellipsis " ▾")
   (setq org-image-actual-width nil)
-  (setq org-journal-dir "~/Seafile/My Library/notes/journal")
+  (setq org-journal-dir "~/Sync/notes/journal")
   (setq org-todo-keywords
         '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
-          (sequence "|" "CANCELLED(c)")))
-  :bind
-  (("C-c g" . org-plot/gnuplot)))
+          (sequence "|" "CANCELLED(c)"))))
 
 (defun get-journal-file-this-year ()
   "Return filename for today's journal entry."
@@ -663,6 +681,15 @@
   (yas-global-mode 1))
 
 (load "~/.emacs.d/modeline-dark.el")
+
+(use-package dired
+  :ensure nil
+  :commands (dired dired-jump)
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "h" 'dired-single-up-directory
+    "l" 'dired-single-buffer
+    "L" 'dired-display-file))
 
 ; Custom Functions
 

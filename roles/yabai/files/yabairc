@@ -34,5 +34,7 @@ yabai -m config window_gap                   2
 
 # application settings
 yabai -m rule --add label=emacs app=Emacs manage=on
+yabai -m rule --add label=deezer app=Deezer manage=on
+yabai -m rule --add label=discord app=Discord manage=on
 
 echo "yabai configuration loaded.."
