@@ -14,10 +14,11 @@
     - alacritty
     # - st
     - ctags
+    - syncthing
     - nvim
     - emacs
-    - dav
+    #- dav
     - ranger
-    - taskwarrior
+    # - taskwarrior
     - mail
-    - code
+    # - code

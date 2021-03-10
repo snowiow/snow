@@ -8,8 +8,9 @@
     - git
     - fish
     # - zsh
+    - syncthing
     - nvim
     - emacs
-    - ranger
-    - taskwarrior
-    - code
+    # - ranger
+    # - taskwarrior
+    # - code

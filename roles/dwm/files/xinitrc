@@ -10,6 +10,6 @@ exec bspwm &
 # exec dwm &
 # dwmstatus 2>&1 >/dev/null &
 setxkbmap us -option caps:escape -option compose:ralt &
-feh --bg-scale ~/Seafile/My\ Library/wallpaper/hollowknight.png &
+feh --bg-scale ~/Sync/wallpaper/hollowknight.png &
 xclip &
 dunst

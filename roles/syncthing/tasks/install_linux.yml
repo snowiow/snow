@@ -1,0 +1,22 @@
+- name: make sure syncthing is installed
+  package:
+    name: syncthing
+    state: present
+  become: yes
+
+- name: create systemd user directory
+  file:
+    path: ~/.config/systemd/user
+    state: directory
+
+- name: syncthing copy systemd service
+  copy:
+    src: "syncthing.service"
+    dest: "~/.config/systemd/user/syncthing.service"
+
+- name: enable syncthing service
+  systemd:
+    name: syncthing.service
+    state: started
+    enabled: yes
+    scope: user
