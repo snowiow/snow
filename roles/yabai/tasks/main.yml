@@ -1,8 +1,8 @@
 - name: make sure yabai is installed
-  package:
+  community.general.homebrew:
     name:
-      - yabai
-      - skhd
+      - koekeishiya/formulae/yabai
+      - koekeishiya/formulae/skhd
     state: present
 
 - name: symlink dotfiles
@@ -15,3 +15,9 @@
   loop:
     - yabairc
     - skhdrc
+
+- name: Start skhd Service
+  command: brew services start skhd
+
+#- name: Start yabi Service
+#  command: brew services yabai

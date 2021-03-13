@@ -1,6 +1,8 @@
 - name: make sure packages are installed
-  package:
+  community.general.homebrew:
     name:
       - fzf
-      # - iosevka
+      - font-iosevka
+      - alfred
+      - deezer
     state: present

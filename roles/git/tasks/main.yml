@@ -1,5 +1,5 @@
 - name: make sure git is installed
-  package:
+  community.general.homebrew:
     name: git
     state: present
 

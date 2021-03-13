@@ -1,7 +1,9 @@
 - name: make sure syncthing is installed
-  package:
-    name: syncthing
+  community.general.homebrew:
+    name:
+      - syncthing
+      - qsyncthingtray
     state: present
 
 - name: Start Syncthing Service
-  command: /usr/local/bin/brew services start syncthing
+  command: brew services start syncthing

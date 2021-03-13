@@ -1,4 +1,4 @@
 - name: install emacs on darwin
-  homebrew_cask:
+  community.general.homebrew:
     name: emacs
     state: present

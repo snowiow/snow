@@ -209,15 +209,13 @@
                           ediff
                           eshell
                           helpful
+                          magit
                           term)))
 
 (use-package evil-commentary
   :after evil
   :config
   (evil-commentary-mode))
-
-(use-package evil-magit
-  :after (evil magit))
 
 (use-package evil-numbers
   :after evil)

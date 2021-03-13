@@ -1,5 +1,5 @@
 - name: install neovim on darwin
-  homebrew:
+  community.general.homebrew:
     name: neovim
     state: present
 

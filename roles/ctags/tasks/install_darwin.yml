@@ -1,4 +1,4 @@
 - name: install ctags on darwin
-  homebrew:
+  community.general.homebrew:
     name: ctags
     state: present

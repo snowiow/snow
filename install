@@ -33,7 +33,6 @@ os="$(uname)"
 if [ "$os" = "Darwin" ]; then
     ansible-playbook --ask-become-pass \
         -i hosts \
-        -e 'ansible_python_interpreter=/usr/local/bin/python3' \
         mac.yml
 elif [ "$os" = "Linux" ]; then
     DAV_PW=$dav_pw \

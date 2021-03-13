@@ -1,3 +1,8 @@
+- name: create fish config directory
+  file:
+    path: ~/.config/fish
+    state: directory
+
 - name: symlink dotfiles
   file:
     src: "{{ ansible_env.PWD }}/roles/fish/files/{{ item }}"

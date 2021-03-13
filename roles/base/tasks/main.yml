@@ -1,5 +1,10 @@
 - include_tasks: "{{ ansible_os_family }}.yml"
 
+- name: create .local/bin directory
+  file:
+    path: ~/.local/bin
+    state: directory
+
 - name: symlink .local bin
   file:
     src: "{{ ansible_env.PWD }}/roles/base/files/bin/{{ item }}"

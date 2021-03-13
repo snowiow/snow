@@ -1,10 +1,10 @@
 - name: make sure fish is installed
-  package:
+  community.general.homebrew:
     name: fish
     state: present
 
 - name: set fish as default shell
   user:
     name: "{{ ansible_env.USER }}"
-    shell: /usr/local/bin/fish
+    shell: /opt/homebrew/bin/fish
   become: yes
