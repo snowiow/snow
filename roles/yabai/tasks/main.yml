@@ -1,11 +1,12 @@
-- name: make sure yabai is installed
+- name: make sure yabai and spacebar are installed
   community.general.homebrew:
     name:
       - koekeishiya/formulae/yabai
       - koekeishiya/formulae/skhd
+      - cmacrae/formulae/spacebar
     state: present
 
-- name: symlink dotfiles
+- name: symlink yabai dotfiles
   file:
     src: "{{ ansible_env.PWD }}/roles/yabai/files/{{ item }}"
     path: ~/.{{ item }}
@@ -16,8 +17,26 @@
     - yabairc
     - skhdrc
 
+- name: create spacebar config directory
+  file:
+    path: ~/.config/spacebar
+    state: directory
+
+- name: symlink spacebar dotfiles
+  file:
+    src: "{{ ansible_env.PWD }}/roles/yabai/files/{{ item }}"
+    path: ~/.config/spacebar/{{ item }}
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - spacebarrc
+
 - name: Start skhd Service
   command: brew services start skhd
 
-#- name: Start yabi Service
-#  command: brew services yabai
+- name: Start yabai Service
+  command: brew services start yabai
+
+- name: Start spacebar Service
+  command: brew services start spacebar

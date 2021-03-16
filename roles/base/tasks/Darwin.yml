@@ -2,6 +2,14 @@
   community.general.homebrew:
     name:
       - fzf
+      - ledger
+      - jq
+      - awscli
+    state: present
+
+- name: make sure casks are installed
+  community.general.homebrew_cask:
+    name:
       - font-iosevka
       - alfred
       - deezer

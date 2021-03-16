@@ -5,5 +5,11 @@
       - qsyncthingtray
     state: present
 
+- name: make sure qsyncthingtrau is installed
+  community.general.homebrew_cask:
+    name:
+      - qsyncthingtray
+    state: present
+
 - name: Start Syncthing Service
   command: brew services start syncthing
