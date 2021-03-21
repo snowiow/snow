@@ -2,10 +2,9 @@
   community.general.homebrew:
     name:
       - syncthing
-      - qsyncthingtray
     state: present
 
-- name: make sure qsyncthingtrau is installed
+- name: make sure qsyncthingtray is installed
   community.general.homebrew_cask:
     name:
       - qsyncthingtray

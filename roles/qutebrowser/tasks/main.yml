@@ -1,8 +1,15 @@
-- name: install qutebrowser
+- name: install qutebrowser on Arch Linux
   become: yes
   package:
     name: qutebrowser
     state: present
+  when: ansible_facts['os_family'] == "ArchLinux"
+
+- name: install qutebrowser on Mac OS
+  community.general.homebrew_cask:
+    name: qutebrowser
+    state: present
+  when: ansible_facts['os_family'] == "Darwin"
 
 - name: create qutebrowser config directory
   file:

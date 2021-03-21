@@ -1,7 +1,9 @@
 - name: make sure packages are installed
   community.general.homebrew:
     name:
+      - coreutils
       - fzf
+      - gnu-sed
       - ledger
       - jq
       - awscli

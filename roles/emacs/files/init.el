@@ -308,6 +308,12 @@
           (interactive)
           (find-file "~/.emacs.d/init.el"))
     "e" 'dired-jump
+
+    ;; find
+    "f"  '(:ignore t :which-key "find in file")
+    "fs" 'swiper
+    "fi" 'counsel-imenu
+
     ;; git
     "g"  '(:ignore t :which-key "Git")
     "gg" 'magit
@@ -349,10 +355,9 @@
     "tr" 'tab-bar-rename-tab
     "tt" 'tab-bar-select-tab-by-name
 
-    "w" 'hydra-scale-window/body
-    "7"  'ripgrep-regexp
-    ":" 'counsel-M-x
-    "/" 'swiper
+    "w"  'hydra-scale-window/body
+    "/"  'ripgrep-regexp
+    ":"  'counsel-M-x
     )
 
   ;; local-leader key mappings
@@ -402,10 +407,13 @@
     :states 'normal
     :keymaps 'org-mode-map
     "RET" 'org-open-at-point
-    "g" 'org-plot/gnuplot
+    "g" '(:ignore t :which-key "go to")
+    "gg" 'counsel-org-goto
+    "gp" 'org-previous-visible-heading
     "i" 'org-toggle-inline-images
     "l" 'org-insert-link
     "o" 'org-agenda-open-link
+    "p" 'org-plot/gnuplot
     "t" 'org-set-tags-command
     "," 'org-ctrl-c-ctrl-c
     "0" 'snow/org-start-presentation

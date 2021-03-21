@@ -1,8 +1,34 @@
 #! /usr/bin/env bash
 
+help() {
+    echo "Usage: bank-to-ledger [file] [account]"
+    echo " file: the CSV file with transactions to read in"
+    echo " account: the account to calculate the transactions against"
+    echo " -h (print this message)"
+    echo "Example: bank-to-ledger my-transactions.csv assets"
+    echo -e "\nTo further edit transactions pipe the output into an editor of your choice"
+    echo "For example: bank-to-ledger my-transactions.csv assets | vim"
+}
+
+while getopts ':h' opt; do
+    case $opt in
+        h)
+            help
+            exit
+            ;;
+    esac
+done
+
+if [ -z $1 ] || [ -z $2 ]
+  then
+    echo "No transaction CSV or account given!"
+    help
+    exit
+fi
+
 tail -n +6 $1                                                   | # remove original header
-ghead -n -3                                                      | # remove footer
-    gtac                                                        | # reverse the entry order
+head -n -3                                                      | # remove footer
+    tac                                                         | # reverse the entry order
     iconv -f ISO8859-1 -t utf8                                  |
     sed -E 's/(-?)([0-9]+)\.([0-9]+),([0-9]+)/\1\2\3,\4/g'      | # remove dots from amounts
     sed -E 's/(-?)([0-9]+),([0-9]+)/\1\2\.\3 EUR/g'             | # from de to en number format
@@ -15,4 +41,4 @@ ghead -n -3                                                      | # remove foot
         --invert \
         --input-date-format "%d.%m.%Y" \
         --account $2 \
-        --file "~/Seafile/My Library/ledger/main.ledger" | cat
+        --file "~/Sync/ledger/main.ledger" | cat
