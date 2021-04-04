@@ -179,10 +179,32 @@
 (defun snow/eshell-config ()
   (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history))
 
+(defun snow/eshell-prompt ()
+  (let ((current-branch (magit-get-current-branch))
+        (aws-vault (getenv "AWS_VAULT")))
+    (concat
+     "\n"
+     (propertize (user-login-name) 'face `(:foreground "#c196d6"))
+     (propertize "@" 'face `(:foreground "white"))
+     (propertize (system-name) 'face `(:foreground "#f0c574"))
+     (when current-branch
+        (propertize (concat "  " current-branch) 'face `(:foreground "#c196d6")))
+     (when kubel-context
+        (propertize (concat " k8s: " kubel-context) 'face `(:foreground "#c86464")))
+     (when aws-vault
+        (propertize (concat "  " aws-vault) 'face `(:foreground "#b2b966")))
+     "\n"
+     (propertize (eshell/pwd) 'face `(:foreground "#819fbb"))
+     "\n"
+     (propertize "$ " 'face `(:foreground "white"))
+     )))
+
 (use-package eshell
   :hook
   (eshell-first-time-mode . snow/eshell-config)
-  (eshell-pre-command . eshell-save-some-history))
+  (eshell-pre-command . eshell-save-some-history)
+  :config
+  (setq eshell-prompt-function 'snow/eshell-prompt))
 
 (use-package eshell-syntax-highlighting
   :after esh-mode
@@ -356,7 +378,7 @@
     "tt" 'tab-bar-select-tab-by-name
 
     "w"  'hydra-scale-window/body
-    "/"  'ripgrep-regexp
+    "/"  'rg-menu
     ":"  'counsel-M-x
     )
 
@@ -425,6 +447,8 @@
     :states 'normal
     :keymaps 'vterm-mode-map
     "p" 'vterm-yank
+    :config
+    (setq vterm-shell "/opt/homebrew/bin/fish")
     )
   )
 
@@ -483,7 +507,10 @@
 
 (use-package jsonnet-mode)
 
-(use-package kubel)
+(use-package kubel
+  :config
+  (setq kubel-use-namespace-list 'on))
+
 (use-package kubel-evil)
 
 (use-package ledger-mode)
@@ -536,6 +563,7 @@
   (org-after-todo-statistics . org-summary-todo)
   ;; (org-mode . flyspell-mode)
   :config
+  (advice-add 'org-open-at-point :before 'evil-set-jump)
   (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
   (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
   (setq org-agenda-custom-commands
@@ -646,6 +674,7 @@
   (emacs-lisp-mode . rainbow-delimiters-mode))
 
 (use-package ripgrep)
+(use-package rg)
 
 (use-package package-lint)
 

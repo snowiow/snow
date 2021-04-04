@@ -1,1 +1,2 @@
+alias k kubectl $*
 alias ave aws-vault exec $*
