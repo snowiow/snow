@@ -177,11 +177,16 @@
   (load-theme 'doom-tomorrow-night t))
 
 (defun snow/eshell-config ()
-  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history))
+  (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
+  (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
+  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history)
+  (setq eshell-scroll-to-bottom-on-input t
+        eshell-prompt-regexp             "^$ "))
 
 (defun snow/eshell-prompt ()
   (let ((current-branch (magit-get-current-branch))
-        (aws-vault (getenv "AWS_VAULT")))
+        (aws-vault (getenv "AWS_VAULT"))
+        (k8s-context (shell-command-to-string "kubectl config current-context")))
     (concat
      "\n"
      (propertize (user-login-name) 'face `(:foreground "#c196d6"))
@@ -190,7 +195,7 @@
      (when current-branch
         (propertize (concat "  " current-branch) 'face `(:foreground "#c196d6")))
      (when kubel-context
-        (propertize (concat " k8s: " kubel-context) 'face `(:foreground "#c86464")))
+        (propertize (concat " k8s: " k8s-context) 'face `(:foreground "#c86464")))
      (when aws-vault
         (propertize (concat "  " aws-vault) 'face `(:foreground "#b2b966")))
      "\n"
@@ -205,6 +210,16 @@
   (eshell-pre-command . eshell-save-some-history)
   :config
   (setq eshell-prompt-function 'snow/eshell-prompt))
+
+(use-package esh-autosuggest
+  :hook (eshell-mode . esh-autosuggest-mode)
+  :bind (:map esh-autosuggest-active-map
+   ("C-l" . 'company-complete-selection))
+  :config
+  (setq esh-autosuggest-delay 0.5)
+  ;; (set-face-foreground 'company-preview-common "#4b5668")
+  ;; (set-face-background 'company-preview nil))
+  )
 
 (use-package eshell-syntax-highlighting
   :after esh-mode
