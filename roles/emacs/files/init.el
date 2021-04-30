@@ -13,6 +13,7 @@
 
 
 ; =============================> BuiltIns
+(setq tags-revert-without-query 1)
 (setq backup-directory-alist `(("." . "~/tmp")))
 
 ; Hide scrollbar
@@ -136,7 +137,7 @@
   :init
   (setq company-dabbrev-downcase nil)
   (setq company-selection-wrap-around t)
-  (setq company-idle-delay 0.0)
+  (setq company-idle-delay 0.1)
   (setq company-minimum-prefix-length 1)
   :config
   :hook
@@ -247,6 +248,8 @@
                           eshell
                           helpful
                           magit
+                          mu4e
+                          pass
                           term)))
 
 (use-package evil-commentary
@@ -392,7 +395,10 @@
     "tr" 'tab-bar-rename-tab
     "tt" 'tab-bar-select-tab-by-name
 
-    "w"  'hydra-scale-window/body
+    "w" '(:ignore t :which-key "Window")
+    "ww" 'hydra-scale-window/body
+    "wf" 'hydra-scale-font/body
+
     "/"  'rg-menu
     ":"  'counsel-M-x
     )
@@ -409,6 +415,12 @@
     "r" 'flutter-hot-restart
     )
 
+  ;; json-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'json-mode-map
+    "f" 'json-pretty-print-buffer
+  )
   ;; jsonnet-mode
   (snow/local-leader-keys
     :states 'normal
@@ -453,6 +465,7 @@
     "p" 'org-plot/gnuplot
     "t" 'org-set-tags-command
     "," 'org-ctrl-c-ctrl-c
+    "v" 'snow/org-exec-codeblock-in-vterm
     "0" 'snow/org-start-presentation
     "$" 'org-archive-subtree
     )
@@ -490,9 +503,15 @@
 (use-package hydra)
 
 (defhydra hydra-scale-window (:timeout 4)
-  "scale text"
+  "scale window"
   ("l" enlarge-window-horizontally "+")
   ("h" shrink-window-horizontally "-")
+  ("q" nil "finished" :exit t))
+
+(defhydra hydra-scale-font (:timeout 4)
+  "scale text"
+  ("j" text-scale-increase "+")
+  ("k" text-scale-decrease "-")
   ("q" nil "finished" :exit t))
 
 (use-package ivy
@@ -520,6 +539,7 @@
    ("C-d" . ivy-switch-buffer-kill)
    ("C-k" . ivy-previous-line)))
 
+(use-package json-mode)
 (use-package jsonnet-mode)
 
 (use-package kubel
@@ -559,6 +579,19 @@
   :hook
   (markdown-mode . flyspell-mode)
   (markdown-mode . auto-fill-mode))
+
+(use-package mu4e
+  :ensure nil
+  :load-path "/opt/homebrew/share/emacs/site-lisp/mu/mu4e/"
+  :config
+  ;; refresh mail every 30 minutes
+  (setq mu4e-update-interval (* 30 60))
+  (setq mu4e-get-mail-command "offlineimap")
+
+  (setq mu4e-drafts-folder "/Drafts")
+  (setq mu4e-sent-folder "/Sent")
+  (setq mu4e-refile-folder "/Archiv")
+  (setq mu4e-trash-folder "/Trash"))
 
 (use-package ob-async)
 (use-package ob-typescript)
@@ -652,7 +685,8 @@
 
 (org-babel-do-load-languages
  'org-babel-load-languages
- '((gnuplot . t)
+ '((eshell . t)
+   (gnuplot . t)
    (ledger . t)
    (python . t)
    (shell . t)
@@ -680,17 +714,10 @@
   :config
   (evil-define-key 'normal org-tree-slide-mode-map
     (kbd "q") 'snow/org-end-presentation
-    (kbd "]") 'org-tree-slide-move-next-tree
-    (kbd "[") 'org-tree-slide-move-previous-tree))
+    (kbd "<right>") 'org-tree-slide-move-next-tree
+    (kbd "<left>") 'org-tree-slide-move-previous-tree))
 
-(use-package rainbow-delimiters
-  :hook
-  (clojure-mode . rainbow-delimiters-mode)
-  (emacs-lisp-mode . rainbow-delimiters-mode))
-
-(use-package ripgrep)
-(use-package rg)
-
+(use-package pass)
 (use-package package-lint)
 
 (use-package projectile
@@ -699,7 +726,20 @@
   :config
   (projectile-mode +1))
 
-(use-package pyvenv)
+(use-package pyvenv
+  :diminish
+  :config
+  (setq pyvenv-mode-line-indicator
+        '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
+  (pyvenv-mode +1))
+
+(use-package rainbow-delimiters
+  :hook
+  (clojure-mode . rainbow-delimiters-mode)
+  (emacs-lisp-mode . rainbow-delimiters-mode))
+
+(use-package ripgrep)
+(use-package rg)
 
 (use-package terraform-mode
   :hook
@@ -766,3 +806,13 @@
   (let (org-log-done org-log-states)   ; turn off logging
     (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
 (put 'dired-find-alternate-file 'disabled nil)
+
+; execute org code in project vterm
+(defun snow/org-exec-codeblock-in-vterm ()
+    "execute current org mode code block in vterm"
+    (org-babel-mark-block)
+    (interactive)
+    (kill-ring-save (region-beginning) (region-end))
+    (projectile-run-vterm)
+    (vterm-yank)
+    (yank-pop))

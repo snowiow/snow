@@ -1,0 +1,6 @@
+- name: symlink offlineimap.py
+  file:
+    src: "{{ ansible_env.PWD }}/roles/offlineimap/files/offlineimap.py"
+    path: ~/.offlineimap.py
+    state: link
+    force: yes

@@ -1,0 +1,11 @@
+- name: install offlineimap on Mac OS
+  community.general.homebrew:
+    name: offlineimap
+    state: present
+
+- name: create offlineimaprc
+  template:
+    src: offlineimaprc.j2
+    dest: "~/.offlineimaprc"
+    follow: false
+    force: yes

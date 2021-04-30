@@ -4,5 +4,6 @@
     state: present
 
 - name: install neovim-python on darwin
-  pip:
+  ansible.builtin.pip:
     name: neovim
+    extra_args: --user

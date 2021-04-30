@@ -1,6 +1,7 @@
 [user]
-	email = marcel.patzwahl+github@posteo.de
+	email = marcel.patzwahl@posteo.de
 	name = snowiow
+	signingkey = 239BB790F0301DA4
 [core]
 	editor = nvim
 [web]
@@ -21,6 +22,7 @@
     stat = !git diff --stat $(git merge-base HEAD \"$REVIEW_BASE\")
     review = !nvim -p $(git files | grep -v composer.lock) +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
     review-one = !nvim -p +\"tabdo Gdiff $REVIEW_BASE\" +\"let g:gitgutter_diff_base = '$REVIEW_BASE'\"
+    a = add
     aa = add --all
     bd = branch -d
     c = commit
@@ -44,3 +46,5 @@
 	user = snowiow
 [url "git@github.com:"]
 	insteadOf = https://github.com/
+[commit]
+	gpgsign = true

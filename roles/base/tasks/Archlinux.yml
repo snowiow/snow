@@ -1,6 +1,8 @@
 - name: make sure packages are installed
   package:
-    name: fzf
+    name:
+      - fzf
+      - pass
     state: present
   become: yes
 

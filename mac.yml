@@ -1,5 +1,7 @@
 - name: Setup local environment
   hosts: localhost
+  vars:
+    cert_path: /opt/homebrew/etc/openssl@1.1/cert.pem
   roles:
     - base
     - yabai
@@ -7,11 +9,8 @@
     - ctags
     - git
     - fish
-    # - zsh
     - syncthing
     - nvim
     - emacs
-    - qutebrowser
-    # - ranger
-    # - taskwarrior
-    # - code
+    - offlineimap
+    - mu

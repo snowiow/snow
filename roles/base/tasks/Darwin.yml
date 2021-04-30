@@ -7,6 +7,7 @@
       - ledger
       - jq
       - awscli
+      - pass
     state: present
 
 - name: make sure casks are installed

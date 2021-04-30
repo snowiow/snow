@@ -1,0 +1,16 @@
+- name: install mu on Mac OSX
+  community.general.homebrew:
+    name: mu
+    state: present
+    install_options: with-emacs
+  when: ansible_facts['os_family'] == "Darwin"
+
+- name: install mu on Arch Linux
+  become: yes
+  package:
+    name: mu4e
+    state: present
+  when: ansible_facts['os_family'] == "ArchLinux"
+
+- name: sync mail dir with mu
+  command: mu init --maildir=~/Mail --my-address=marcel.patzwahl@posteo.de

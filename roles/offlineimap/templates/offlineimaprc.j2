@@ -3,29 +3,20 @@ ui = ttyui
 accounts = Privat
 pythonfile = ~/.offlineimap.py
 
-[mbnames]
-enabled = yes
-filename = ~/.config/mutt/mailboxes
-header = "mailboxes "
-peritem = "+%(accountname)s/%(foldername)s"
-sep = " "
-footer = "\n"
-
 [Account Privat]
 localrepository = Privat-Local
 remoterepository = Privat-Remote
-postsynchook = /usr/bin/notmuch new
 
 [Repository Privat-Local]
 type=Maildir
-localfolders = ~/Mail/Privat
+localfolders = ~/Mail
 createfolders = true
 
 [Repository Privat-Remote]
 type = IMAP
 remoteuser = marcel.patzwahl@posteo.de
-remotepasseval = get_pass('~/.mailpw_privat.gpg')
+remotepasseval = get_pass('mail/posteo')
 remotehost = posteo.de
 maxconnections = 3
-sslcacertfile = /etc/ssl/certs/ca-certificates.crt
+sslcacertfile = {{ cert_path }}
 createfolders = True

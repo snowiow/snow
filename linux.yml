@@ -1,5 +1,7 @@
 - name: Setup local environment
   hosts: localhost
+  vars:
+    cert_path: /etc/ssl/certs/ca-certificates.crt
   roles:
     - base
     - locale
@@ -20,5 +22,6 @@
     #- dav
     - ranger
     # - taskwarrior
+    - offlineimap
     - mail
     # - code

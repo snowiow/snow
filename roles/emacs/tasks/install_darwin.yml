@@ -1,4 +1,7 @@
+- name: tap emacs plus
+  command: brew tap d12frosted/emacs-plus
+
 - name: install emacs on darwin
-  community.general.homebrew_cask:
-    name: emacs
+  community.general.homebrew:
+    name: emacs-plus
     state: present

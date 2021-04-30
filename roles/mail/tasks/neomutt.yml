@@ -10,6 +10,13 @@
     - neomuttrc
     - vim-keys.rc
 
+- name: symlink notmuch-config
+  file:
+    src: "{{ ansible_env.PWD }}/roles/mail/files/notmuch-config"
+    path: ~/.notmuch-config
+    state: link
+    force: yes
+
 - name: clone mailboxes-splitter
   git:
     repo: https://github.com/snowiow/mailboxes-splitter
