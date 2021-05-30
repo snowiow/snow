@@ -129,6 +129,13 @@
   :hook
   (dired-mode . all-the-icons-dired-mode))
 
+
+(use-package auth-source-pass
+  :ensure nil
+  :config
+  (auth-source-pass-enable)
+  (setq auth-sources '(password-store)))
+
 (use-package cider)
 
 (use-package clojure-mode)
@@ -247,9 +254,11 @@
                           ediff
                           eshell
                           helpful
+                          info
                           magit
                           mu4e
                           pass
+                          proced
                           term)))
 
 (use-package evil-commentary
@@ -296,6 +305,9 @@
   (global-flycheck-mode)
   :config
   (setq flycheck-check-syntax-automatically '(save new-line mode-enabled)))
+
+(use-package forge
+  :disabled)
 
 (use-package general
   :config
@@ -359,6 +371,7 @@
     "gg" 'magit
     "gb" 'magit-blame
     "gd" 'magit-diff
+    "gl" 'git-link
 
     ;; help
     "h" '(:ignore t :which-key "Help")
@@ -480,6 +493,10 @@
     )
   )
 
+(use-package git-link
+  :config
+  (setq git-link-open-in-browser t))
+
 (use-package go-mode)
 
 (use-package go-tag)
@@ -584,14 +601,27 @@
   :ensure nil
   :load-path "/opt/homebrew/share/emacs/site-lisp/mu/mu4e/"
   :config
+  (mu4e t)
   ;; refresh mail every 30 minutes
   (setq mu4e-update-interval (* 30 60))
   (setq mu4e-get-mail-command "offlineimap")
+  (setq mu4e-compose-format-flowed t)
 
   (setq mu4e-drafts-folder "/Drafts")
   (setq mu4e-sent-folder "/Sent")
   (setq mu4e-refile-folder "/Archiv")
-  (setq mu4e-trash-folder "/Trash"))
+  (setq mu4e-trash-folder "/Trash")
+  (setq user-mail-address "marcel.patzwahl@posteo.de")
+
+  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+
+  ;; smtp settings
+  (setq smtpmail-default-smtp-server "posteo.de")
+  (setq smtpmail-smtp-server "posteo.de")
+  (setq smtpmail-smtp-user "marcel.patzwahl@posteo.de")
+  (setq smtpmail-smtp-service 587)
+  (setq smtpmail-stream-type 'starttls)
+  (setq message-send-mail-function 'smtpmail-send-it))
 
 (use-package ob-async)
 (use-package ob-typescript)
@@ -720,6 +750,12 @@
 (use-package pass)
 (use-package package-lint)
 
+(use-package proced
+  :config
+  (add-hook 'proced-mode-hook
+            (lambda ()
+              (proced-toggle-auto-update t))))
+
 (use-package projectile
   :init
   (setq projectile-completion-system 'ivy)
@@ -816,3 +852,11 @@
     (projectile-run-vterm)
     (vterm-yank)
     (yank-pop))
+
+(use-package aws
+  :load-path "~/.emacs.d/packages/awscli"
+  :custom
+  (aws-vault t))
+
+(use-package aws-evil
+  :load-path "~/.emacs.d/packages/awscli")
