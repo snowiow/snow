@@ -1,7 +1,15 @@
-- name: make sure git is installed
+- name: install git on Mac OSX
   community.general.homebrew:
     name: git
     state: present
+  when: ansible_facts['os_family'] == "Darwin"
+
+- name: install git on Linux
+  become: yes
+  package:
+    name: git
+    state: present
+  when: ansible_facts['os_family'] == "ArchLinux"
 
 - name: symlink gitconfig
   file:

@@ -22,6 +22,8 @@
 (tool-bar-mode -1)
 ; Hide Menu Bar
 (menu-bar-mode -1)
+; Hide tab-bar
+(setq tab-bar-show nil)
 ;; Activate Paren Mode
 (show-paren-mode t)
 ; Always show this many lines above or below cursor
