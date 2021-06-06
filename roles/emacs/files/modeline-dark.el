@@ -8,7 +8,7 @@
 			    'face 'font-lock-negation-char-face)))
     '(:eval (propertize
             (concat " " (all-the-icons-icon-for-buffer))))
-    (propertize " %b " 'face 'font-lock-defaults)
+    (propertize " %b " 'face 'font-lock-negation-char-face)
     '(:eval (when (buffer-modified-p)
 		(propertize "+" 'face 'font-lock-variable-name-face)))
     " ("

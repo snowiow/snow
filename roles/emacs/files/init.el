@@ -69,10 +69,6 @@
 (setq-default fill-column 80)
 
 
-; ERC
-(setq erc-autojoin-channels-alist '(("freenode.net" "#emacs")))
-(setq erc-prompt-for-password nil)
-
 ; EDiff
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 (custom-set-faces
@@ -136,19 +132,19 @@
   :ensure nil
   :config
   (auth-source-pass-enable)
-  (setq auth-sources '(password-store)))
+  :custom
+  (auth-sources '(password-store)))
 
 (use-package cider)
 
 (use-package clojure-mode)
 
 (use-package company
-  :init
-  (setq company-dabbrev-downcase nil)
-  (setq company-selection-wrap-around t)
-  (setq company-idle-delay 0.1)
-  (setq company-minimum-prefix-length 1)
-  :config
+  :custom
+  (company-dabbrev-downcase nil)
+  (company-selection-wrap-around t)
+  (company-idle-delay 0.1)
+  (company-minimum-prefix-length 1)
   :hook
   (after-init . global-company-mode)
   :bind (:map company-active-map
@@ -166,25 +162,47 @@
   (dart-mode . flutter-test-mode))
 
 (use-package dashboard
-  :init
-  (setq dashboard-startup-banner 'logo)
-  (setq dashboard-items '((agenda . 5)
-                          (projects . 5)
-                          (recents  . 5)))
+  :custom
+  (dashboard-startup-banner 'logo)
+  (tab-bar-new-tab-choice "*dashboard*")
+  (dashboard-items '((agenda . 5)
+                     (projects . 5)
+                     (recents  . 5)))
   :config
-  (dashboard-setup-startup-hook)
-  (setq tab-bar-new-tab-choice "*dashboard*"))
+  (dashboard-setup-startup-hook))
 
 (use-package dired-single)
 (use-package dockerfile-mode)
 
 (use-package doom-themes
-  :init
-  (setq doom-themes-enable-bold t
-	doom-themes-enable-italic t)
+  :custom
+  (doom-themes-enable-bold t)
+  (doom-themes-enable-italic t)
   :config
   (load-theme 'doom-one-light t)
   (load-theme 'doom-tomorrow-night t))
+
+(use-package erc
+  :custom
+  (erc-prompt-for-password nil)
+  (erc-modules '(autojoin fill notifications stamp track))
+  (erc-autojoin-timing 'ident)
+  (erc-autojoin-channels-alist '(("libera.chat" "#systemcrafters" "#emacs")))
+  (erc-rename-buffers t)
+  (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY"))
+  (erc-hide-list '("JOIN" "NICK" "PART" "QUIT" "MODE" "AWAY"))
+  (erc-timestamp-only-if-changed-flag nil)
+  (erc-timestamp-format "%H:%M ")
+  (erc-insert-timestamp-function 'erc-insert-timestamp-left)
+  (erc-fill-prefix "      ")
+  (erc-fill-column 120)
+  :config
+  (setq erc-prompt-for-nickserv-password nil))
+
+(use-package erc-hl-nicks
+  :after erc
+  :config
+  (add-to-list 'erc-modules 'hl-nicks))
 
 (defun snow/eshell-config ()
   (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
@@ -218,31 +236,28 @@
   :hook
   (eshell-first-time-mode . snow/eshell-config)
   (eshell-pre-command . eshell-save-some-history)
-  :config
-  (setq eshell-prompt-function 'snow/eshell-prompt))
+  :custom
+  (eshell-prompt-function 'snow/eshell-prompt))
 
 (use-package esh-autosuggest
   :hook (eshell-mode . esh-autosuggest-mode)
   :bind (:map esh-autosuggest-active-map
    ("C-l" . 'company-complete-selection))
-  :config
-  (setq esh-autosuggest-delay 0.5)
-  ;; (set-face-foreground 'company-preview-common "#4b5668")
-  ;; (set-face-background 'company-preview nil))
-  )
+  :custom
+  (esh-autosuggest-delay 0.5))
 
 (use-package eshell-syntax-highlighting
   :after esh-mode
-  :config
+  :custom
   (eshell-syntax-highlighting-global-mode +1))
 
 (use-package evil
-  :init
-  (setq evil-want-C-u-scroll t)
-  (setq evil-want-keybinding nil)
-  (setq evil-want-Y-yank-to-eol t)
-  (setq evil-search-module 'evil-search)
-  (setq evil-undo-system 'undo-tree)
+  :custom
+  (evil-want-C-u-scroll t)
+  (evil-want-keybinding nil)
+  (evil-want-Y-yank-to-eol t)
+  (evil-search-module 'evil-search)
+  (evil-undo-system 'undo-tree)
   :config
   (evil-mode))
 
@@ -284,7 +299,7 @@
 
 (use-package evil-surround
   :after evil
-  :config
+  :custom
   (global-evil-surround-mode 1))
 
 (use-package exec-path-from-shell
@@ -305,8 +320,8 @@
 (use-package flycheck
   :init
   (global-flycheck-mode)
-  :config
-  (setq flycheck-check-syntax-automatically '(save new-line mode-enabled)))
+  :custom
+  (flycheck-check-syntax-automatically '(save new-line mode-enabled)))
 
 (use-package forge
   :disabled)
@@ -496,8 +511,8 @@
   )
 
 (use-package git-link
-  :config
-  (setq git-link-open-in-browser t))
+  :custom
+  (git-link-open-in-browser t))
 
 (use-package go-mode)
 
@@ -509,15 +524,15 @@
 (use-package gnuplot)
 
 (use-package helpful
-  :config
-  (setq counsel-describe-function-function #'helpful-callable)
-  (setq counsel-describe-variable-function #'helpful-variable))
+  :custom
+  (counsel-describe-function-function #'helpful-callable)
+  (counsel-describe-variable-function #'helpful-variable))
 
 (use-package highlight-indent-guides
-  :init
-  (setq highlight-indent-guides-method 'character)
-  :config
-  (add-hook 'yaml-mode-hook 'highlight-indent-guides-mode))
+  :custom
+  (highlight-indent-guides-method 'character)
+  :hook
+  (yaml-mode highlight-indent-guides-mode))
 
 (use-package hydra)
 
@@ -602,33 +617,34 @@
 (use-package mu4e
   :ensure nil
   :load-path "/opt/homebrew/share/emacs/site-lisp/mu/mu4e/"
-  :config
-  (mu4e t)
+  :custom
+  (mu4e-update-interval (* 30 60))
+  (mu4e-get-mail-command "offlineimap")
   ;; refresh mail every 30 minutes
-  (setq mu4e-update-interval (* 30 60))
-  (setq mu4e-get-mail-command "offlineimap")
-  (setq mu4e-compose-format-flowed t)
-
-  (setq mu4e-drafts-folder "/Drafts")
-  (setq mu4e-sent-folder "/Sent")
-  (setq mu4e-refile-folder "/Archiv")
-  (setq mu4e-trash-folder "/Trash")
-  (setq user-mail-address "marcel.patzwahl@posteo.de")
-
-  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t)
+  (mu4e-compose-format-flowed t)
+  (mu4e-drafts-folder "/Drafts")
+  (mu4e-sent-folder "/Sent")
+  (mu4e-refile-folder "/Archiv")
+  (mu4e-trash-folder "/Trash")
+  (user-mail-address "marcel.patzwahl@posteo.de")
 
   ;; smtp settings
-  (setq smtpmail-default-smtp-server "posteo.de")
-  (setq smtpmail-smtp-server "posteo.de")
-  (setq smtpmail-smtp-user "marcel.patzwahl@posteo.de")
-  (setq smtpmail-smtp-service 587)
-  (setq smtpmail-stream-type 'starttls)
-  (setq message-send-mail-function 'smtpmail-send-it))
+  (smtpmail-default-smtp-server "posteo.de")
+  (smtpmail-smtp-server "posteo.de")
+  (smtpmail-smtp-user "marcel.patzwahl@posteo.de")
+  (smtpmail-smtp-service 587)
+  (smtpmail-stream-type 'starttls)
+  (message-send-mail-function 'smtpmail-send-it)
+  :config
+  (mu4e t)
+  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t))
 
 (use-package ob-async)
 (use-package ob-typescript)
+
 (use-package openwith
   :config
+  (add-to-list 'mm-inhibit-file-name-handlers 'openwith-file-handler) ;; needed to not randomly open the attachment when trying to send it
   (setq openwith-associations
         (list
          (list (openwith-make-extension-regexp
@@ -636,17 +652,17 @@
                 "open"
                 '(file))))
   (openwith-mode t))
+
 (use-package python-mode)
 
 (use-package org
   :hook
   (org-after-todo-statistics . org-summary-todo)
-  ;; (org-mode . flyspell-mode)
-  :config
-  (advice-add 'org-open-at-point :before 'evil-set-jump)
-  (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
-  (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
-  (setq org-agenda-custom-commands
+  :custom
+  ;; important first settings which is used by other configurations
+  (org-directory "~/Sync/notes")
+  ;; AGENDA SETTINGS
+  (org-agenda-custom-commands
         '(("w" "Work Todos"
            ((agenda "" ((org-agenda-span 1)))
             (todo ""
@@ -654,19 +670,24 @@
                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
            ((org-agenda-compact-blocks t)
             (org-agenda-files '("~/Sync/notes/work.org"))))))
-  (setq org-directory "~/Sync/notes")
-  (setq org-agenda-files
-        (file-expand-wildcards (concat org-directory "/*.org")))
-
-  (setq org-agenda-skip-deadline-if-done t)
-  (setq org-agenda-skip-deadline-prewarning-if-scheduled t)
-  (setq org-agenda-skip-scheduled-if-deadline-is-shown t)
-  (setq org-agenda-skip-scheduled-if-done t)
-  (setq org-agenda-window-setup 'current-window)
-  (setq org-archive-location "%s_archive::datetree/* Archived Tasks")
-  (setq org-confirm-babel-evaluate nil)
-  (setq org-babel-python-command "python3")
-
+  (org-agenda-files (file-expand-wildcards (concat org-directory "/*.org")))
+  (org-agenda-skip-deadline-if-done t)
+  (org-agenda-skip-deadline-prewarning-if-scheduled t)
+  (org-agenda-skip-scheduled-if-deadline-is-shown t)
+  (org-agenda-skip-scheduled-if-done t)
+  (org-agenda-window-setup 'current-window)
+  (org-archive-location "%s_archive::datetree/* Archived Tasks")
+  (org-babel-python-command "python3")
+  (org-confirm-babel-evaluate nil)
+  (org-default-notes-file (concat org-directory "/capture.org"))
+  (org-ellipsis " ▾")
+  (org-image-actual-width nil)
+  (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
+                       (sequence "|" "CANCELLED(c)")))
+  :config
+  (advice-add 'org-open-at-point :before 'evil-set-jump)
+  (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
+  (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
   (setq org-capture-templates
         '(("a" "Appointments")
           ("ap" "Private" entry (file+headline
@@ -701,14 +722,7 @@
           ("fw" "Gewicht Eintrag" table-line
            (id "weight-table")
            "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)))
-
-  (setq org-default-notes-file (concat org-directory "/capture.org"))
-  (setq org-ellipsis " ▾")
-  (setq org-image-actual-width nil)
-  (setq org-journal-dir "~/Sync/notes/journal")
-  (setq org-todo-keywords
-        '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
-          (sequence "|" "CANCELLED(c)"))))
+  (setq org-journal-dir "~/Sync/notes/journal"))
 
 (defun get-journal-file-this-year ()
   "Return filename for today's journal entry."
@@ -759,8 +773,8 @@
               (proced-toggle-auto-update t))))
 
 (use-package projectile
-  :init
-  (setq projectile-completion-system 'ivy)
+  :custom
+  (projectile-completion-system 'ivy)
   :config
   (projectile-mode +1))
 
@@ -783,8 +797,10 @@
   :hook
   (terraform-mode . terraform-format-on-save-mode))
 
+(use-package tramp)
+
 (use-package typescript-mode
-  :init
+  :custom
   (setq typescript-indent-level 2))
 
 (use-package undo-tree
@@ -795,8 +811,8 @@
 
 (use-package which-key
   :init (which-key-mode)
-  :config
-  (setq which-key-idle-delay 0.3))
+  :custom
+  (which-key-idle-delay 0.3))
 
 (use-package yaml-mode
   :config
@@ -808,7 +824,14 @@
   :config
   (yas-global-mode 1))
 
-(load "~/.emacs.d/modeline-dark.el")
+
+(defun snow/dired-open-locally ()
+  "Make a local file copy of the remote file under the cursor in dired.
+Opens it.  Mainly used to open pdfs or other complex formats from remote machines"
+  (interactive)
+  (let* ((filename (dired-get-filename nil t))
+         (local-tmp-file (file-local-copy filename)))
+    (find-file local-tmp-file)))
 
 (use-package dired
   :ensure nil
@@ -817,8 +840,10 @@
   (evil-collection-define-key 'normal 'dired-mode-map
     "h" 'dired-single-up-directory
     "l" 'dired-single-buffer
-    "L" 'dired-display-file))
+    "L" 'dired-display-file
+    "M" 'snow/dired-open-locally))
 
+(load "~/.emacs.d/modeline-dark.el")
 ; Custom Functions
 
 ; dark/light theme switch
@@ -837,7 +862,10 @@
 (defun snow/erc ()
     "Join ERC with default settings"
     (interactive)
-    (erc :server "irc.freenode.net" :port "6667" :nick "snowiow"))
+    (erc-tls
+     :server "irc.libera.chat"
+     :port "6697"
+     :nick "snowiow"))
 
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."

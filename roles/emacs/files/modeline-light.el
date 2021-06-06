@@ -6,7 +6,7 @@
        '(:eval (when (not (string= "" vc-mode))
 		 (propertize (concat " " (substring vc-mode 5))
 			     'face 'font-lock-negation-char-face)))
-       (propertize " %b " 'face 'font-lock-defaults)
+       (propertize " %b " 'face 'font-lock-negation-char-face)
        '(:eval (when (buffer-modified-p)
 	 	 (propertize "+" 'face 'font-lock-variable-name-face)))
        " ("
