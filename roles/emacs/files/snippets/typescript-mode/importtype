@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# name: importtype
+# key: it
+# --
+
+import type { ${2:moduleName} } from '${1:module}';

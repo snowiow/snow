@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# name: exportclass
+# key: ec
+# --
+
+export class ${1:ClassName} extends ${2:} {
+
+}

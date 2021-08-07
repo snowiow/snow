@@ -127,7 +127,6 @@
   :hook
   (dired-mode . all-the-icons-dired-mode))
 
-
 (use-package auth-source-pass
   :ensure nil
   :config
@@ -361,7 +360,8 @@
   ;; evil-insert-state mappings
   (general-define-key
    :keymaps 'evil-insert-state-map
-   "C-o" 'company-complete)
+   "C-o" 'company-complete
+   "C-y" 'yas-expand)
 
 
   ;; leader key mappings
@@ -429,6 +429,8 @@
     "ww" 'hydra-scale-window/body
     "wf" 'hydra-scale-font/body
 
+    "y" 'yas-insert-snippet
+
     "/"  'rg-menu
     ":"  'counsel-M-x
     )
@@ -461,8 +463,10 @@
   (snow/local-leader-keys
     :states 'normal
     :keymaps 'emacs-lisp-mode-map
-    "b" 'eval-buffer
-    "e" 'eval-last-sexp
+    "e" '(:ignore t :which-key "eval")
+    "eb" 'eval-buffer
+    "ee" 'eval-last-sexp
+    "ef" 'eval-defun
     )
 
   ;; ledger-mode
@@ -481,6 +485,15 @@
     :keymaps 'lisp-interaction-mode-map
     "e" 'eval-print-last-sexp
     )
+
+  ;; mu4e-compose-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'mu4e-compose-mode-map
+    "a" 'mml-attach-file
+    "cc" 'message-goto-cc
+    "bcc" 'message-goto-bcc)
+
   ;; org-mode
   (snow/local-leader-keys
     :states 'normal
@@ -532,7 +545,7 @@
   :custom
   (highlight-indent-guides-method 'character)
   :hook
-  (yaml-mode highlight-indent-guides-mode))
+  (yaml-mode . highlight-indent-guides-mode))
 
 (use-package hydra)
 
@@ -669,7 +682,19 @@
                   ((org-agenda-overriding-header "\nUnscheduled TODOs")
                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
            ((org-agenda-compact-blocks t)
-            (org-agenda-files '("~/Sync/notes/work.org"))))))
+            (org-agenda-files '("~/Sync/notes/work.org" "~/Sync/notes/appointments.org"))))
+          ("p" "Private Todos"
+           ((agenda "" ((org-agenda-span 1)))
+            (tags-todo "+PRIORITY=\"A\"-TODO=\"WAITING\""
+                       ((org-agenda-overriding-header "\nHigh Priority")
+                        (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+            (tags-todo "-PRIORITY=\"A\""
+                  ((org-agenda-overriding-header "\nUnscheduled TODOs")
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+            (todo "WAITING"
+                  ((org-agenda-overriding-header "\nWAITING"))))
+           ((org-agenda-compact-blocks t)
+            (org-agenda-files '("~/Sync/notes/todos.org" "~/Sync/notes/appointments.org"))))))
   (org-agenda-files (file-expand-wildcards (concat org-directory "/*.org")))
   (org-agenda-skip-deadline-if-done t)
   (org-agenda-skip-deadline-prewarning-if-scheduled t)
@@ -692,19 +717,19 @@
         '(("a" "Appointments")
           ("ap" "Private" entry (file+headline
                               (lambda ()
-                                (concat org-directory "/todos.org"))
-                              "Termine")
+                                (concat org-directory "/appointments.org"))
+                              "Private")
            "* %?")
           ("aw" "Work" entry (file+headline
                                    (lambda ()
-                                     (concat org-directory "/work.org"))
-                                   "Appointments")
+                                     (concat org-directory "/appointments.org"))
+                                   "Work")
            "* %?")
           ("t" "Todos")
           ("tt" "Todo" entry (file+headline
                               (lambda ()
                                 (concat org-directory "/todos.org"))
-                              "Allgemein")
+                              "Inbox")
            "* TODO %?")
           ("tw" "Todo Work" entry (file+headline
                                    (lambda ()
@@ -801,7 +826,7 @@
 
 (use-package typescript-mode
   :custom
-  (setq typescript-indent-level 2))
+  (typescript-indent-level 2))
 
 (use-package undo-tree
   :config
@@ -821,6 +846,9 @@
 					(setq evil-shift-width 2)))))
 
 (use-package yasnippet
+  :bind
+  (:map yas-keymap
+        ("C-y" . yas-next-field-or-maybe-expand))
   :config
   (yas-global-mode 1))
 
@@ -860,7 +888,7 @@ Opens it.  Mainly used to open pdfs or other complex formats from remote machine
 
 ; ERC
 (defun snow/erc ()
-    "Join ERC with default settings"
+    "Join ERC with default settings."
     (interactive)
     (erc-tls
      :server "irc.libera.chat"

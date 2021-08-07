@@ -163,3 +163,17 @@ alt - p : yabai -m window --toggle sticky;\
 # change layout of desktop
 ctrl + alt - a : yabai -m space --layout bsp
 ctrl + alt - d : yabai -m space --layout float
+ctrl + alt - s : yabai -m space --layout stack
+
+# stack cycling
+alt - p : yabai -m query --spaces --space \
+            | jq -re ".index" \
+            | xargs -I{} yabai -m query --windows --space {} \
+            | jq -sre "add | map(select(.minimized != 1)) | sort_by(.display, .frame.y, .frame.x, .id) | reverse | nth(index(map(select(.focused == 1))) - 1).id" \
+            | xargs -I{} yabai -m window --focus {}
+
+alt - n : yabai -m query --spaces --space \
+            | jq -re ".index" \
+            | xargs -I{} yabai -m query --windows --space {} \
+            | jq -sre "add | map(select(.minimized != 1)) | sort_by(.display, .frame.y, .frame.y, .id) | nth(index(map(select(.focused == 1))) - 1).id" \
+            | xargs -I{} yabai -m window --focus {}
