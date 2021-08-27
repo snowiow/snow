@@ -411,9 +411,12 @@
     "lt" 'imenu
 
     ;; org mode
-    "o" '(:ignore t :which-key "Org Mode")
-    "oa" 'org-agenda
-    "oc" 'org-capture
+    "o"   '(:ignore t :which-key "Org Mode")
+    "oa"  'org-agenda
+    "oc"  'org-capture
+    "or"  '(:ignore t :which-key "Roam")
+    "orf" 'org-roam-node-find
+    "ort" 'org-roam-buffer-toggle
 
     ;; projectile
     "p" 'projectile-command-map
@@ -467,6 +470,7 @@
     "eb" 'eval-buffer
     "ee" 'eval-last-sexp
     "ef" 'eval-defun
+    "l" 'package-lint-current-buffer
     )
 
   ;; ledger-mode
@@ -499,18 +503,21 @@
     :states 'normal
     :keymaps 'org-mode-map
     "RET" 'org-open-at-point
-    "g" '(:ignore t :which-key "go to")
-    "gg" 'counsel-org-goto
-    "gp" 'org-previous-visible-heading
-    "i" 'org-toggle-inline-images
-    "l" 'org-insert-link
-    "o" 'org-agenda-open-link
-    "p" 'org-plot/gnuplot
-    "t" 'org-set-tags-command
-    "," 'org-ctrl-c-ctrl-c
-    "v" 'snow/org-exec-codeblock-in-vterm
-    "0" 'snow/org-start-presentation
-    "$" 'org-archive-subtree
+    "g"   '(:ignore t :which-key "go to")
+    "gg"  'counsel-org-goto
+    "gp"  'org-previous-visible-heading
+    "i"   'org-toggle-inline-images
+    "l"   'org-insert-link
+    "o"   'org-agenda-open-link
+    "p"   'org-plot/gnuplot
+    "r"   '(:ignore t :which-key "Org Roam")
+    "ra"  'org-roam-alias-add
+    "ri"  'org-roam-node-insert
+    "t"   'org-set-tags-command
+    ","   'org-ctrl-c-ctrl-c
+    "v"   'snow/org-exec-codeblock-in-vterm
+    "0"   'snow/org-start-presentation
+    "$"   'org-archive-subtree
     )
 
   ;; vterm-mode
@@ -766,6 +773,15 @@
 (use-package org-bullets
   :after org
   :hook (org-mode . org-bullets-mode))
+
+(use-package org-roam
+  :init
+  (setq org-roam-v2-ack t)
+  :custom
+  (org-roam-directory "~/Sync/notes/roam")
+  (org-roam-completion-everywhere t)
+  :config
+  (org-roam-setup))
 
 (defun snow/org-start-presentation ()
   (interactive)
