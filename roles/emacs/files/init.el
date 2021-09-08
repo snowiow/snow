@@ -411,12 +411,19 @@
     "lt" 'imenu
 
     ;; org mode
-    "o"   '(:ignore t :which-key "Org Mode")
-    "oa"  'org-agenda
-    "oc"  'org-capture
-    "or"  '(:ignore t :which-key "Roam")
-    "orf" 'org-roam-node-find
-    "ort" 'org-roam-buffer-toggle
+    "o"    '(:ignore t :which-key "Org Mode")
+    "oa"   'org-agenda
+    "oc"   'org-capture
+    "or"   '(:ignore t :which-key "Roam")
+    "ord"  '(:ignore t :which-key "Daily")
+    "ordt" 'org-roam-dailies-capture-today
+    "ordT" 'org-roam-dailies-goto-today
+    "ordy" 'org-roam-dailies-capture-yesterday
+    "ordY" 'org-roam-dailies-goto-yesterday
+    "ordd" 'org-roam-dailies-capture-date
+    "ordD" 'org-roam-dailies-goto-date
+    "orf"  'org-roam-node-find
+    "ort"  'org-roam-buffer-toggle
 
     ;; projectile
     "p" 'projectile-command-map
@@ -689,7 +696,7 @@
                   ((org-agenda-overriding-header "\nUnscheduled TODOs")
                    (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
            ((org-agenda-compact-blocks t)
-            (org-agenda-files '("~/Sync/notes/work.org" "~/Sync/notes/appointments.org"))))
+            (org-agenda-files '("~/Sync/notes/work.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org"))))
           ("p" "Private Todos"
            ((agenda "" ((org-agenda-span 1)))
             (tags-todo "+PRIORITY=\"A\"-TODO=\"WAITING\""
@@ -701,7 +708,7 @@
             (todo "WAITING"
                   ((org-agenda-overriding-header "\nWAITING"))))
            ((org-agenda-compact-blocks t)
-            (org-agenda-files '("~/Sync/notes/todos.org" "~/Sync/notes/appointments.org"))))))
+            (org-agenda-files '("~/Sync/notes/todos.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org"))))))
   (org-agenda-files (file-expand-wildcards (concat org-directory "/*.org")))
   (org-agenda-skip-deadline-if-done t)
   (org-agenda-skip-deadline-prewarning-if-scheduled t)
@@ -721,31 +728,11 @@
   (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
   (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
   (setq org-capture-templates
-        '(("a" "Appointments")
-          ("ap" "Private" entry (file+headline
+        '(("a" "Private Appointments" entry (file+headline
                               (lambda ()
                                 (concat org-directory "/appointments.org"))
                               "Private")
            "* %?")
-          ("aw" "Work" entry (file+headline
-                                   (lambda ()
-                                     (concat org-directory "/appointments.org"))
-                                   "Work")
-           "* %?")
-          ("t" "Todos")
-          ("tt" "Todo" entry (file+headline
-                              (lambda ()
-                                (concat org-directory "/todos.org"))
-                              "Inbox")
-           "* TODO %?")
-          ("tw" "Todo Work" entry (file+headline
-                                   (lambda ()
-                                     (concat org-directory "/work.org"))
-                                   "Todos")
-           "* TODO %?")
-          ("j" "Journal Note"
-           entry (file+datetree (lambda () (get-journal-file-this-year)))
-           "* %U %?")
           ("f" "Fitness")
           ("fj" "Workout Journal Entry"
            entry (file+datetree (lambda () (concat org-directory "/fitness.org"))
@@ -753,13 +740,29 @@
            "* %U %?")
           ("fw" "Gewicht Eintrag" table-line
            (id "weight-table")
-           "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)))
-  (setq org-journal-dir "~/Sync/notes/journal"))
-
-(defun get-journal-file-this-year ()
-  "Return filename for today's journal entry."
-  (let ((yearly-name (concat "/" (format-time-string "%Y") ".org")))
-    (expand-file-name (concat org-journal-dir yearly-name))))
+           "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)
+          ("t" "Todos")
+          ("tt" "Todo" entry (file+headline
+                              (lambda ()
+                                (concat org-directory "/todos.org"))
+                              "Inbox")
+           "* TODO %?")
+          ("w" "Work")
+          ("wa" "Appointments" entry (file+headline
+                              (lambda ()
+                                (concat org-directory "/appointments.org"))
+                              "Work")
+           "* %?")
+          ("wm" "Meeting" entry (file+headline
+                                   (lambda ()
+                                     (concat org-directory "/meetings.org"))
+                                   "Work")
+           (file"~/Sync/notes/templates/meeting.org"))
+          ("wt" "Todo Work" entry (file+headline
+                                   (lambda ()
+                                     (concat org-directory "/work.org"))
+                                   "Todos")
+           "* TODO %?"))))
 
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -780,8 +783,16 @@
   :custom
   (org-roam-directory "~/Sync/notes/roam")
   (org-roam-completion-everywhere t)
-  :config
-  (org-roam-setup))
+  (org-roam-capture-templates
+   '(("b" "book notes" plain (file "~/Sync/notes/roam/templates/booknote.org")
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+      :unnarrowed t)
+     ("d" "default" plain
+      "%?"
+      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+      :unnarrowed t)))
+   :config
+   (org-roam-db-autosync-mode))
 
 (defun snow/org-start-presentation ()
   (interactive)
