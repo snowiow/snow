@@ -612,6 +612,8 @@
 (use-package ledger-mode)
 
 (use-package linum-relative
+  :custom
+  (linum-relative-backend 'display-line-numbers-mode)
   :config
   (linum-relative-global-mode))
 
@@ -753,11 +755,32 @@
                                 (concat org-directory "/appointments.org"))
                               "Work")
            "* %?")
-          ("wm" "Meeting" entry (file+headline
-                                   (lambda ()
-                                     (concat org-directory "/meetings.org"))
-                                   "Work")
-           (file"~/Sync/notes/templates/meeting.org"))
+          ("wm" "Meetings")
+          ("wmm" "New Meeting" entry (file+headline
+                                 (lambda ()
+                                   (concat org-directory "/meetings.org"))
+                                 "Work")
+           (file "~/Sync/notes/templates/meeting.org"))
+          ("wmd" "Daily" entry (file+headline
+                                     (lambda ()
+                                       (concat org-directory "/meetings.org"))
+                                     "DevOps Daily")
+           (file  "templates/repeating-meeting.org"))
+          ("wmh" "Tech Huddle" entry (file+headline
+                                     (lambda ()
+                                       (concat org-directory "/meetings.org"))
+                                     "Tech Huddle")
+           (file  "templates/repeating-meeting.org"))
+          ("wmr" "Retro" entry (file+headline
+                                     (lambda ()
+                                       (concat org-directory "/meetings.org"))
+                                     "Retro")
+           (file  "templates/repeating-meeting.org"))
+         ("wmt" "Tech BiWeekly" entry (file+headline
+                                     (lambda ()
+                                       (concat org-directory "/meetings.org"))
+                                     "Tech BiWeekly")
+           (file repeating-meeting-file))
           ("wt" "Todo Work" entry (file+headline
                                    (lambda ()
                                      (concat org-directory "/work.org"))
@@ -827,6 +850,7 @@
 (use-package projectile
   :custom
   (projectile-completion-system 'ivy)
+  (projectile-switch-project-action 'projectile-dired)
   :config
   (projectile-mode +1))
 
@@ -938,10 +962,11 @@ Opens it.  Mainly used to open pdfs or other complex formats from remote machine
     (vterm-yank)
     (yank-pop))
 
-(use-package aws
+(use-package aws-mode
   :load-path "~/.emacs.d/packages/awscli"
   :custom
   (aws-vault t))
 
 (use-package aws-evil
+  :after aws-mode
   :load-path "~/.emacs.d/packages/awscli")

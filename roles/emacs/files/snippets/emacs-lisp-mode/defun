@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: defun
+# key: f
+# --
+(defun ${1:name} ($2)
+  "$3"
+  ($4))
