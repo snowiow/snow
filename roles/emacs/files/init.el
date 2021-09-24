@@ -13,6 +13,9 @@
 
 
 ; =============================> BuiltIns
+; Start as Server
+(server-start)
+
 (setq tags-revert-without-query 1)
 (setq backup-directory-alist `(("." . "~/tmp")))
 
@@ -133,6 +136,8 @@
   (auth-source-pass-enable)
   :custom
   (auth-sources '(password-store)))
+
+(use-package browse-at-remote)
 
 (use-package cider)
 
@@ -389,6 +394,7 @@
     "gb" 'magit-blame
     "gd" 'magit-diff
     "gl" 'git-link
+    "gw" 'browse-at-remote
 
     ;; help
     "h" '(:ignore t :which-key "Help")
@@ -565,8 +571,10 @@
 
 (defhydra hydra-scale-window (:timeout 4)
   "scale window"
-  ("l" enlarge-window-horizontally "+")
-  ("h" shrink-window-horizontally "-")
+  ("l" enlarge-window-horizontally "h+")
+  ("h" shrink-window-horizontally "h-")
+  ("k" enlarge-window "v+")
+  ("j" shrink-window "v-")
   ("q" nil "finished" :exit t))
 
 (defhydra hydra-scale-font (:timeout 4)

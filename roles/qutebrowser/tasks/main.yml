@@ -1,24 +1,4 @@
-- name: install qutebrowser on Arch Linux
-  become: yes
-  package:
-    name: qutebrowser
-    state: present
-  when: ansible_facts['os_family'] == "ArchLinux"
-
-- name: install qutebrowser on Mac OS
-  community.general.homebrew_cask:
-    name: qutebrowser
-    state: present
+- import_tasks: setup_darwin.yml
   when: ansible_facts['os_family'] == "Darwin"
-
-- name: create qutebrowser config directory
-  file:
-    path: ~/.config/qutebrowser
-    state: directory
-
-- name: symlink qutebrowser dotfiles
-  file:
-    src: "{{ ansible_env.PWD }}/roles/qutebrowser/files/autoconfig.yml"
-    path: ~/.config/qutebrowser/autoconfig.yml
-    state: link
-    force: yes
+- import_tasks: setup_linux.yml
+  when: ansible_facts['os_family'] == "Archlinux"

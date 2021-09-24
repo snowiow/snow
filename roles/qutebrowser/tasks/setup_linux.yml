@@ -1,0 +1,5 @@
+- name: install qutebrowser on Arch Linux
+  become: yes
+  package:
+    name: qutebrowser
+    state: present
