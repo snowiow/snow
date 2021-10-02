@@ -2,7 +2,6 @@
 (require 'package)
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
-        ("org" . "https://orgmode.org/elpa/")
         ("melpa" . "https://melpa.org/packages/")))
 
 (package-initialize)
@@ -327,8 +326,7 @@
   :custom
   (flycheck-check-syntax-automatically '(save new-line mode-enabled)))
 
-(use-package forge
-  :disabled)
+(use-package forge)
 
 (use-package general
   :config
@@ -547,6 +545,8 @@
   :custom
   (git-link-open-in-browser t))
 
+(use-package github-review)
+
 (use-package go-mode)
 
 (use-package go-tag)
@@ -626,6 +626,7 @@
   (linum-relative-global-mode))
 
 (use-package lsp-mode
+  :commands lsp
   :hook
   (go-mode . lsp)
   (python-mode . lsp)
@@ -773,6 +774,11 @@
                                      (lambda ()
                                        (concat org-directory "/meetings.org"))
                                      "DevOps Daily")
+                                     (file  "templates/repeating-meeting.org"))
+           ("wme" "Extended Sync" entry (file+headline
+                                     (lambda ()
+                                       (concat org-directory "/meetings.org"))
+                                     "Extended Sync")
            (file  "templates/repeating-meeting.org"))
           ("wmh" "Tech Huddle" entry (file+headline
                                      (lambda ()
