@@ -4,6 +4,7 @@
 	signingkey = 239BB790F0301DA4
 [core]
 	editor = nvim
+	excludesfile = ~/.gitignore_global
 [web]
 	browser = qutebrowser
 [merge]

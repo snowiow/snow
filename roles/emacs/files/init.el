@@ -14,7 +14,6 @@
 ; =============================> BuiltIns
 ; Start as Server
 (server-start)
-
 (setq tags-revert-without-query 1)
 (setq backup-directory-alist `(("." . "~/tmp")))
 
@@ -210,6 +209,7 @@
 (defun snow/eshell-config ()
   (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
   (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
+  (define-key eshell-mode-map (kbd "<down>") 'eshell-next-input)
   (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history)
   (setq eshell-scroll-to-bottom-on-input t
         eshell-prompt-regexp             "^$ "))
@@ -279,7 +279,10 @@
                           mu4e
                           pass
                           proced
-                          term)))
+                          rg
+                          ripgrep
+                          term
+                          xref)))
 
 (use-package evil-commentary
   :after evil
@@ -382,9 +385,11 @@
     "e" 'dired-jump
 
     ;; find
-    "f"  '(:ignore t :which-key "find in file")
-    "fs" 'swiper
+    "f"  '(:ignore t :which-key "find")
+    "ff" 'find-file
     "fi" 'counsel-imenu
+    "fr" 'rg
+    "fs" 'swiper
 
     ;; git
     "g"  '(:ignore t :which-key "Git")
@@ -428,6 +433,7 @@
     "ordD" 'org-roam-dailies-goto-date
     "orf"  'org-roam-node-find
     "ort"  'org-roam-buffer-toggle
+    "os"   'snow/rg-org
 
     ;; projectile
     "p" 'projectile-command-map
@@ -691,8 +697,6 @@
                 '(file))))
   (openwith-mode t))
 
-(use-package python-mode)
-
 (use-package org
   :hook
   (org-after-todo-statistics . org-summary-todo)
@@ -810,6 +814,11 @@
    (shell . t)
    (typescript . t)))
 
+(defun snow/rg-org (regexp)
+  "Do a REGEXP search in org files in the org directory."
+  (interactive "sRegexp: ")
+  (rg regexp "*.org" org-directory))
+
 (use-package org-bullets
   :after org
   :hook (org-mode . org-bullets-mode))
@@ -855,6 +864,29 @@
 (use-package pass)
 (use-package package-lint)
 
+(use-package popper
+  :after (shackle projectile)
+  :bind (("C-'"   . popper-toggle-latest)
+         ("M-'"   . popper-cycle)
+         ("C-M-'" . popper-toggle-type))
+  :custom
+  (popper-display-control nil)
+  (popper-group-function #'popper-group-by-projectile)
+  :init
+  (setq popper-reference-buffers
+        '("\\*info\\*"
+          "\\*Ledger Report\\*"
+          "\\*Messages\\*"
+          compilation-mode
+          eshell-mode
+          help-mode
+          helpful-mode
+          magit-status-mode
+          rg-mode
+          vterm-mode))
+  (popper-mode +1)
+  (popper-echo-mode +1))
+
 (use-package proced
   :config
   (add-hook 'proced-mode-hook
@@ -866,6 +898,7 @@
   (projectile-completion-system 'ivy)
   (projectile-switch-project-action 'projectile-dired)
   :config
+  (add-hook 'projectile-after-switch-project-hook 'snow/set-tab-name-to-current-project)
   (projectile-mode +1))
 
 (use-package pyvenv
@@ -875,6 +908,8 @@
         '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
   (pyvenv-mode +1))
 
+(use-package python-mode)
+
 (use-package rainbow-delimiters
   :hook
   (clojure-mode . rainbow-delimiters-mode)
@@ -882,6 +917,7 @@
 
 (use-package ripgrep)
 (use-package rg)
+
 
 (use-package terraform-mode
   :hook
@@ -917,6 +953,15 @@
   :config
   (yas-global-mode 1))
 
+(use-package shackle
+  :config
+  (setq shackle-rules '(
+                        (compilation-mode :noselect t)
+                        (("^\\*eshell.*?\\*" "^\\*vterm.*?\\*") :regexp t :other t :select t)
+                        (" *transient*" :align below)
+                        ))
+  (setq shackle-default-rule '(:select t))
+  (shackle-mode t))
 
 (defun snow/dired-open-locally ()
   "Make a local file copy of the remote file under the cursor in dired.
@@ -935,6 +980,7 @@ Opens it.  Mainly used to open pdfs or other complex formats from remote machine
     "l" 'dired-single-buffer
     "L" 'dired-display-file
     "M" 'snow/dired-open-locally))
+
 
 (load "~/.emacs.d/modeline-dark.el")
 ; Custom Functions
@@ -976,10 +1022,16 @@ Opens it.  Mainly used to open pdfs or other complex formats from remote machine
     (vterm-yank)
     (yank-pop))
 
+(defun snow/set-tab-name-to-current-project ()
+  "Name the current tab after the open project."
+  (interactive)
+   (tab-bar-rename-tab (projectile-project-name)))
+
 (use-package aws-mode
   :load-path "~/.emacs.d/packages/awscli"
   :custom
-  (aws-vault t))
+  (aws-vault t)
+  (aws-output "yaml"))
 
 (use-package aws-evil
   :after aws-mode
