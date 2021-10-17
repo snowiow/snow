@@ -739,9 +739,11 @@
   (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
                        (sequence "|" "CANCELLED(c)")))
   :config
+  (require 'org-habit)
   (advice-add 'org-open-at-point :before 'evil-set-jump)
   (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
   (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
+  (add-to-list 'org-modules 'habits)
   (setq org-capture-templates
         '(("a" "Private Appointments" entry (file+headline
                               (lambda ()
@@ -756,6 +758,9 @@
           ("fw" "Gewicht Eintrag" table-line
            (id "weight-table")
            "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)
+          ("k" "Keyboard WPM" table-line
+           (id "wpm-progress")
+           "| %u | %^{WPM} | %^{Accuracy} | %{Consistency}"  :immediate-finish t)
           ("t" "Todos")
           ("tt" "Todo" entry (file+headline
                               (lambda ()
