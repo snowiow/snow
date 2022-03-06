@@ -7,41 +7,41 @@
     (setq package-archives
           '(("gnu" . "http://elpa.gnu.org/packages/")
             ("melpa" . "https://melpa.org/packages/")))
- #+END_SRC
+  #+END_SRC
 ** use-package setup
-  #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
      (package-initialize)
      (require 'use-package)
      (setq use-package-always-ensure t)
      (use-package use-package-ensure-system-package
        :ensure t)
- #+END_SRC
+   #+END_SRC
 * Emacs Server
   #+BEGIN_SRC emacs-lisp
     (server-start)
- #+END_SRC
+  #+END_SRC
 * Tag Settings
   Don't ask to reread a tags file if it was written outside of Emacs
- #+BEGIN_SRC emacs-lisp
+  #+BEGIN_SRC emacs-lisp
     (setq tags-revert-without-query 1)
-#+END_SRC
+  #+END_SRC
 * UI Settings 
 ** GUI Elements
    Disable all GUI Elements
-  #+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
      (scroll-bar-mode -1)
      (tool-bar-mode -1)
      (menu-bar-mode -1)
      (setq ring-bell-function 'ignore)
-#+END_SRC
+   #+END_SRC
 ** Better Help Buffers
    #+BEGIN_SRC emacs-lisp
-    (use-package helpful
-      :custom
-      (counsel-describe-function-function #'helpful-callable)
-      (counsel-describe-variable-function #'helpful-variable))
-  
-#+END_SRC
+     (use-package helpful
+       :custom
+       (counsel-describe-function-function #'helpful-callable)
+       (counsel-describe-variable-function #'helpful-variable))
+
+   #+END_SRC
 ** Icons
    #+BEGIN_SRC emacs-lisp
      (use-package all-the-icons)
@@ -52,17 +52,17 @@
 ** Tab Bar Settings
    #+BEGIN_SRC emacs-lisp
      (setq tab-bar-show nil)
-#+END_SRC
+   #+END_SRC
 
 ** Theme
    #+BEGIN_SRC emacs-lisp
-      (use-package doom-themes
-        :custom
-        (doom-themes-enable-bold t)
-        (doom-themes-enable-italic t)
-        :config
-        (load-theme 'doom-one-light t)
-        (load-theme 'doom-tomorrow-night t))
+     (use-package doom-themes
+       :custom
+       (doom-themes-enable-bold t)
+       (doom-themes-enable-italic t)
+       :config
+       (load-theme 'doom-one-light t)
+       (load-theme 'doom-tomorrow-night t))
 
      (defun snow/switch-theme ()
        "switches between dark and light theme"
@@ -74,31 +74,31 @@
          (progn
            (enable-theme 'doom-tomorrow-night)
            (load "~/.emacs.d/modeline-dark.el"))))
-    #+END_SRC
+   #+END_SRC
 
 ** Which Key
    #+BEGIN_SRC emacs-lisp
-    (use-package which-key
-      :init (which-key-mode)
-      :custom
-      (which-key-idle-delay 0.3))
-    #+END_SRC
+     (use-package which-key
+       :init (which-key-mode)
+       :custom
+       (which-key-idle-delay 0.3))
+   #+END_SRC
 ** Modeline
    #+BEGIN_SRC emacs-lisp
-    (load "~/.emacs.d/modeline-dark.el")
-#+END_SRC
+     (load "~/.emacs.d/modeline-dark.el")
+   #+END_SRC
 
 * Font Settings
   Due to differnt resolutions on Mac the font should be displayed bigger
   #+BEGIN_SRC emacs-lisp
-     (if (eq system-type 'gnu/linux)
-         (set-face-attribute 'default nil
-                             :family "Iosevka Term"
-                             :height 120)
-       (set-face-attribute 'default nil
-                           :family "Iosevka Term"
-                           :height 140))
-#+END_SRC
+    (if (eq system-type 'gnu/linux)
+        (set-face-attribute 'default nil
+                            :family "Iosevka Term"
+                            :height 120)
+      (set-face-attribute 'default nil
+                          :family "Iosevka Term"
+                          :height 140))
+  #+END_SRC
 * Mac OSX Settings
   Set option to super and commant to meta
   #+BEGIN_SRC emacs-lisp
@@ -108,34 +108,34 @@
     (use-package exec-path-from-shell
       :config
       (when (memq window-system '(mac ns x))
-      (exec-path-from-shell-initialize)))
-#+END_SRC
+        (exec-path-from-shell-initialize)))
+  #+END_SRC
 
 * Backups
   #+BEGIN_SRC emacs-lisp
-     (setq backup-directory-alist `(("." . "~/tmp")))
-#+END_SRC
+    (setq backup-directory-alist `(("." . "~/tmp")))
+  #+END_SRC
 
 * Editor Settings
   #+BEGIN_SRC emacs-lisp
-     (setq require-final-newline t)
-     (setq-default fill-column 80)
-     (setq-default
-      whitespace-line-column 80
-      whitespace-style '(face lines-tail))
-#+END_SRC
+    (setq require-final-newline t)
+    (setq-default fill-column 80)
+    (setq-default
+     whitespace-line-column 80
+     whitespace-style '(face lines-tail))
+  #+END_SRC
   Always keep some lines visible underneath and above the cursor, when at the bottom or top of the window
   #+BEGIN_SRC emacs-lisp
-     (setq scroll-margin 5)
-#+END_SRC
+    (setq scroll-margin 5)
+  #+END_SRC
 
   Wrap lines so they are shown in the buffer completely without horizontal scrolling
-#+BEGIN_SRC emacs-lisp
-     (global-visual-line-mode t)
-#+END_SRC
+  #+BEGIN_SRC emacs-lisp
+    (global-visual-line-mode t)
+  #+END_SRC
 
 ** Autocompletion
-#+BEGIN_SRC emacs-lisp
+   #+BEGIN_SRC emacs-lisp
      (use-package company
        :custom
        (company-dabbrev-downcase nil)
@@ -145,27 +145,27 @@
        :hook
        (after-init . global-company-mode)
        :bind (:map company-active-map
-        ("M-n" . nil)
-        ("M-p" . nil)
-        ("C-n" . company-select-next)
-        ("C-p" . company-select-previous)
-        ("C-p" . company-select-previous)
-        ("C-d" . company-show-doc-buffer)))
-#+END_SRC
+                   ("M-n" . nil)
+                   ("M-p" . nil)
+                   ("C-n" . company-select-next)
+                   ("C-p" . company-select-previous)
+                   ("C-p" . company-select-previous)
+                   ("C-d" . company-show-doc-buffer)))
+   #+END_SRC
 ** Global Tab settings
    #+BEGIN_SRC emacs-lisp
      (setq-default tab-width 4)
      (setq-default indent-tabs-mode nil)
-#+END_SRC
+   #+END_SRC
 ** Parenthesis Handling
 *** Highlight parenthesis
-   #+BEGIN_SRC emacs-lisp
-     (show-paren-mode t)
+    #+BEGIN_SRC emacs-lisp
+      (show-paren-mode t)
     #+END_SRC
 *** Create matching parenthesis
     #+BEGIN_SRC emacs-lisp
       (electric-pair-mode 1)
-     #+END_SRC
+    #+END_SRC
 *** Rainbow Delimiter
     #+BEGIN_SRC emacs-lisp
       (use-package rainbow-delimiters
@@ -173,23 +173,23 @@
         :hook
         (clojure-mode . rainbow-delimiters-mode)
         (emacs-lisp-mode . rainbow-delimiters-mode))
- #+END_SRC
+    #+END_SRC
 
 ** Relative Line Numbers
    #+BEGIN_SRC emacs-lisp
-    (use-package linum-relative
-      :custom
-      (linum-relative-backend 'display-line-numbers-mode)
-      :config
-      (linum-relative-global-mode))
-  #+END_SRC
+     (use-package linum-relative
+       :custom
+       (linum-relative-backend 'display-line-numbers-mode)
+       :config
+       (linum-relative-global-mode))
+   #+END_SRC
 
 ** Indent Guides
    #+BEGIN_SRC emacs-lisp
-    (use-package highlight-indent-guides
-      :custom
-      (highlight-indent-guides-method 'character))
-#+END_SRC
+     (use-package highlight-indent-guides
+       :custom
+       (highlight-indent-guides-method 'character))
+   #+END_SRC
 * Buffer Management 
   #+BEGIN_SRC emacs-lisp
     (use-package popper
@@ -224,18 +224,23 @@
                             ))
       (setq shackle-default-rule '(:select t))
       (shackle-mode t))
-#+END_SRC
+  #+END_SRC
+* File Handling
 
+  #+BEGIN_SRC emacs-lisp
+  (global-auto-revert-mode 1)
+  #+END_SRC
+  
 * Prompt Settings
   #+BEGIN_SRC emacs-lisp
-     (defalias 'yes-or-no-p 'y-or-n-p)
-#+END_SRC
+    (defalias 'yes-or-no-p 'y-or-n-p)
+  #+END_SRC
 
 * Custom File Settings
   #+BEGIN_SRC emacs-lisp
-     (setq custom-file "~/.emacs.d/custom.el")
-     (load custom-file)
-#+END_SRC
+    (setq custom-file "~/.emacs.d/custom.el")
+    (load custom-file 'noerror 'nomessage)
+  #+END_SRC
 
 * Ediff
    #+BEGIN_SRC emacs-lisp
@@ -251,143 +256,145 @@
 #+END_SRC
 * Org Mode
   #+BEGIN_SRC emacs-lisp
-        (use-package org
-          :hook
-          (org-after-todo-statistics . org-summary-todo)
-          :custom
-          ;; important first settings which is used by other configurations
-          (org-directory "~/Sync/notes")
-          ;; AGENDA SETTINGS
-          (org-agenda-custom-commands
-           '(("w" "Work Todos"
-              ((agenda "" ((org-agenda-span 1)))
-               (todo ""
-                     ((org-agenda-overriding-header "\nUnscheduled TODOs")
-                      (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
-              ((org-agenda-compact-blocks t)
-               (org-agenda-files '("~/Sync/notes/work.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))
-             ("p" "Private Todos"
-              ((agenda "" ((org-agenda-span 1)))
-               (tags-todo "+PRIORITY=\"A\"-TODO=\"WAITING\""
-                          ((org-agenda-overriding-header "\nHigh Priority")
-                           (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
-               (tags-todo "-PRIORITY=\"A\""
-                          ((org-agenda-overriding-header "\nUnscheduled TODOs")
-                           (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
-               (todo "WAITING"
-                     ((org-agenda-overriding-header "\nWAITING"))))
-              ((org-agenda-compact-blocks t)
-               (org-agenda-files '("~/Sync/notes/todos.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))))
-          (org-agenda-files (file-expand-wildcards (concat org-directory "/*.org")))
-          (org-agenda-skip-deadline-if-done t)
-          (org-agenda-skip-deadline-prewarning-if-scheduled t)
-          (org-agenda-skip-scheduled-if-deadline-is-shown t)
-          (org-agenda-skip-scheduled-if-done t)
-          (org-agenda-window-setup 'current-window)
-          (org-archive-location "%s_archive::datetree/* Archived Tasks")
-          (org-babel-python-command "python3")
-          (org-confirm-babel-evaluate nil)
-          (org-default-notes-file (concat org-directory "/capture.org"))
-          (org-ellipsis " ▾")
-          (org-image-actual-width nil)
-          (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
-                               (sequence "|" "CANCELLED(c)")))
-          :config
-          (require 'org-habit)
-          (advice-add 'org-open-at-point :before 'evil-set-jump)
-          (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
-          (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
-          (add-to-list 'org-modules 'habits)
-          (setq org-capture-templates
-                '(("a" "Private Appointments" entry (file+headline
-                                                     (lambda ()
-                                                       (concat org-directory "/appointments.org"))
-                                                     "Private")
-                   "* %?")
-                  ("f" "Fitness")
-                  ("fj" "Workout Journal Entry"
-                   entry (file+datetree (lambda () (concat org-directory "/fitness.org"))
-                                        "Gym" "Workout Journal")
-                   "* %U %?")
-                  ("fw" "Gewicht Eintrag" table-line
-                   (id "weight-table")
-                   "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)
-                  ("k" "Keyboard WPM" table-line
-                   (id "wpm-progress")
-                   "| %u | %^{WPM} | %^{Accuracy} | %^{Consistency}"  :immediate-finish t)
-                  ("t" "Todos")
-                  ("tt" "Todo" entry (file+headline
-                                      (lambda ()
-                                        (concat org-directory "/todos.org"))
-                                      "Inbox")
-                   "* TODO %?")
-                  ("w" "Work")
-                  ("wa" "Appointments" entry (file+headline
-                                              (lambda ()
-                                                (concat org-directory "/appointments.org"))
-                                              "Work")
-                   "* %?")
-                  ("wm" "Meetings")
-                  ("wmm" "New Meeting" entry (file+headline
-                                              (lambda ()
-                                                (concat org-directory "/meetings.org"))
-                                              "Work")
-                   (file "~/Sync/notes/templates/meeting.org"))
-                  ("wmd" "Daily" entry (file+headline
-                                        (lambda ()
-                                          (concat org-directory "/meetings.org"))
-                                        "DevOps Daily")
-                   (file  "templates/repeating-meeting.org"))
-                  ("wme" "Extended Sync" entry (file+headline
-                                                (lambda ()
-                                                  (concat org-directory "/meetings.org"))
-                                                "Extended Sync")
-                   (file  "templates/repeating-meeting.org"))
-                  ("wmh" "Tech Huddle" entry (file+headline
-                                              (lambda ()
-                                                (concat org-directory "/meetings.org"))
-                                              "Tech Huddle")
-                   (file  "templates/repeating-meeting.org"))
-                  ("wmr" "Retro" entry (file+headline
-                                        (lambda ()
-                                          (concat org-directory "/meetings.org"))
-                                        "Retro")
-                   (file  "templates/repeating-meeting.org"))
-                  ("wms" "Platform Sync between DataPlatform and PE" entry (file+headline
-                                              (lambda ()
-                                                (concat org-directory "/meetings.org"))
-                                              "Platform Sync between DataPlatform and PE")
-                   (file  "templates/repeating-meeting.org"))
-                  ("wmt" "Tech BiWeekly" entry (file+headline
-                                                (lambda ()
-                                                  (concat org-directory "/meetings.org"))
-                                                "Tech BiWeekly")
-                   (file repeating-meeting-file))
-                  ("wt" "Todo Work" entry (file+headline
-                                           (lambda ()
-                                             (concat org-directory "/work.org"))
-                                           "Todos")
-                   "* TODO %?"))))
+            (use-package org
+              :hook
+              (org-after-todo-statistics . org-summary-todo)
+              :custom
+              ;; important first settings which is used by other configurations
+              (org-directory "~/Sync/notes")
+              ;; AGENDA SETTINGS
+              (org-agenda-custom-commands
+               '(("w" "Work Todos"
+                  ((agenda "" ((org-agenda-span 1)))
+                   (tags-todo "-TODO=\"WAITING\""
+                         ((org-agenda-overriding-header "\nUnscheduled TODOs")
+                          (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+                   (todo "WAITING"
+                         ((org-agenda-overriding-header "\nWAITING"))))
+                  ((org-agenda-compact-blocks t)
+                   (org-agenda-files '("~/Sync/notes/work.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))
+                 ("p" "Private Todos"
+                  ((agenda "" ((org-agenda-span 1)))
+                   (tags-todo "+PRIORITY=\"A\"-TODO=\"WAITING\""
+                              ((org-agenda-overriding-header "\nHigh Priority")
+                               (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+                   (tags-todo "-PRIORITY=\"A\""
+                              ((org-agenda-overriding-header "\nUnscheduled TODOs")
+                               (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+                   (todo "WAITING"
+                         ((org-agenda-overriding-header "\nWAITING"))))
+                  ((org-agenda-compact-blocks t)
+                   (org-agenda-files '("~/Sync/notes/todos.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))))
+              (org-agenda-files (file-expand-wildcards (concat org-directory "/*.org")))
+              (org-agenda-skip-deadline-if-done t)
+              (org-agenda-skip-deadline-prewarning-if-scheduled t)
+              (org-agenda-skip-scheduled-if-deadline-is-shown t)
+              (org-agenda-skip-scheduled-if-done t)
+              (org-agenda-window-setup 'current-window)
+              (org-archive-location "%s_archive::datetree/* Archived Tasks")
+              (org-babel-python-command "python3")
+              (org-confirm-babel-evaluate nil)
+              (org-default-notes-file (concat org-directory "/capture.org"))
+              (org-ellipsis " ▾")
+              (org-image-actual-width nil)
+              (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
+                                   (sequence "|" "CANCELLED(c)")))
+              :config
+              (require 'org-habit)
+              (advice-add 'org-open-at-point :before 'evil-set-jump)
+              (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
+              (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
+              (add-to-list 'org-modules 'habits)
+              (setq org-capture-templates
+                    '(("a" "Private Appointments" entry (file+headline
+                                                         (lambda ()
+                                                           (concat org-directory "/appointments.org"))
+                                                         "Private")
+                       "* %?")
+                      ("f" "Fitness")
+                      ("fj" "Workout Journal Entry"
+                       entry (file+datetree (lambda () (concat org-directory "/fitness.org"))
+                                            "Gym" "Workout Journal")
+                       "* %U %?")
+                      ("fw" "Gewicht Eintrag" table-line
+                       (id "weight-table")
+                       "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)
+                      ("k" "Keyboard WPM" table-line
+                       (id "wpm-progress-ferris")
+                       "| %u | %^{WPM} | %^{Accuracy} | %^{Consistency}"  :immediate-finish t)
+                      ("t" "Todos")
+                      ("tt" "Todo" entry (file+headline
+                                          (lambda ()
+                                            (concat org-directory "/todos.org"))
+                                          "Inbox")
+                       "* TODO %?")
+                      ("w" "Work")
+                      ("wa" "Appointments" entry (file+headline
+                                                  (lambda ()
+                                                    (concat org-directory "/appointments.org"))
+                                                  "Work")
+                       "* %?")
+                      ("wm" "Meetings")
+                      ("wmm" "New Meeting" entry (file+headline
+                                                  (lambda ()
+                                                    (concat org-directory "/meetings.org"))
+                                                  "Work")
+                       (file "~/Sync/notes/templates/meeting.org"))
+                      ("wmd" "Daily" entry (file+headline
+                                            (lambda ()
+                                              (concat org-directory "/meetings.org"))
+                                            "DevOps Daily")
+                       (file  "templates/repeating-meeting.org"))
+                      ("wme" "Extended Sync" entry (file+headline
+                                                    (lambda ()
+                                                      (concat org-directory "/meetings.org"))
+                                                    "Extended Sync")
+                       (file  "templates/repeating-meeting.org"))
+                      ("wmf" "Refinement" entry (file+headline
+                                                  (lambda ()
+                                                    (concat org-directory "/meetings.org"))
+                                                  "Refinement")
+                       (file  "templates/repeating-meeting.org"))
+                      ("wmr" "Retro" entry (file+headline
+                                            (lambda ()
+                                              (concat org-directory "/meetings.org"))
+                                            "Retro")
+                       (file  "templates/repeating-meeting.org"))
+                      ("wms" "Platform Sync between DataPlatform and PE" entry (file+headline
+                                                  (lambda ()
+                                                    (concat org-directory "/meetings.org"))
+                                                  "Platform Sync between DataPlatform and PE")
+                       (file  "templates/repeating-meeting.org"))
+                      ("wmt" "Tech BiWeekly" entry (file+headline
+                                                    (lambda ()
+                                                      (concat org-directory "/meetings.org"))
+                                                    "Tech BiWeekly")
+                       (file repeating-meeting-file))
+                      ("wt" "Todo Work" entry (file+headline
+                                               (lambda ()
+                                                 (concat org-directory "/work.org"))
+                                               "Todos")
+                       "* TODO %?"))))
 
-        (defun snow/rg-org (regexp)
-          "Do a REGEXP search in org files in the org directory."
-          (interactive "sRegexp: ")
-          (rg regexp "*.org" org-directory))
+            (defun snow/rg-org (regexp)
+              "Do a REGEXP search in org files in the org directory."
+              (interactive "sRegexp: ")
+              (rg regexp "*.org" org-directory))
 
-    (defun snow/org-exec-codeblock-in-vterm ()
-      "execute current org mode code block in vterm"
-      (org-babel-mark-block)
-      (interactive)
-      (kill-ring-save (region-beginning) (region-end))
-      (projectile-run-vterm)
-      (vterm-yank)
-      (yank-pop))
+        (defun snow/org-exec-codeblock-in-vterm ()
+          "execute current org mode code block in vterm"
+          (org-babel-mark-block)
+          (interactive)
+          (kill-ring-save (region-beginning) (region-end))
+          (projectile-run-vterm)
+          (vterm-yank)
+          (yank-pop))
 
-    (defun org-summary-todo (n-done n-not-done)
-      "Switch entry to DONE when all subentries are done, to TODO otherwise."
-      (let (org-log-done org-log-states)   ; turn off logging
-        (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-    (put 'dired-find-alternate-file 'disabled nil)
+        (defun org-summary-todo (n-done n-not-done)
+          "Switch entry to DONE when all subentries are done, to TODO otherwise."
+          (let (org-log-done org-log-states)   ; turn off logging
+            (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+        (put 'dired-find-alternate-file 'disabled nil)
 #+END_SRC
 
 ** Babel Tangle Config
@@ -663,6 +670,7 @@
          "g"  '(:ignore t :which-key "Git")
          "gg" 'magit
          "gb" 'magit-blame
+         "gc" 'magit-clone
          "gd" 'magit-diff
          "gl" 'git-link
          "gw" 'browse-at-remote
@@ -816,7 +824,6 @@
        )
    #+END_SRC
 
-   
 ** Hydra
    #+BEGIN_SRC emacs-lisp
     (use-package hydra)

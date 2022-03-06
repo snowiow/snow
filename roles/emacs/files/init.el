@@ -31,12 +31,12 @@
 (setq tab-bar-show nil)
 
 (use-package doom-themes
-   :custom
-   (doom-themes-enable-bold t)
-   (doom-themes-enable-italic t)
-   :config
-   (load-theme 'doom-one-light t)
-   (load-theme 'doom-tomorrow-night t))
+  :custom
+  (doom-themes-enable-bold t)
+  (doom-themes-enable-italic t)
+  :config
+  (load-theme 'doom-one-light t)
+  (load-theme 'doom-tomorrow-night t))
 
 (defun snow/switch-theme ()
   "switches between dark and light theme"
@@ -70,7 +70,7 @@
 (use-package exec-path-from-shell
   :config
   (when (memq window-system '(mac ns x))
-  (exec-path-from-shell-initialize)))
+    (exec-path-from-shell-initialize)))
 
 (setq backup-directory-alist `(("." . "~/tmp")))
 
@@ -93,12 +93,12 @@
   :hook
   (after-init . global-company-mode)
   :bind (:map company-active-map
-   ("M-n" . nil)
-   ("M-p" . nil)
-   ("C-n" . company-select-next)
-   ("C-p" . company-select-previous)
-   ("C-p" . company-select-previous)
-   ("C-d" . company-show-doc-buffer)))
+              ("M-n" . nil)
+              ("M-p" . nil)
+              ("C-n" . company-select-next)
+              ("C-p" . company-select-previous)
+              ("C-p" . company-select-previous)
+              ("C-d" . company-show-doc-buffer)))
 
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
@@ -156,10 +156,12 @@
   (setq shackle-default-rule '(:select t))
   (shackle-mode t))
 
+(global-auto-revert-mode 1)
+
 (defalias 'yes-or-no-p 'y-or-n-p)
 
 (setq custom-file "~/.emacs.d/custom.el")
-(load custom-file)
+(load custom-file 'noerror 'nomessage)
 
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
 (custom-set-faces
@@ -181,9 +183,11 @@
       (org-agenda-custom-commands
        '(("w" "Work Todos"
           ((agenda "" ((org-agenda-span 1)))
-           (todo ""
+           (tags-todo "-TODO=\"WAITING\""
                  ((org-agenda-overriding-header "\nUnscheduled TODOs")
-                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp)))))
+                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+           (todo "WAITING"
+                 ((org-agenda-overriding-header "\nWAITING"))))
           ((org-agenda-compact-blocks t)
            (org-agenda-files '("~/Sync/notes/work.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))
          ("p" "Private Todos"
@@ -233,7 +237,7 @@
                (id "weight-table")
                "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)
               ("k" "Keyboard WPM" table-line
-               (id "wpm-progress")
+               (id "wpm-progress-ferris")
                "| %u | %^{WPM} | %^{Accuracy} | %^{Consistency}"  :immediate-finish t)
               ("t" "Todos")
               ("tt" "Todo" entry (file+headline
@@ -263,10 +267,10 @@
                                               (concat org-directory "/meetings.org"))
                                             "Extended Sync")
                (file  "templates/repeating-meeting.org"))
-              ("wmh" "Tech Huddle" entry (file+headline
+              ("wmf" "Refinement" entry (file+headline
                                           (lambda ()
                                             (concat org-directory "/meetings.org"))
-                                          "Tech Huddle")
+                                          "Refinement")
                (file  "templates/repeating-meeting.org"))
               ("wmr" "Retro" entry (file+headline
                                     (lambda ()
@@ -553,6 +557,7 @@
     "g"  '(:ignore t :which-key "Git")
     "gg" 'magit
     "gb" 'magit-blame
+    "gc" 'magit-clone
     "gd" 'magit-diff
     "gl" 'git-link
     "gw" 'browse-at-remote
