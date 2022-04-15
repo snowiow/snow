@@ -374,10 +374,6 @@
   :after org
   :hook (org-mode . org-modern-mode))
 
-;; (use-package org-bullets
-;;   :after org
-;;   :hook (org-mode . org-bullets-mode))
-
 (use-package org-roam
   :init
   (setq org-roam-v2-ack t)
@@ -457,6 +453,7 @@
                           info
                           magit
                           mu4e
+                          package-menu
                           pass
                           proced
                           rg
@@ -863,7 +860,10 @@
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle))
   :init
-  (marginalia-mode))
+  (marginalia-mode)
+  :config
+  (add-to-list 'marginalia-prompt-categories '("Find File:" . project-file))
+  (add-to-list 'marginalia-prompt-categories '("Switch to buffer:" . buffer)))
 
 (use-package consult)
 
@@ -879,7 +879,7 @@
 
 (defun snow/dired-open-locally ()
   "Make a local file copy of the remote file under the cursor in dired and
-   opens it.  Mainly used to open pdfs or other complex formats From remote machines"
+                   opens it.  Mainly used to open pdfs or other complex formats From remote machines"
   (interactive)
   (let* ((filename (dired-get-filename nil t))
          (local-tmp-file (file-local-copy filename)))
@@ -890,8 +890,8 @@
   :commands (dired dired-jump)
   :config
   (evil-collection-define-key 'normal 'dired-mode-map
-    "h" 'dired-single-up-directory
-    "l" 'dired-single-buffer
+    "h" 'dired-up-directory
+    "l" 'dired-buffer
     "L" 'dired-display-file
     "M" 'snow/dired-open-locally))
 
@@ -941,8 +941,6 @@
   (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
   (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
   (define-key eshell-mode-map (kbd "<down>") 'eshell-next-input)
-  (setq eshell-scroll-to-bottom-on-input t)
-  (setq eshell-prompt-regexp "^$ ")
   (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history))
 
 (defun snow/eshell-prompt ()

@@ -471,13 +471,6 @@
        :after org
        :hook (org-mode . org-modern-mode))
    #+END_SRC
-** Org Bullets
-   #+BEGIN_SRC emacs-lisp
-     ;; (use-package org-bullets
-     ;;   :after org
-     ;;   :hook (org-mode . org-bullets-mode))
-   #+END_SRC
-
 ** Roam
    #+BEGIN_SRC emacs-lisp
      (use-package org-roam
@@ -569,6 +562,7 @@
                                info
                                magit
                                mu4e
+                               package-menu
                                pass
                                proced
                                rg
@@ -1015,7 +1009,10 @@
       :bind (:map minibuffer-local-map
                   ("M-A" . marginalia-cycle))
       :init
-      (marginalia-mode))
+      (marginalia-mode)
+      :config
+      (add-to-list 'marginalia-prompt-categories '("Find File:" . project-file))
+      (add-to-list 'marginalia-prompt-categories '("Switch to buffer:" . buffer)))
 
     (use-package consult)
 
@@ -1031,7 +1028,7 @@
 
     (defun snow/dired-open-locally ()
       "Make a local file copy of the remote file under the cursor in dired and
-       opens it.  Mainly used to open pdfs or other complex formats From remote machines"
+                       opens it.  Mainly used to open pdfs or other complex formats From remote machines"
       (interactive)
       (let* ((filename (dired-get-filename nil t))
              (local-tmp-file (file-local-copy filename)))
@@ -1042,11 +1039,11 @@
       :commands (dired dired-jump)
       :config
       (evil-collection-define-key 'normal 'dired-mode-map
-        "h" 'dired-single-up-directory
-        "l" 'dired-single-buffer
+        "h" 'dired-up-directory
+        "l" 'dired-buffer
         "L" 'dired-display-file
         "M" 'snow/dired-open-locally))
-           #+END_SRC
+  #+END_SRC
 
 * Programming
 ** Linting
