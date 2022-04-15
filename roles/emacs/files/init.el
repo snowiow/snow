@@ -174,129 +174,129 @@
  '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
 
 (use-package org
-      :hook
-      (org-after-todo-statistics . org-summary-todo)
-      :custom
-      ;; important first settings which is used by other configurations
-      (org-directory "~/Sync/notes")
-      ;; AGENDA SETTINGS
-      (org-agenda-custom-commands
-       '(("w" "Work Todos"
-          ((agenda "" ((org-agenda-span 1)))
-           (tags-todo "-TODO=\"WAITING\""
-                 ((org-agenda-overriding-header "\nUnscheduled TODOs")
-                  (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
-           (todo "WAITING"
-                 ((org-agenda-overriding-header "\nWAITING"))))
-          ((org-agenda-compact-blocks t)
-           (org-agenda-files '("~/Sync/notes/work.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))
-         ("p" "Private Todos"
-          ((agenda "" ((org-agenda-span 1)))
-           (tags-todo "+PRIORITY=\"A\"-TODO=\"WAITING\""
-                      ((org-agenda-overriding-header "\nHigh Priority")
-                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
-           (tags-todo "-PRIORITY=\"A\""
-                      ((org-agenda-overriding-header "\nUnscheduled TODOs")
-                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
-           (todo "WAITING"
-                 ((org-agenda-overriding-header "\nWAITING"))))
-          ((org-agenda-compact-blocks t)
-           (org-agenda-files '("~/Sync/notes/todos.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))))
-      (org-agenda-files (file-expand-wildcards (concat org-directory "/*.org")))
-      (org-agenda-skip-deadline-if-done t)
-      (org-agenda-skip-deadline-prewarning-if-scheduled t)
-      (org-agenda-skip-scheduled-if-deadline-is-shown t)
-      (org-agenda-skip-scheduled-if-done t)
-      (org-agenda-window-setup 'current-window)
-      (org-archive-location "%s_archive::datetree/* Archived Tasks")
-      (org-babel-python-command "python3")
-      (org-confirm-babel-evaluate nil)
-      (org-default-notes-file (concat org-directory "/capture.org"))
-      (org-ellipsis " ▾")
-      (org-image-actual-width nil)
-      (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
-                           (sequence "|" "CANCELLED(c)")))
-      :config
-      (require 'org-habit)
-      (advice-add 'org-open-at-point :before 'evil-set-jump)
-      (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
-      (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
-      (add-to-list 'org-modules 'habits)
-      (setq org-capture-templates
-            '(("a" "Private Appointments" entry (file+headline
-                                                 (lambda ()
-                                                   (concat org-directory "/appointments.org"))
-                                                 "Private")
-               "* %?")
-              ("f" "Fitness")
-              ("fj" "Workout Journal Entry"
-               entry (file+datetree (lambda () (concat org-directory "/fitness.org"))
-                                    "Gym" "Workout Journal")
-               "* %U %?")
-              ("fw" "Gewicht Eintrag" table-line
-               (id "weight-table")
-               "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)
-              ("k" "Keyboard WPM" table-line
-               (id "wpm-progress-ferris")
-               "| %u | %^{WPM} | %^{Accuracy} | %^{Consistency}"  :immediate-finish t)
-              ("t" "Todos")
-              ("tt" "Todo" entry (file+headline
-                                  (lambda ()
-                                    (concat org-directory "/todos.org"))
-                                  "Inbox")
-               "* TODO %?")
-              ("w" "Work")
-              ("wa" "Appointments" entry (file+headline
-                                          (lambda ()
-                                            (concat org-directory "/appointments.org"))
-                                          "Work")
-               "* %?")
-              ("wm" "Meetings")
-              ("wmm" "New Meeting" entry (file+headline
-                                          (lambda ()
-                                            (concat org-directory "/meetings.org"))
-                                          "Work")
-               (file "~/Sync/notes/templates/meeting.org"))
-              ("wmd" "Daily" entry (file+headline
-                                    (lambda ()
-                                      (concat org-directory "/meetings.org"))
-                                    "DevOps Daily")
-               (file  "templates/repeating-meeting.org"))
-              ("wme" "Extended Sync" entry (file+headline
-                                            (lambda ()
-                                              (concat org-directory "/meetings.org"))
-                                            "Extended Sync")
-               (file  "templates/repeating-meeting.org"))
-              ("wmf" "Refinement" entry (file+headline
-                                          (lambda ()
-                                            (concat org-directory "/meetings.org"))
-                                          "Refinement")
-               (file  "templates/repeating-meeting.org"))
-              ("wmr" "Retro" entry (file+headline
-                                    (lambda ()
-                                      (concat org-directory "/meetings.org"))
-                                    "Retro")
-               (file  "templates/repeating-meeting.org"))
-              ("wms" "Platform Sync between DataPlatform and PE" entry (file+headline
-                                          (lambda ()
-                                            (concat org-directory "/meetings.org"))
-                                          "Platform Sync between DataPlatform and PE")
-               (file  "templates/repeating-meeting.org"))
-              ("wmt" "Tech BiWeekly" entry (file+headline
-                                            (lambda ()
-                                              (concat org-directory "/meetings.org"))
-                                            "Tech BiWeekly")
-               (file repeating-meeting-file))
-              ("wt" "Todo Work" entry (file+headline
-                                       (lambda ()
-                                         (concat org-directory "/work.org"))
-                                       "Todos")
-               "* TODO %?"))))
+  :hook
+  (org-after-todo-statistics . org-summary-todo)
+  :custom
+  ;; important first settings which is used by other configurations
+  (org-directory "~/Sync/notes")
+  ;; AGENDA SETTINGS
+  (org-agenda-custom-commands
+   '(("w" "Work Todos"
+      ((agenda "" ((org-agenda-span 1)))
+       (tags-todo "-TODO=\"WAITING\""
+                  ((org-agenda-overriding-header "\nUnscheduled TODOs")
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+       (todo "WAITING"
+             ((org-agenda-overriding-header "\nWAITING"))))
+      ((org-agenda-compact-blocks t)
+       (org-agenda-files '("~/Sync/notes/work.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))
+     ("p" "Private Todos"
+      ((agenda "" ((org-agenda-span 1)))
+       (tags-todo "+PRIORITY=\"A\"-TODO=\"WAITING\""
+                  ((org-agenda-overriding-header "\nHigh Priority")
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+       (tags-todo "-PRIORITY=\"A\""
+                  ((org-agenda-overriding-header "\nUnscheduled TODOs")
+                   (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+       (todo "WAITING"
+             ((org-agenda-overriding-header "\nWAITING"))))
+      ((org-agenda-compact-blocks t)
+       (org-agenda-files '("~/Sync/notes/todos.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))))
+  (org-agenda-files (file-expand-wildcards (concat org-directory "/*.org")))
+  (org-agenda-skip-deadline-if-done t)
+  (org-agenda-skip-deadline-prewarning-if-scheduled t)
+  (org-agenda-skip-scheduled-if-deadline-is-shown t)
+  (org-agenda-skip-scheduled-if-done t)
+  (org-agenda-window-setup 'current-window)
+  (org-archive-location "%s_archive::datetree/* Archived Tasks")
+  (org-babel-python-command "python3")
+  (org-confirm-babel-evaluate nil)
+  (org-default-notes-file (concat org-directory "/capture.org"))
+  (org-ellipsis " ▾")
+  (org-image-actual-width nil)
+  (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
+                       (sequence "|" "CANCELLED(c)")))
+  :config
+  (require 'org-habit)
+  (advice-add 'org-open-at-point :before 'evil-set-jump)
+  (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
+  (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
+  (add-to-list 'org-modules 'habits)
+  (setq org-capture-templates
+        '(("a" "Private Appointments" entry (file+headline
+                                             (lambda ()
+                                               (concat org-directory "/appointments.org"))
+                                             "Private")
+           "* %?")
+          ("f" "Fitness")
+          ("fj" "Workout Journal Entry"
+           entry (file+datetree (lambda () (concat org-directory "/fitness.org"))
+                                "Gym" "Workout Journal")
+           "* %U %?")
+          ("fw" "Gewicht Eintrag" table-line
+           (id "weight-table")
+           "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)
+          ("k" "Keyboard WPM" table-line
+           (id "wpm-progress-ferris")
+           "| %u | %^{WPM} | %^{Accuracy} | %^{Consistency}"  :immediate-finish t)
+          ("t" "Todos")
+          ("tt" "Todo" entry (file+headline
+                              (lambda ()
+                                (concat org-directory "/todos.org"))
+                              "Inbox")
+           "* TODO %?")
+          ("w" "Work")
+          ("wa" "Appointments" entry (file+headline
+                                      (lambda ()
+                                        (concat org-directory "/appointments.org"))
+                                      "Work")
+           "* %?")
+          ("wm" "Meetings")
+          ("wmm" "New Meeting" entry (file+headline
+                                      (lambda ()
+                                        (concat org-directory "/meetings.org"))
+                                      "Work")
+           (file "~/Sync/notes/templates/meeting.org"))
+          ("wmd" "Daily" entry (file+headline
+                                (lambda ()
+                                  (concat org-directory "/meetings.org"))
+                                "DevOps Daily")
+           (file  "templates/repeating-meeting.org"))
+          ("wme" "Extended Sync" entry (file+headline
+                                        (lambda ()
+                                          (concat org-directory "/meetings.org"))
+                                        "Extended Sync")
+           (file  "templates/repeating-meeting.org"))
+          ("wmf" "Refinement" entry (file+headline
+                                     (lambda ()
+                                       (concat org-directory "/meetings.org"))
+                                     "Refinement")
+           (file  "templates/repeating-meeting.org"))
+          ("wmr" "Retro" entry (file+headline
+                                (lambda ()
+                                  (concat org-directory "/meetings.org"))
+                                "Retro")
+           (file  "templates/repeating-meeting.org"))
+          ("wms" "Platform Sync between DataPlatform and PE" entry (file+headline
+                                                                    (lambda ()
+                                                                      (concat org-directory "/meetings.org"))
+                                                                    "Platform Sync between DataPlatform and PE")
+           (file  "templates/repeating-meeting.org"))
+          ("wmt" "Tech BiWeekly" entry (file+headline
+                                        (lambda ()
+                                          (concat org-directory "/meetings.org"))
+                                        "Tech BiWeekly")
+           (file repeating-meeting-file))
+          ("wt" "Todo Work" entry (file+headline
+                                   (lambda ()
+                                     (concat org-directory "/work.org"))
+                                   "Todos")
+           "* TODO %?"))))
 
-    (defun snow/rg-org (regexp)
-      "Do a REGEXP search in org files in the org directory."
-      (interactive "sRegexp: ")
-      (rg regexp "*.org" org-directory))
+(defun snow/rg-org (regexp)
+  "Do a REGEXP search in org files in the org directory."
+  (interactive "sRegexp: ")
+  (rg regexp "*.org" org-directory))
 
 (defun snow/org-exec-codeblock-in-vterm ()
   "execute current org mode code block in vterm"
@@ -323,15 +323,15 @@
 (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'snow/org-babel-tangle-config)))
 
 (setq solar-n-hemi-seasons
-    '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
+      '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
 
 (setq holiday-general-holidays
-    '((holiday-fixed 1 1 "Neujahr")
+      '((holiday-fixed 1 1 "Neujahr")
         (holiday-fixed 5 1 "1. Mai")
         (holiday-fixed 10 3 "Tag der Deutschen Einheit")))
 
 (setq holiday-christian-holidays
-    '((holiday-float 12 0 -4 "1. Advent" 24)
+      '((holiday-float 12 0 -4 "1. Advent" 24)
         (holiday-float 12 0 -3 "2. Advent" 24)
         (holiday-float 12 0 -2 "3. Advent" 24)
         (holiday-float 12 0 -1 "4. Advent" 24)
@@ -360,19 +360,23 @@
 (use-package ob-async)
 (use-package ob-typescript)
 
- (org-babel-do-load-languages
-  'org-babel-load-languages
-  '((emacs-lisp . t)
-    (eshell . t)
-    (gnuplot . t)
-    (ledger . t)
-    (python . t)
-    (shell . t)
-    (typescript . t)))
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((emacs-lisp . t)
+   (eshell . t)
+   (gnuplot . t)
+   (ledger . t)
+   (python . t)
+   (shell . t)
+   (typescript . t)))
 
-(use-package org-bullets
+(use-package org-modern
   :after org
-  :hook (org-mode . org-bullets-mode))
+  :hook (org-mode . org-modern-mode))
+
+;; (use-package org-bullets
+;;   :after org
+;;   :hook (org-mode . org-bullets-mode))
 
 (use-package org-roam
   :init
@@ -417,72 +421,75 @@
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
 (use-package undo-tree
+  :custom
+  (undo-tree-auto-save-history nil)
   :config
   (global-undo-tree-mode))
 
- (defun snow/evil-yank-highlight-advice (orig-fn beg end &rest args)
-   "Highlight yanked region."
-   (pulse-momentary-highlight-region beg end)
-   (apply orig-fn beg end args))
+(defun snow/evil-yank-highlight-advice (orig-fn beg end &rest args)
+  "Highlight yanked region."
+  (pulse-momentary-highlight-region beg end)
+  (apply orig-fn beg end args))
 
- (use-package evil
-   :after undo-tree
-   :custom
-   (evil-want-C-u-scroll t)
-   (evil-want-keybinding nil)
-   (evil-want-Y-yank-to-eol t)
-   (evil-search-module 'evil-search)
-   (evil-undo-system 'undo-tree)
-   :config
-   (advice-add 'evil-yank :around 'snow/evil-yank-highlight-advice)
-   (evil-mode))
+(use-package evil
+  :after undo-tree
+  :custom
+  (evil-want-C-u-scroll t)
+  (evil-want-keybinding nil)
+  (evil-want-Y-yank-to-eol t)
+  (evil-search-module 'evil-search)
+  (evil-undo-system 'undo-tree)
+  :config
+  (advice-add 'evil-yank :around 'snow/evil-yank-highlight-advice)
+  (evil-mode))
 
- (use-package evil-collection
-   :after evil
-   :config
-   (evil-collection-init '(calc
-                           calendar
-                           dashboard
-                           dired
-                           ediff
-                           eshell
-                           forge
-                           helpful
-                           info
-                           magit
-                           mu4e
-                           pass
-                           proced
-                           rg
-                           ripgrep
-                           term
-                           xref)))
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init '(calc
+                          calendar
+                          dashboard
+                          dired
+                          ediff
+                          eshell
+                          forge
+                          helpful
+                          info
+                          magit
+                          mu4e
+                          pass
+                          proced
+                          rg
+                          ripgrep
+                          term
+                          xref)))
 
- (use-package evil-commentary
-   :after evil
-   :config
-   (evil-commentary-mode))
+(use-package evil-commentary
+  :after evil
+  :config
+  (evil-commentary-mode))
 
- (use-package evil-numbers
-   :after evil)
+(use-package evil-numbers
+  :after evil)
 
- (use-package evil-org
-   :after org
-   :hook
-   (org-mode . evil-org-mode)
-   :config
-   (add-hook 'evil-org-mode-hook
-             (lambda ()
-               (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))))
-   (require 'evil-org-agenda)
-   (evil-org-agenda-set-keys))
+(use-package evil-org
+  :after org
+  :hook
+  (org-mode . evil-org-mode)
+  :config
+  (add-hook 'evil-org-mode-hook
+            (lambda ()
+              (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
 
- (use-package evil-surround
-   :after evil
-   :custom
-   (global-evil-surround-mode 1))
+(use-package evil-surround
+  :after evil
+  :custom
+  (global-evil-surround-mode 1))
 
 (use-package general
+  :after consult
   :config
   (general-evil-setup t)
   (general-define-key
@@ -539,19 +546,19 @@
     "am" 'mu4e
     "ap" 'pass
 
-    "b" 'ivy-switch-buffer
+    "b" 'consult-buffer
     "c" (lambda ()
           (interactive)
-          (find-file "~/.emacs.d/init.org"))
+          (find-file "~/workspace/snow/roles/emacs/files/init.org"))
     "e" 'dired-jump
 
     ;; find
     "f"  '(:ignore t :which-key "find")
     "fd" 'dired
     "ff" 'find-file
-    "fi" 'counsel-imenu
+    "fi" 'consult-imenu
     "fr" 'rg
-    "fs" 'swiper
+    "fs" 'consult-line
 
     ;; git
     "g"  '(:ignore t :which-key "Git")
@@ -564,13 +571,13 @@
 
     ;; help
     "h" '(:ignore t :which-key "Help")
-    "ha" 'info-apropos
-    "hf" 'counsel-describe-function
+    "ha" 'consult-apropos
+    "hf" 'describe-function
     "hk" 'describe-key
     "hi" 'info
     "hp" 'describe-package
-    "hs" 'counsel-describe-symbol
-    "hv" 'counsel-describe-variable
+    "hs" 'describe-symbol
+    "hv" 'describe-variable
 
     ;; language-server-protocol
     "l" '(:ignore t :which-key "LSP")
@@ -580,7 +587,7 @@
     "ln" 'lsp-rename
     "lr" 'lsp-find-references
     "ls" 'lsp-describe-session
-    "lt" 'imenu
+    "lt" 'consult-imenu
 
     ;; org mode
     "o"    '(:ignore t :which-key "Org Mode")
@@ -615,7 +622,7 @@
     "y" 'yas-insert-snippet
 
     "/"  'rg-menu
-    ":"  'counsel-M-x
+    ":"  'execute-extended-command
     )
 
   ;; local-leader key mappings
@@ -684,7 +691,7 @@
     :keymaps 'org-mode-map
     "RET" 'org-open-at-point
     "g"   '(:ignore t :which-key "go to")
-    "gg"  'counsel-org-goto
+    "gg"  'consult-org-heading
     "gp"  'org-previous-visible-heading
     "i"   'org-toggle-inline-images
     "l"   'org-insert-link
@@ -727,26 +734,26 @@
   ("q" nil "finished" :exit t))
 
 (use-package erc
-   :custom
-   (erc-prompt-for-password nil)
-   (erc-modules '(autojoin fill notifications stamp track))
-   (erc-autojoin-timing 'ident)
-   (erc-autojoin-channels-alist '(("libera.chat" "#systemcrafters" "#emacs")))
-   (erc-rename-buffers t)
-   (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY"))
-   (erc-hide-list '("JOIN" "NICK" "PART" "QUIT" "MODE" "AWAY"))
-   (erc-timestamp-only-if-changed-flag nil)
-   (erc-timestamp-format "%H:%M ")
-   (erc-insert-timestamp-function 'erc-insert-timestamp-left)
-   (erc-fill-prefix "      ")
-   (erc-fill-column 120)
-   :config
-   (setq erc-prompt-for-nickserv-password nil))
+  :custom
+  (erc-prompt-for-password nil)
+  (erc-modules '(autojoin fill notifications stamp track))
+  (erc-autojoin-timing 'ident)
+  (erc-autojoin-channels-alist '(("libera.chat" "#systemcrafters" "#emacs")))
+  (erc-rename-buffers t)
+  (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY"))
+  (erc-hide-list '("JOIN" "NICK" "PART" "QUIT" "MODE" "AWAY"))
+  (erc-timestamp-only-if-changed-flag nil)
+  (erc-timestamp-format "%H:%M ")
+  (erc-insert-timestamp-function 'erc-insert-timestamp-left)
+  (erc-fill-prefix "      ")
+  (erc-fill-column 120)
+  :config
+  (setq erc-prompt-for-nickserv-password nil))
 
- (use-package erc-hl-nicks
-   :after erc
-   :config
-   (add-to-list 'erc-modules 'hl-nicks))
+(use-package erc-hl-nicks
+  :after erc
+  :config
+  (add-to-list 'erc-modules 'hl-nicks))
 
 (defun snow/erc ()
   "Join ERC with default settings."
@@ -760,18 +767,18 @@
 (use-package clojure-mode)
 
 (use-package dart-mode
-    :hook
-    (dart-mode . flutter-test-mode))
+  :hook
+  (dart-mode . flutter-test-mode))
 
-  (use-package flutter
-    :after dart-mode
-    :custom
-    (flutter-sdk-path "~/flutter/"))
+(use-package flutter
+  :after dart-mode
+  :custom
+  (flutter-sdk-path "~/flutter/"))
 
-  (use-package flutter-l10n-flycheck
-    :after flutter
-    :config
-    (flutter-l10n-flycheck-setup))
+(use-package flutter-l10n-flycheck
+  :after flutter
+  :config
+  (flutter-l10n-flycheck-setup))
 
 (use-package lsp-dart
   :after lsp
@@ -834,36 +841,45 @@
   :hook
   (yaml-mode . highlight-indent-guides-mode))
 
-(use-package counsel)
-
-(use-package ivy
+(use-package vertico
   :init
-  (ivy-mode 1)
-  :config
-
-  (setq ivy-use-virtual-buffers t)
-  (setq ivy-wrap t)
-  (setq ivy-initial-inputs-alist nil)
-  (setq ivy-count-format "(%d/%d) ")
-  (setq ivy-display-style nil)
-  (setq ivy-re-builders-alist
-        '((t . ivy--regex-ignore-order)))
+  (vertico-mode)
+  :custom
+  (vertico-cycle t)
   :bind
-  (:map ivy-minibuffer-map
-        ("C-j" . ivy-next-line)
-        ("C-k" . ivy-previous-line)
-        ("C-S-k" . ivy-beginning-of-buffer)
-        ("C-S-j" . ivy-end-of-buffer)
-        ("C-d" . ivy-scroll-up-command)
-        ("C-u" . ivy-scroll-down-command)
-        ("C-y" . ivy-immediate-done)
-        :map ivy-switch-buffer-map
-        ("C-d" . ivy-switch-buffer-kill)
-        ("C-k" . ivy-previous-line)))
+  (:map vertico-map
+        ("C-j" . vertico-next)
+        ("C-k" . vertico-previous)
+        ("C-^" . vertico-first)
+        ("C-$" . vertico-last)))
+
+(use-package orderless
+  :init
+  (setq completion-styles '(orderless basic)
+        completion-category-defaults nil
+        completion-category-overrides '((file (styles partial-completion)))))
+
+(use-package marginalia
+  :bind (:map minibuffer-local-map
+              ("M-A" . marginalia-cycle))
+  :init
+  (marginalia-mode))
+
+(use-package consult)
+
+(use-package embark
+  :bind
+  (("C-a" . embark-act)       
+   ("C-e" . embark-dwim)       
+   ("C-h B" . embark-bindings)))
+
+(use-package embark-consult
+  :ensure t
+  :after (embark consult))
 
 (defun snow/dired-open-locally ()
-  "Make a local file copy of the remote file under the cursor in dired.
-Opens it.  Mainly used to open pdfs or other complex formats from remote machines"
+  "Make a local file copy of the remote file under the cursor in dired and
+   opens it.  Mainly used to open pdfs or other complex formats From remote machines"
   (interactive)
   (let* ((filename (dired-get-filename nil t))
          (local-tmp-file (file-local-copy filename)))
@@ -893,6 +909,7 @@ Opens it.  Mainly used to open pdfs or other complex formats from remote machine
   :hook
   (go-mode . lsp)
   (python-mode . lsp)
+  (javascript-mode . lsp)
   ;; (terraform-mode . lsp) ;; currently not working properly
   (typescript-mode . lsp)
   :init
@@ -909,7 +926,7 @@ Opens it.  Mainly used to open pdfs or other complex formats from remote machine
 
 (use-package projectile
   :custom
-  (projectile-completion-system 'ivy)
+  ;; (projectile-completion-system 'ivy)
   (projectile-switch-project-action 'projectile-dired)
   :config
   (add-hook 'projectile-after-switch-project-hook 'snow/set-tab-name-to-current-project)
@@ -924,9 +941,9 @@ Opens it.  Mainly used to open pdfs or other complex formats from remote machine
   (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
   (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
   (define-key eshell-mode-map (kbd "<down>") 'eshell-next-input)
-  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'counsel-esh-history)
-  (setq eshell-scroll-to-bottom-on-input t
-        eshell-prompt-regexp             "^$ "))
+  (setq eshell-scroll-to-bottom-on-input t)
+  (setq eshell-prompt-regexp "^$ ")
+  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history))
 
 (defun snow/eshell-prompt ()
   (let ((current-branch (magit-get-current-branch))
