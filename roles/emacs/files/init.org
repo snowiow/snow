@@ -458,7 +458,7 @@
       '((emacs-lisp . t)
         (eshell . t)
         (gnuplot . t)
-        (ledger . t)
+        ;; (ledger . t)
         (python . t)
         (shell . t)
         (typescript . t)))
@@ -987,62 +987,63 @@
    #+END_SRC
 * Navigation
   #+BEGIN_SRC emacs-lisp
-    (use-package vertico
-      :init
-      (vertico-mode)
-      :custom
-      (vertico-cycle t)
-      :bind
-      (:map vertico-map
-            ("C-j" . vertico-next)
-            ("C-k" . vertico-previous)
-            ("C-^" . vertico-first)
-            ("C-$" . vertico-last)))
+        (use-package vertico
+          :init
+          (vertico-mode)
+          :custom
+          (vertico-cycle t)
+          :bind
+          (:map vertico-map
+                ("C-j" . vertico-next)
+                ("C-k" . vertico-previous)
+                ("C-^" . vertico-first)
+                ("C-$" . vertico-last)
+                ("C-e" . vertico-exit-input)))
 
-    (use-package orderless
-      :init
-      (setq completion-styles '(orderless basic)
-            completion-category-defaults nil
-            completion-category-overrides '((file (styles partial-completion)))))
+        (use-package orderless
+          :init
+          (setq completion-styles '(orderless basic)
+                completion-category-defaults nil
+                completion-category-overrides '((file (styles partial-completion)))))
 
-    (use-package marginalia
-      :bind (:map minibuffer-local-map
-                  ("M-A" . marginalia-cycle))
-      :init
-      (marginalia-mode)
-      :config
-      (add-to-list 'marginalia-prompt-categories '("Find File:" . project-file))
-      (add-to-list 'marginalia-prompt-categories '("Switch to buffer:" . buffer)))
+        (use-package marginalia
+          :bind (:map minibuffer-local-map
+                      ("M-A" . marginalia-cycle))
+          :init
+          (marginalia-mode)
+          :config
+          (add-to-list 'marginalia-prompt-categories '("Find File:" . project-file))
+          (add-to-list 'marginalia-prompt-categories '("Switch to buffer:" . buffer)))
 
-    (use-package consult)
+        (use-package consult)
 
-    (use-package embark
-      :bind
-      (("C-a" . embark-act)       
-       ("C-e" . embark-dwim)       
-       ("C-h B" . embark-bindings)))
+        (use-package embark
+          :bind
+          (("C-a" . embark-act)       
+           ("C-e" . embark-dwim)       
+           ("C-h B" . embark-bindings)))
 
-    (use-package embark-consult
-      :ensure t
-      :after (embark consult))
+        (use-package embark-consult
+          :ensure t
+          :after (embark consult))
 
-    (defun snow/dired-open-locally ()
-      "Make a local file copy of the remote file under the cursor in dired and
-                       opens it.  Mainly used to open pdfs or other complex formats From remote machines"
-      (interactive)
-      (let* ((filename (dired-get-filename nil t))
-             (local-tmp-file (file-local-copy filename)))
-        (find-file local-tmp-file)))
+        (defun snow/dired-open-locally ()
+          "Make a local file copy of the remote file under the cursor in dired and
+                           opens it.  Mainly used to open pdfs or other complex formats From remote machines"
+          (interactive)
+          (let* ((filename (dired-get-filename nil t))
+                 (local-tmp-file (file-local-copy filename)))
+            (find-file local-tmp-file)))
 
-    (use-package dired
-      :ensure nil
-      :commands (dired dired-jump)
-      :config
-      (evil-collection-define-key 'normal 'dired-mode-map
-        "h" 'dired-up-directory
-        "l" 'dired-buffer
-        "L" 'dired-display-file
-        "M" 'snow/dired-open-locally))
+        (use-package dired
+          :ensure nil
+          :commands (dired dired-jump)
+          :config
+          (evil-collection-define-key 'normal 'dired-mode-map
+            "h" 'dired-up-directory
+            "l" 'dired-find-file
+            "L" 'dired-display-file
+            "M" 'snow/dired-open-locally))
   #+END_SRC
 
 * Programming
@@ -1095,195 +1096,218 @@
       "Name the current tab after the open project."
       (interactive)
       (tab-bar-rename-tab (projectile-project-name)))
-  #+END_SRC
+    (cl-defmethod project-root ((project (head local)))
+      (cdr project))
+
+    (defun snow/project-try-local (dir)
+      "Determine if DIR is a non-Git project.
+         DIR must include a .project file to be considered a project."
+      (let ((root (locate-dominating-file dir ".project")))
+        (and root (cons 'local root))))
+
+    (add-hook 'project-find-functions 'snow/project-try-local)
+
+    (defun snow/project-to-tab-name (path)
+      "Extract the last directory name from PATH to set it as the tab name."
+      (file-name-nondirectory (directory-file-name path)))
+
+    (defun snow/project-switch-project (orig-fun &rest args)
+      "Rename current tab to the selected project."
+      (let* ((project-dir (or (car args) (project-prompt-project-dir)))
+             (tab-name (snow/project-to-tab-name project-dir)))
+        (tab-bar-rename-tab tab-name)
+        (funcall orig-fun project-dir)))
+
+    (advice-add 'project-switch-project :around #'snow/project-switch-project)
+      #+END_SRC
 * Shell
 ** Eshell
-   #+BEGIN_SRC emacs-lisp
-     (defun snow/eshell-config ()
-       (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
-       (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
-       (define-key eshell-mode-map (kbd "<down>") 'eshell-next-input)
-       (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history))
+#+BEGIN_SRC emacs-lisp
+  (defun snow/eshell-config ()
+    (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
+    (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
+    (define-key eshell-mode-map (kbd "<down>") 'eshell-next-input)
+    (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history))
 
-     (defun snow/eshell-prompt ()
-       (let ((current-branch (magit-get-current-branch))
-             (aws-vault (getenv "AWS_VAULT"))
-             (k8s-context (shell-command-to-string "kubectl config current-context")))
-         (concat
-          "\n"
-          (propertize (user-login-name) 'face `(:foreground "#c196d6"))
-          (propertize "@" 'face `(:foreground "white"))
-          (propertize (system-name) 'face `(:foreground "#f0c574"))
-          (when current-branch
-            (propertize (concat "  " current-branch) 'face `(:foreground "#c196d6")))
-          (when kubel-context
-            (propertize (concat " k8s: " k8s-context) 'face `(:foreground "#c86464")))
-          (when aws-vault
-            (propertize (concat "  " aws-vault) 'face `(:foreground "#b2b966")))
-          "\n"
-          (propertize (eshell/pwd) 'face `(:foreground "#819fbb"))
-          "\n"
-          (propertize "$ " 'face `(:foreground "white"))
-          )))
+  (defun snow/eshell-prompt ()
+    (let ((current-branch (magit-get-current-branch))
+          (aws-vault (getenv "AWS_VAULT"))
+          (k8s-context (shell-command-to-string "kubectl config current-context")))
+      (concat
+       "\n"
+       (propertize (user-login-name) 'face `(:foreground "#c196d6"))
+       (propertize "@" 'face `(:foreground "white"))
+       (propertize (system-name) 'face `(:foreground "#f0c574"))
+       (when current-branch
+         (propertize (concat "  " current-branch) 'face `(:foreground "#c196d6")))
+       (when kubel-context
+         (propertize (concat " k8s: " k8s-context) 'face `(:foreground "#c86464")))
+       (when aws-vault
+         (propertize (concat "  " aws-vault) 'face `(:foreground "#b2b966")))
+       "\n"
+       (propertize (eshell/pwd) 'face `(:foreground "#819fbb"))
+       "\n"
+       (propertize "$ " 'face `(:foreground "white"))
+       )))
 
-     (use-package eshell
-       :hook
-       (eshell-first-time-mode . snow/eshell-config)
-       (eshell-pre-command . eshell-save-some-history)
-       :custom
-       (eshell-prompt-function 'snow/eshell-prompt))
+  (use-package eshell
+    :hook
+    (eshell-first-time-mode . snow/eshell-config)
+    (eshell-pre-command . eshell-save-some-history)
+    :custom
+    (eshell-prompt-function 'snow/eshell-prompt))
 
-     (use-package esh-autosuggest
-       :hook (eshell-mode . esh-autosuggest-mode)
-       :bind (:map esh-autosuggest-active-map
-                   ("C-l" . 'company-complete-selection))
-       :custom
-       (esh-autosuggest-delay 0.5))
+  (use-package esh-autosuggest
+    :hook (eshell-mode . esh-autosuggest-mode)
+    :bind (:map esh-autosuggest-active-map
+                ("C-l" . 'company-complete-selection))
+    :custom
+    (esh-autosuggest-delay 0.5))
 
-     (use-package eshell-syntax-highlighting
-       :after esh-mode
-       :custom
-       (eshell-syntax-highlighting-global-mode +1))
-   #+END_SRC
+  (use-package eshell-syntax-highlighting
+    :after esh-mode
+    :custom
+    (eshell-syntax-highlighting-global-mode +1))
+#+END_SRC
 ** Tramp
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
-     (use-package tramp)
-   #+END_SRC
+  (use-package tramp)
+#+END_SRC
 ** Vterm
-   #+BEGIN_SRC emacs-lisp
-     (use-package vterm)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package vterm)
+#+END_SRC
 * Auth
-  #+BEGIN_SRC emacs-lisp
-    (use-package auth-source-pass
-      :ensure nil
-      :config
-      (auth-source-pass-enable)
-      :custom
-      (auth-sources '(password-store)))
+#+BEGIN_SRC emacs-lisp
+  (use-package auth-source-pass
+    :ensure nil
+    :config
+    (auth-source-pass-enable)
+    :custom
+    (auth-sources '(password-store)))
 
-  #+END_SRC
+#+END_SRC
 * Git
-  #+BEGIN_SRC emacs-lisp
-    (use-package browse-at-remote)
+#+BEGIN_SRC emacs-lisp
+  (use-package browse-at-remote)
 
-    (use-package forge)
+  (use-package forge)
 
-    (use-package git-link
-      :custom
-      (git-link-open-in-browser t))
+  (use-package git-link
+    :custom
+    (git-link-open-in-browser t))
 
-    (use-package github-review)
+  (use-package github-review)
 
-    (use-package magit)
-  #+END_SRC
+  (use-package magit)
+#+END_SRC
 * Mail
-  #+BEGIN_SRC emacs-lisp
-    (use-package mu4e
-      :ensure nil
-      :load-path "/opt/homebrew/share/emacs/site-lisp/mu/mu4e/"
-      :custom
-      (mu4e-update-interval (* 30 60))
-      (mu4e-get-mail-command "offlineimap")
-      ;; refresh mail every 30 minutes
-      (mu4e-compose-format-flowed t)
-      (mu4e-drafts-folder "/Drafts")
-      (mu4e-sent-folder "/Sent")
-      (mu4e-refile-folder "/Archiv")
-      (mu4e-trash-folder "/Trash")
-      (user-mail-address "marcel.patzwahl@posteo.de")
+#+BEGIN_SRC emacs-lisp
+  (use-package mu4e
+    :ensure nil
+    :load-path "/opt/homebrew/share/emacs/site-lisp/mu/mu4e/"
+    :custom
+    (mu4e-update-interval (* 30 60))
+    (mu4e-get-mail-command "offlineimap")
+    ;; refresh mail every 30 minutes
+    (mu4e-compose-format-flowed t)
+    (mu4e-drafts-folder "/Drafts")
+    (mu4e-sent-folder "/Sent")
+    (mu4e-refile-folder "/Archiv")
+    (mu4e-trash-folder "/Trash")
+    (user-mail-address "marcel.patzwahl@posteo.de")
 
-      ;; smtp settings
-      (smtpmail-default-smtp-server "posteo.de")
-      (smtpmail-smtp-server "posteo.de")
-      (smtpmail-smtp-user "marcel.patzwahl@posteo.de")
-      (smtpmail-smtp-service 587)
-      (smtpmail-stream-type 'starttls)
-      (message-send-mail-function 'smtpmail-send-it)
-      :config
-      (mu4e t)
-      (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t))
-  #+END_SRC
+    ;; smtp settings
+    (smtpmail-default-smtp-server "posteo.de")
+    (smtpmail-smtp-server "posteo.de")
+    (smtpmail-smtp-user "marcel.patzwahl@posteo.de")
+    (smtpmail-smtp-service 587)
+    (smtpmail-stream-type 'starttls)
+    (message-send-mail-function 'smtpmail-send-it)
+    :config
+    (mu4e t)
+    (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t))
+#+END_SRC
 
 * Kubernetes
-  #+BEGIN_SRC emacs-lisp
-    (use-package kubel
-      :config
-      (setq kubel-use-namespace-list 'on))
+#+BEGIN_SRC emacs-lisp
+  (use-package kubel
+    :config
+    (setq kubel-use-namespace-list 'on))
 
-    (use-package kubel-evil)
-  #+END_SRC
+  (use-package kubel-evil)
+#+END_SRC
 
 * Snippets
-  #+BEGIN_SRC emacs-lisp
-    (use-package yasnippet
-      :bind
-      (:map yas-keymap
-            ("C-y" . yas-next-field-or-maybe-expand))
-      :config
-      (yas-global-mode 1))
+#+BEGIN_SRC emacs-lisp
+  (use-package yasnippet
+    :bind
+    (:map yas-keymap
+          ("C-y" . yas-next-field-or-maybe-expand))
+    :config
+    (yas-global-mode 1))
 
 
-  #+END_SRC
+#+END_SRC
 
 * Search
-  #+BEGIN_SRC emacs-lisp
-    (use-package ripgrep)
-    (use-package rg)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package ripgrep)
+  (use-package rg)
+#+END_SRC
 
 * Open external files
-  #+BEGIN_SRC emacs-lisp
-    (use-package openwith
-      :config
-      (add-to-list 'mm-inhibit-file-name-handlers 'openwith-file-handler) ;; needed to not randomly open the attachment when trying to send it
-      (setq openwith-associations
-            (list
-             (list (openwith-make-extension-regexp
-                    '("pdf"))
-                   "open"
-                   '(file))))
-      (openwith-mode t))
+#+BEGIN_SRC emacs-lisp
+  (use-package openwith
+    :config
+    (add-to-list 'mm-inhibit-file-name-handlers 'openwith-file-handler) ;; needed to not randomly open the attachment when trying to send it
+    (setq openwith-associations
+          (list
+           (list (openwith-make-extension-regexp
+                  '("pdf"))
+                 "open"
+                 '(file))))
+    (openwith-mode t))
 
-  #+END_SRC
+#+END_SRC
 
 * Other Applications
-  #+BEGIN_SRC emacs-lisp
-    (use-package dashboard
-      :custom
-      (dashboard-startup-banner 'logo)
-      (tab-bar-new-tab-choice "*dashboard*")
-      (dashboard-items '((agenda . 5)
-                         (projects . 5)
-                         (recents  . 5)))
-      :config
-      (dashboard-setup-startup-hook))
+#+BEGIN_SRC emacs-lisp
+  (use-package dashboard
+    :custom
+    (dashboard-startup-banner 'logo)
+    (tab-bar-new-tab-choice "*dashboard*")
+    (dashboard-items '((agenda . 5)
+                       (projects . 5)
+                       (recents  . 5)))
+    :config
+    (dashboard-setup-startup-hook))
 
-    (use-package gnuplot)
-
-
+  (use-package gnuplot)
 
 
-    (use-package pass)
 
 
-    (use-package proced
-      :config
-      (add-hook 'proced-mode-hook
-                (lambda ()
-                  (proced-toggle-auto-update t))))
-  #+END_SRC
+  (use-package pass)
+
+
+  (use-package proced
+    :config
+    (add-hook 'proced-mode-hook
+              (lambda ()
+                (proced-toggle-auto-update t))))
+#+END_SRC
 
 * Experimental Stuff
-  #+BEGIN_SRC emacs-lisp
-    (use-package aws-mode
-      :load-path "~/.emacs.d/packages/awscli"
-      :custom
-      (aws-vault t)
-      (aws-output "yaml"))
+#+BEGIN_SRC emacs-lisp
+  (use-package aws-mode
+    :load-path "~/.emacs.d/packages/awscli"
+    :custom
+    (aws-vault t)
+    (aws-output "yaml"))
 
-    (use-package aws-evil
-      :after aws-mode
-      :load-path "~/.emacs.d/packages/awscli")
-  #+END_SRC
+  (use-package aws-evil
+    :after aws-mode
+    :load-path "~/.emacs.d/packages/awscli")
+#+END_SRC

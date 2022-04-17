@@ -365,7 +365,7 @@
  '((emacs-lisp . t)
    (eshell . t)
    (gnuplot . t)
-   (ledger . t)
+   ;; (ledger . t)
    (python . t)
    (shell . t)
    (typescript . t)))
@@ -848,7 +848,8 @@
         ("C-j" . vertico-next)
         ("C-k" . vertico-previous)
         ("C-^" . vertico-first)
-        ("C-$" . vertico-last)))
+        ("C-$" . vertico-last)
+        ("C-e" . vertico-exit-input)))
 
 (use-package orderless
   :init
@@ -891,7 +892,7 @@
   :config
   (evil-collection-define-key 'normal 'dired-mode-map
     "h" 'dired-up-directory
-    "l" 'dired-buffer
+    "l" 'dired-find-file
     "L" 'dired-display-file
     "M" 'snow/dired-open-locally))
 
@@ -936,6 +937,29 @@
   "Name the current tab after the open project."
   (interactive)
   (tab-bar-rename-tab (projectile-project-name)))
+(cl-defmethod project-root ((project (head local)))
+  (cdr project))
+
+(defun snow/project-try-local (dir)
+  "Determine if DIR is a non-Git project.
+     DIR must include a .project file to be considered a project."
+  (let ((root (locate-dominating-file dir ".project")))
+    (and root (cons 'local root))))
+
+(add-hook 'project-find-functions 'snow/project-try-local)
+
+(defun snow/project-to-tab-name (path)
+  "Extract the last directory name from PATH to set it as the tab name."
+  (file-name-nondirectory (directory-file-name path)))
+
+(defun snow/project-switch-project (orig-fun &rest args)
+  "Rename current tab to the selected project."
+  (let* ((project-dir (or (car args) (project-prompt-project-dir)))
+         (tab-name (snow/project-to-tab-name project-dir)))
+    (tab-bar-rename-tab tab-name)
+    (funcall orig-fun project-dir)))
+
+(advice-add 'project-switch-project :around #'snow/project-switch-project)
 
 (defun snow/eshell-config ()
   (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
