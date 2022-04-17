@@ -124,13 +124,13 @@
   (highlight-indent-guides-method 'character))
 
 (use-package popper
-  :after (shackle projectile)
+  :after (shackle)
   :bind (("C-'"   . popper-toggle-latest)
          ("M-'"   . popper-cycle)
          ("C-M-'" . popper-toggle-type))
   :custom
   (popper-display-control nil)
-  (popper-group-function #'popper-group-by-projectile)
+  (popper-group-function #'popper-group-by-project)
   :init
   (setq popper-reference-buffers
         '("\\*info\\*"
@@ -297,15 +297,6 @@
   "Do a REGEXP search in org files in the org directory."
   (interactive "sRegexp: ")
   (rg regexp "*.org" org-directory))
-
-(defun snow/org-exec-codeblock-in-vterm ()
-  "execute current org mode code block in vterm"
-  (org-babel-mark-block)
-  (interactive)
-  (kill-ring-save (region-beginning) (region-end))
-  (projectile-run-vterm)
-  (vterm-yank)
-  (yank-pop))
 
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."
@@ -602,9 +593,6 @@
     "ort"  'org-roam-buffer-toggle
     "os"   'snow/rg-org
 
-    ;; projectile
-    "p" 'projectile-command-map
-
     ;;tab-bar-mode
     "t" '(:ignore t :which-key "Tabs")
     "tc" 'tab-close
@@ -699,7 +687,6 @@
     "ri"  'org-roam-node-insert
     "t"   'org-set-tags-command
     ","   'org-ctrl-c-ctrl-c
-    "v"   'snow/org-exec-codeblock-in-vterm
     "0"   'snow/org-start-presentation
     "$"   'org-archive-subtree
     )
@@ -861,10 +848,7 @@
   :bind (:map minibuffer-local-map
               ("M-A" . marginalia-cycle))
   :init
-  (marginalia-mode)
-  :config
-  (add-to-list 'marginalia-prompt-categories '("Find File:" . project-file))
-  (add-to-list 'marginalia-prompt-categories '("Switch to buffer:" . buffer)))
+  (marginalia-mode))
 
 (use-package consult)
 
@@ -925,24 +909,12 @@
 
 ;; (use-package tree-sitter-langs)
 
-(use-package projectile
-  :custom
-  ;; (projectile-completion-system 'ivy)
-  (projectile-switch-project-action 'projectile-dired)
-  :config
-  (add-hook 'projectile-after-switch-project-hook 'snow/set-tab-name-to-current-project)
-  (projectile-mode +1))
-
-(defun snow/set-tab-name-to-current-project ()
-  "Name the current tab after the open project."
-  (interactive)
-  (tab-bar-rename-tab (projectile-project-name)))
 (cl-defmethod project-root ((project (head local)))
   (cdr project))
 
 (defun snow/project-try-local (dir)
   "Determine if DIR is a non-Git project.
-     DIR must include a .project file to be considered a project."
+       DIR must include a .project file to be considered a project."
   (let ((root (locate-dominating-file dir ".project")))
     (and root (cons 'local root))))
 

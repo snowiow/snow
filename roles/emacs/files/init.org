@@ -193,13 +193,13 @@
 * Buffer Management 
   #+BEGIN_SRC emacs-lisp
     (use-package popper
-      :after (shackle projectile)
+      :after (shackle)
       :bind (("C-'"   . popper-toggle-latest)
              ("M-'"   . popper-cycle)
              ("C-M-'" . popper-toggle-type))
       :custom
       (popper-display-control nil)
-      (popper-group-function #'popper-group-by-projectile)
+      (popper-group-function #'popper-group-by-project)
       :init
       (setq popper-reference-buffers
             '("\\*info\\*"
@@ -225,6 +225,7 @@
       (setq shackle-default-rule '(:select t))
       (shackle-mode t))
   #+END_SRC
+
 * File Handling
 
   #+BEGIN_SRC emacs-lisp
@@ -380,15 +381,6 @@
       "Do a REGEXP search in org files in the org directory."
       (interactive "sRegexp: ")
       (rg regexp "*.org" org-directory))
-
-    (defun snow/org-exec-codeblock-in-vterm ()
-      "execute current org mode code block in vterm"
-      (org-babel-mark-block)
-      (interactive)
-      (kill-ring-save (region-beginning) (region-end))
-      (projectile-run-vterm)
-      (vterm-yank)
-      (yank-pop))
 
     (defun org-summary-todo (n-done n-not-done)
       "Switch entry to DONE when all subentries are done, to TODO otherwise."
@@ -715,9 +707,6 @@
          "ort"  'org-roam-buffer-toggle
          "os"   'snow/rg-org
 
-         ;; projectile
-         "p" 'projectile-command-map
-
          ;;tab-bar-mode
          "t" '(:ignore t :which-key "Tabs")
          "tc" 'tab-close
@@ -812,7 +801,6 @@
          "ri"  'org-roam-node-insert
          "t"   'org-set-tags-command
          ","   'org-ctrl-c-ctrl-c
-         "v"   'snow/org-exec-codeblock-in-vterm
          "0"   'snow/org-start-presentation
          "$"   'org-archive-subtree
          )
@@ -1010,10 +998,7 @@
           :bind (:map minibuffer-local-map
                       ("M-A" . marginalia-cycle))
           :init
-          (marginalia-mode)
-          :config
-          (add-to-list 'marginalia-prompt-categories '("Find File:" . project-file))
-          (add-to-list 'marginalia-prompt-categories '("Switch to buffer:" . buffer)))
+          (marginalia-mode))
 
         (use-package consult)
 
@@ -1083,43 +1068,41 @@
      ;; (use-package tree-sitter-langs)
    #+END_SRC
 * Project Management
-  #+BEGIN_SRC emacs-lisp
-    (use-package projectile
-      :custom
-      ;; (projectile-completion-system 'ivy)
-      (projectile-switch-project-action 'projectile-dired)
-      :config
-      (add-hook 'projectile-after-switch-project-hook 'snow/set-tab-name-to-current-project)
-      (projectile-mode +1))
 
-    (defun snow/set-tab-name-to-current-project ()
-      "Name the current tab after the open project."
-      (interactive)
-      (tab-bar-rename-tab (projectile-project-name)))
-    (cl-defmethod project-root ((project (head local)))
-      (cdr project))
+** project.el
+Create a way to add local projects to the project.el project list. Normally only directories in version control are recognized as projects by project.el.
+This code snippet adds an additional function to the =project-find-functions= which searches for a /.project/ file in the root of the chosen directory. If it is present, the directory is seen as a project by project.el
 
-    (defun snow/project-try-local (dir)
-      "Determine if DIR is a non-Git project.
+#+BEGIN_SRC emacs-lisp
+  (cl-defmethod project-root ((project (head local)))
+    (cdr project))
+
+  (defun snow/project-try-local (dir)
+    "Determine if DIR is a non-Git project.
          DIR must include a .project file to be considered a project."
-      (let ((root (locate-dominating-file dir ".project")))
-        (and root (cons 'local root))))
+    (let ((root (locate-dominating-file dir ".project")))
+      (and root (cons 'local root))))
 
-    (add-hook 'project-find-functions 'snow/project-try-local)
+  (add-hook 'project-find-functions 'snow/project-try-local)
 
-    (defun snow/project-to-tab-name (path)
-      "Extract the last directory name from PATH to set it as the tab name."
-      (file-name-nondirectory (directory-file-name path)))
+#+END_SRC
 
-    (defun snow/project-switch-project (orig-fun &rest args)
-      "Rename current tab to the selected project."
-      (let* ((project-dir (or (car args) (project-prompt-project-dir)))
-             (tab-name (snow/project-to-tab-name project-dir)))
-        (tab-bar-rename-tab tab-name)
-        (funcall orig-fun project-dir)))
+This snippet adds an advice around the =project-switch-project= function to automatically rename the current tab to the name of the chosen project. This is to better distinguish, which project is opened in which tab.
 
-    (advice-add 'project-switch-project :around #'snow/project-switch-project)
-      #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defun snow/project-to-tab-name (path)
+    "Extract the last directory name from PATH to set it as the tab name."
+    (file-name-nondirectory (directory-file-name path)))
+
+  (defun snow/project-switch-project (orig-fun &rest args)
+    "Rename current tab to the selected project."
+    (let* ((project-dir (or (car args) (project-prompt-project-dir)))
+           (tab-name (snow/project-to-tab-name project-dir)))
+      (tab-bar-rename-tab tab-name)
+      (funcall orig-fun project-dir)))
+
+  (advice-add 'project-switch-project :around #'snow/project-switch-project)
+#+END_SRC
 * Shell
 ** Eshell
 #+BEGIN_SRC emacs-lisp
