@@ -124,7 +124,7 @@
   (highlight-indent-guides-method 'character))
 
 (use-package popper
-  :after (shackle)
+  :after (shackle project)
   :bind (("C-'"   . popper-toggle-latest)
          ("M-'"   . popper-cycle)
          ("C-M-'" . popper-toggle-type))
@@ -825,18 +825,28 @@
   :hook
   (yaml-mode . highlight-indent-guides-mode))
 
-(use-package vertico
+;; (use-package vertico
+;;   :init
+;;   (vertico-mode)
+;;   :custom
+;;   (vertico-cycle t)
+;;   :bind
+;;   (:map vertico-map
+;;         ("C-j" . vertico-next)
+;;         ("C-k" . vertico-previous)
+;;         ("C-^" . vertico-first)
+;;         ("C-$" . vertico-last)
+;;         ("C-e" . vertico-exit-input)))
+
+(use-package icomplete
+  :ensure nil
   :init
-  (vertico-mode)
-  :custom
-  (vertico-cycle t)
-  :bind
-  (:map vertico-map
-        ("C-j" . vertico-next)
-        ("C-k" . vertico-previous)
-        ("C-^" . vertico-first)
-        ("C-$" . vertico-last)
-        ("C-e" . vertico-exit-input)))
+  (icomplete-vertical-mode t)
+  :bind (:map icomplete-vertical-mode-minibuffer-map
+              ("<return>" . 'icomplete-force-complete-and-exit))
+  :config
+  (define-key minibuffer-local-completion-map " " 'self-insert-command)
+  (setq icomplete-show-matches-on-no-input t))
 
 (use-package orderless
   :init
@@ -864,7 +874,7 @@
 
 (defun snow/dired-open-locally ()
   "Make a local file copy of the remote file under the cursor in dired and
-                   opens it.  Mainly used to open pdfs or other complex formats From remote machines"
+                               opens it.  Mainly used to open pdfs or other complex formats From remote machines"
   (interactive)
   (let* ((filename (dired-get-filename nil t))
          (local-tmp-file (file-local-copy filename)))
@@ -933,14 +943,9 @@
 
 (advice-add 'project-switch-project :around #'snow/project-switch-project)
 
-(defun snow/eshell-config ()
-  (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
-  (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
-  (define-key eshell-mode-map (kbd "<down>") 'eshell-next-input)
-  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history))
-
 (defun snow/eshell-prompt ()
-  (let ((current-branch (magit-get-current-branch))
+  (let (
+        (current-branch (magit-get-current-branch))
         (aws-vault (getenv "AWS_VAULT"))
         (k8s-context (shell-command-to-string "kubectl config current-context")))
     (concat
@@ -957,15 +962,23 @@
      "\n"
      (propertize (eshell/pwd) 'face `(:foreground "#819fbb"))
      "\n"
-     (propertize "$ " 'face `(:foreground "white"))
-     )))
+     (propertize "$ " 'face `(:foreground "white")))))
+
+(defun snow/eshell-config ()
+  (eshell-hist-initialize)
+  (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
+  (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
+  (define-key eshell-mode-map (kbd "<down>") 'eshell-next-input)
+  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history))
 
 (use-package eshell
   :hook
   (eshell-first-time-mode . snow/eshell-config)
   (eshell-pre-command . eshell-save-some-history)
   :custom
-  (eshell-prompt-function 'snow/eshell-prompt))
+  (eshell-prompt-function 'snow/eshell-prompt)
+                                        ; needs to match the custum prompt
+  (eshell-prompt-regexp "^$ "))
 
 (use-package esh-autosuggest
   :hook (eshell-mode . esh-autosuggest-mode)

@@ -2,1071 +2,1084 @@
 #+PROPERTY: header-args:emacs-lisp :tangle "init.el" :mkdirp yes
 
 * Package Management
-  #+BEGIN_SRC emacs-lisp
-    (require 'package)
-    (setq package-archives
-          '(("gnu" . "http://elpa.gnu.org/packages/")
-            ("melpa" . "https://melpa.org/packages/")))
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (require 'package)
+  (setq package-archives
+        '(("gnu" . "http://elpa.gnu.org/packages/")
+          ("melpa" . "https://melpa.org/packages/")))
+#+END_SRC
 ** use-package setup
-   #+BEGIN_SRC emacs-lisp
-     (package-initialize)
-     (require 'use-package)
-     (setq use-package-always-ensure t)
-     (use-package use-package-ensure-system-package
-       :ensure t)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (package-initialize)
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+  (use-package use-package-ensure-system-package
+    :ensure t)
+#+END_SRC
 * Emacs Server
-  #+BEGIN_SRC emacs-lisp
-    (server-start)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (server-start)
+#+END_SRC
 * Tag Settings
-  Don't ask to reread a tags file if it was written outside of Emacs
-  #+BEGIN_SRC emacs-lisp
-    (setq tags-revert-without-query 1)
-  #+END_SRC
+Don't ask to reread a tags file if it was written outside of Emacs
+#+BEGIN_SRC emacs-lisp
+  (setq tags-revert-without-query 1)
+#+END_SRC
 * UI Settings 
 ** GUI Elements
-   Disable all GUI Elements
-   #+BEGIN_SRC emacs-lisp
-     (scroll-bar-mode -1)
-     (tool-bar-mode -1)
-     (menu-bar-mode -1)
-     (setq ring-bell-function 'ignore)
-   #+END_SRC
+Disable all GUI Elements
+#+BEGIN_SRC emacs-lisp
+  (scroll-bar-mode -1)
+  (tool-bar-mode -1)
+  (menu-bar-mode -1)
+  (setq ring-bell-function 'ignore)
+#+END_SRC
 ** Better Help Buffers
-   #+BEGIN_SRC emacs-lisp
-     (use-package helpful
-       :custom
-       (counsel-describe-function-function #'helpful-callable)
-       (counsel-describe-variable-function #'helpful-variable))
+#+BEGIN_SRC emacs-lisp
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable))
 
-   #+END_SRC
+#+END_SRC
 ** Icons
-   #+BEGIN_SRC emacs-lisp
-     (use-package all-the-icons)
-     (use-package all-the-icons-dired
-       :hook
-       (dired-mode . all-the-icons-dired-mode))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package all-the-icons)
+  (use-package all-the-icons-dired
+    :hook
+    (dired-mode . all-the-icons-dired-mode))
+#+END_SRC
 ** Tab Bar Settings
-   #+BEGIN_SRC emacs-lisp
-     (setq tab-bar-show nil)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq tab-bar-show nil)
+#+END_SRC
 
 ** Theme
-   #+BEGIN_SRC emacs-lisp
-     (use-package doom-themes
-       :custom
-       (doom-themes-enable-bold t)
-       (doom-themes-enable-italic t)
-       :config
-       (load-theme 'doom-one-light t)
-       (load-theme 'doom-tomorrow-night t))
+#+BEGIN_SRC emacs-lisp
+  (use-package doom-themes
+    :custom
+    (doom-themes-enable-bold t)
+    (doom-themes-enable-italic t)
+    :config
+    (load-theme 'doom-one-light t)
+    (load-theme 'doom-tomorrow-night t))
 
-     (defun snow/switch-theme ()
-       "switches between dark and light theme"
-       (interactive)
-       (if (eq (car custom-enabled-themes) 'doom-tomorrow-night)
-           (progn
-             (disable-theme 'doom-tomorrow-night)
-             (load "~/.emacs.d/modeline-light.el"))
-         (progn
-           (enable-theme 'doom-tomorrow-night)
-           (load "~/.emacs.d/modeline-dark.el"))))
-   #+END_SRC
+  (defun snow/switch-theme ()
+    "switches between dark and light theme"
+    (interactive)
+    (if (eq (car custom-enabled-themes) 'doom-tomorrow-night)
+        (progn
+          (disable-theme 'doom-tomorrow-night)
+          (load "~/.emacs.d/modeline-light.el"))
+      (progn
+        (enable-theme 'doom-tomorrow-night)
+        (load "~/.emacs.d/modeline-dark.el"))))
+#+END_SRC
 
 ** Which Key
-   #+BEGIN_SRC emacs-lisp
-     (use-package which-key
-       :init (which-key-mode)
-       :custom
-       (which-key-idle-delay 0.3))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package which-key
+    :init (which-key-mode)
+    :custom
+    (which-key-idle-delay 0.3))
+#+END_SRC
 ** Modeline
-   #+BEGIN_SRC emacs-lisp
-     (load "~/.emacs.d/modeline-dark.el")
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (load "~/.emacs.d/modeline-dark.el")
+#+END_SRC
 
 * Font Settings
-  Due to differnt resolutions on Mac the font should be displayed bigger
-  #+BEGIN_SRC emacs-lisp
-    (if (eq system-type 'gnu/linux)
-        (set-face-attribute 'default nil
-                            :family "Iosevka Term"
-                            :height 120)
+Due to differnt resolutions on Mac the font should be displayed bigger
+#+BEGIN_SRC emacs-lisp
+  (if (eq system-type 'gnu/linux)
       (set-face-attribute 'default nil
                           :family "Iosevka Term"
-                          :height 140))
-  #+END_SRC
+                          :height 120)
+    (set-face-attribute 'default nil
+                        :family "Iosevka Term"
+                        :height 140))
+#+END_SRC
 * Mac OSX Settings
-  Set option to super and commant to meta
-  #+BEGIN_SRC emacs-lisp
-    (setq mac-option-modifier 'super)
-    (setq mac-command-modifier 'meta)
+Set option to super and commant to meta
+#+BEGIN_SRC emacs-lisp
+  (setq mac-option-modifier 'super)
+  (setq mac-command-modifier 'meta)
 
-    (use-package exec-path-from-shell
-      :config
-      (when (memq window-system '(mac ns x))
-        (exec-path-from-shell-initialize)))
-  #+END_SRC
+  (use-package exec-path-from-shell
+    :config
+    (when (memq window-system '(mac ns x))
+      (exec-path-from-shell-initialize)))
+#+END_SRC
 
 * Backups
-  #+BEGIN_SRC emacs-lisp
-    (setq backup-directory-alist `(("." . "~/tmp")))
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq backup-directory-alist `(("." . "~/tmp")))
+#+END_SRC
 
 * Editor Settings
-  #+BEGIN_SRC emacs-lisp
-    (setq require-final-newline t)
-    (setq-default fill-column 80)
-    (setq-default
-     whitespace-line-column 80
-     whitespace-style '(face lines-tail))
-  #+END_SRC
-  Always keep some lines visible underneath and above the cursor, when at the bottom or top of the window
-  #+BEGIN_SRC emacs-lisp
-    (setq scroll-margin 5)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq require-final-newline t)
+  (setq-default fill-column 80)
+  (setq-default
+   whitespace-line-column 80
+   whitespace-style '(face lines-tail))
+#+END_SRC
+Always keep some lines visible underneath and above the cursor, when at the bottom or top of the window
+#+BEGIN_SRC emacs-lisp
+  (setq scroll-margin 5)
+#+END_SRC
 
-  Wrap lines so they are shown in the buffer completely without horizontal scrolling
-  #+BEGIN_SRC emacs-lisp
-    (global-visual-line-mode t)
-  #+END_SRC
+Wrap lines so they are shown in the buffer completely without horizontal scrolling
+#+BEGIN_SRC emacs-lisp
+  (global-visual-line-mode t)
+#+END_SRC
 
 ** Autocompletion
-   #+BEGIN_SRC emacs-lisp
-     (use-package company
-       :custom
-       (company-dabbrev-downcase nil)
-       (company-selection-wrap-around t)
-       (company-idle-delay 0.1)
-       (company-minimum-prefix-length 1)
-       :hook
-       (after-init . global-company-mode)
-       :bind (:map company-active-map
-                   ("M-n" . nil)
-                   ("M-p" . nil)
-                   ("C-n" . company-select-next)
-                   ("C-p" . company-select-previous)
-                   ("C-p" . company-select-previous)
-                   ("C-d" . company-show-doc-buffer)))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package company
+    :custom
+    (company-dabbrev-downcase nil)
+    (company-selection-wrap-around t)
+    (company-idle-delay 0.1)
+    (company-minimum-prefix-length 1)
+    :hook
+    (after-init . global-company-mode)
+    :bind (:map company-active-map
+                ("M-n" . nil)
+                ("M-p" . nil)
+                ("C-n" . company-select-next)
+                ("C-p" . company-select-previous)
+                ("C-p" . company-select-previous)
+                ("C-d" . company-show-doc-buffer)))
+#+END_SRC
 ** Global Tab settings
-   #+BEGIN_SRC emacs-lisp
-     (setq-default tab-width 4)
-     (setq-default indent-tabs-mode nil)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq-default tab-width 4)
+  (setq-default indent-tabs-mode nil)
+#+END_SRC
 ** Parenthesis Handling
 *** Highlight parenthesis
-    #+BEGIN_SRC emacs-lisp
-      (show-paren-mode t)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (show-paren-mode t)
+#+END_SRC
 *** Create matching parenthesis
-    #+BEGIN_SRC emacs-lisp
-      (electric-pair-mode 1)
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (electric-pair-mode 1)
+#+END_SRC
 *** Rainbow Delimiter
-    #+BEGIN_SRC emacs-lisp
-      (use-package rainbow-delimiters
-        :after (clojure-mode emacs-lisp-mode)
-        :hook
-        (clojure-mode . rainbow-delimiters-mode)
-        (emacs-lisp-mode . rainbow-delimiters-mode))
-    #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package rainbow-delimiters
+    :after (clojure-mode emacs-lisp-mode)
+    :hook
+    (clojure-mode . rainbow-delimiters-mode)
+    (emacs-lisp-mode . rainbow-delimiters-mode))
+#+END_SRC
 
 ** Relative Line Numbers
-   #+BEGIN_SRC emacs-lisp
-     (use-package linum-relative
-       :custom
-       (linum-relative-backend 'display-line-numbers-mode)
-       :config
-       (linum-relative-global-mode))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package linum-relative
+    :custom
+    (linum-relative-backend 'display-line-numbers-mode)
+    :config
+    (linum-relative-global-mode))
+#+END_SRC
 
 ** Indent Guides
-   #+BEGIN_SRC emacs-lisp
-     (use-package highlight-indent-guides
-       :custom
-       (highlight-indent-guides-method 'character))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package highlight-indent-guides
+    :custom
+    (highlight-indent-guides-method 'character))
+#+END_SRC
 * Buffer Management 
-  #+BEGIN_SRC emacs-lisp
-    (use-package popper
-      :after (shackle)
-      :bind (("C-'"   . popper-toggle-latest)
-             ("M-'"   . popper-cycle)
-             ("C-M-'" . popper-toggle-type))
-      :custom
-      (popper-display-control nil)
-      (popper-group-function #'popper-group-by-project)
-      :init
-      (setq popper-reference-buffers
-            '("\\*info\\*"
-              "\\*Ledger Report\\*"
-              "\\*Messages\\*"
-              compilation-mode
-              eshell-mode
-              help-mode
-              helpful-mode
-              magit-status-mode
-              rg-mode
-              vterm-mode))
-      (popper-mode +1)
-      (popper-echo-mode +1))
+#+BEGIN_SRC emacs-lisp
+  (use-package popper
+    :after (shackle project)
+    :bind (("C-'"   . popper-toggle-latest)
+           ("M-'"   . popper-cycle)
+           ("C-M-'" . popper-toggle-type))
+    :custom
+    (popper-display-control nil)
+    (popper-group-function #'popper-group-by-project)
+    :init
+    (setq popper-reference-buffers
+          '("\\*info\\*"
+            "\\*Ledger Report\\*"
+            "\\*Messages\\*"
+            compilation-mode
+            eshell-mode
+            help-mode
+            helpful-mode
+            magit-status-mode
+            rg-mode
+            vterm-mode))
+    (popper-mode +1)
+    (popper-echo-mode +1))
 
-    (use-package shackle
-      :config
-      (setq shackle-rules '(
-                            (compilation-mode :noselect t)
-                            (("^\\*eshell.*?\\*" "^\\*vterm.*?\\*") :regexp t :other t :select t)
-                            (" *transient*" :align below)
-                            ))
-      (setq shackle-default-rule '(:select t))
-      (shackle-mode t))
-  #+END_SRC
+  (use-package shackle
+    :config
+    (setq shackle-rules '(
+                          (compilation-mode :noselect t)
+                          (("^\\*eshell.*?\\*" "^\\*vterm.*?\\*") :regexp t :other t :select t)
+                          (" *transient*" :align below)
+                          ))
+    (setq shackle-default-rule '(:select t))
+    (shackle-mode t))
+#+END_SRC
 
 * File Handling
 
-  #+BEGIN_SRC emacs-lisp
-    (global-auto-revert-mode 1)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (global-auto-revert-mode 1)
+#+END_SRC
   
 * Prompt Settings
-  #+BEGIN_SRC emacs-lisp
-    (defalias 'yes-or-no-p 'y-or-n-p)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (defalias 'yes-or-no-p 'y-or-n-p)
+#+END_SRC
 
 * Custom File Settings
-  #+BEGIN_SRC emacs-lisp
-    (setq custom-file "~/.emacs.d/custom.el")
-    (load custom-file 'noerror 'nomessage)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq custom-file "~/.emacs.d/custom.el")
+  (load custom-file 'noerror 'nomessage)
+#+END_SRC
 
 * Ediff
-  #+BEGIN_SRC emacs-lisp
-    (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-    (custom-set-faces
-     ;; custom-set-faces was added by Custom.
-     ;; If you edit it by hand, you could mess it up, so be careful.
-     ;; Your init file should contain only one such instance.
-     ;; If there is more than one, they won't work right.
-     '(ediff-current-diff-Ancestor ((t (:background "#223448" :foreground "#4db5bd"))))
-     '(ediff-current-diff-B ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "#50a14f"))))
-     '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq ediff-window-setup-function 'ediff-setup-windows-plain)
+  (custom-set-faces
+   ;; custom-set-faces was added by Custom.
+   ;; If you edit it by hand, you could mess it up, so be careful.
+   ;; Your init file should contain only one such instance.
+   ;; If there is more than one, they won't work right.
+   '(ediff-current-diff-Ancestor ((t (:background "#223448" :foreground "#4db5bd"))))
+   '(ediff-current-diff-B ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "#50a14f"))))
+   '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
+#+END_SRC
 * Org Mode
-  #+BEGIN_SRC emacs-lisp
-    (use-package org
-      :hook
-      (org-after-todo-statistics . org-summary-todo)
-      :custom
-      ;; important first settings which is used by other configurations
-      (org-directory "~/Sync/notes")
-      ;; AGENDA SETTINGS
-      (org-agenda-custom-commands
-       '(("w" "Work Todos"
-          ((agenda "" ((org-agenda-span 1)))
-           (tags-todo "-TODO=\"WAITING\""
-                      ((org-agenda-overriding-header "\nUnscheduled TODOs")
-                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
-           (todo "WAITING"
-                 ((org-agenda-overriding-header "\nWAITING"))))
-          ((org-agenda-compact-blocks t)
-           (org-agenda-files '("~/Sync/notes/work.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))
-         ("p" "Private Todos"
-          ((agenda "" ((org-agenda-span 1)))
-           (tags-todo "+PRIORITY=\"A\"-TODO=\"WAITING\""
-                      ((org-agenda-overriding-header "\nHigh Priority")
-                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
-           (tags-todo "-PRIORITY=\"A\""
-                      ((org-agenda-overriding-header "\nUnscheduled TODOs")
-                       (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
-           (todo "WAITING"
-                 ((org-agenda-overriding-header "\nWAITING"))))
-          ((org-agenda-compact-blocks t)
-           (org-agenda-files '("~/Sync/notes/todos.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))))
-      (org-agenda-files (file-expand-wildcards (concat org-directory "/*.org")))
-      (org-agenda-skip-deadline-if-done t)
-      (org-agenda-skip-deadline-prewarning-if-scheduled t)
-      (org-agenda-skip-scheduled-if-deadline-is-shown t)
-      (org-agenda-skip-scheduled-if-done t)
-      (org-agenda-window-setup 'current-window)
-      (org-archive-location "%s_archive::datetree/* Archived Tasks")
-      (org-babel-python-command "python3")
-      (org-confirm-babel-evaluate nil)
-      (org-default-notes-file (concat org-directory "/capture.org"))
-      (org-ellipsis " ▾")
-      (org-image-actual-width nil)
-      (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
-                           (sequence "|" "CANCELLED(c)")))
-      :config
-      (require 'org-habit)
-      (advice-add 'org-open-at-point :before 'evil-set-jump)
-      (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
-      (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
-      (add-to-list 'org-modules 'habits)
-      (setq org-capture-templates
-            '(("a" "Private Appointments" entry (file+headline
-                                                 (lambda ()
-                                                   (concat org-directory "/appointments.org"))
-                                                 "Private")
-               "* %?")
-              ("f" "Fitness")
-              ("fj" "Workout Journal Entry"
-               entry (file+datetree (lambda () (concat org-directory "/fitness.org"))
-                                    "Gym" "Workout Journal")
-               "* %U %?")
-              ("fw" "Gewicht Eintrag" table-line
-               (id "weight-table")
-               "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)
-              ("k" "Keyboard WPM" table-line
-               (id "wpm-progress-ferris")
-               "| %u | %^{WPM} | %^{Accuracy} | %^{Consistency}"  :immediate-finish t)
-              ("t" "Todos")
-              ("tt" "Todo" entry (file+headline
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :hook
+    (org-after-todo-statistics . org-summary-todo)
+    :custom
+    ;; important first settings which is used by other configurations
+    (org-directory "~/Sync/notes")
+    ;; AGENDA SETTINGS
+    (org-agenda-custom-commands
+     '(("w" "Work Todos"
+        ((agenda "" ((org-agenda-span 1)))
+         (tags-todo "-TODO=\"WAITING\""
+                    ((org-agenda-overriding-header "\nUnscheduled TODOs")
+                     (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+         (todo "WAITING"
+               ((org-agenda-overriding-header "\nWAITING"))))
+        ((org-agenda-compact-blocks t)
+         (org-agenda-files '("~/Sync/notes/work.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))
+       ("p" "Private Todos"
+        ((agenda "" ((org-agenda-span 1)))
+         (tags-todo "+PRIORITY=\"A\"-TODO=\"WAITING\""
+                    ((org-agenda-overriding-header "\nHigh Priority")
+                     (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+         (tags-todo "-PRIORITY=\"A\""
+                    ((org-agenda-overriding-header "\nUnscheduled TODOs")
+                     (org-agenda-skip-function '(org-agenda-skip-entry-if 'timestamp))))
+         (todo "WAITING"
+               ((org-agenda-overriding-header "\nWAITING"))))
+        ((org-agenda-compact-blocks t)
+         (org-agenda-files '("~/Sync/notes/todos.org" "~/Sync/notes/appointments.org" "~/Sync/notes/meetings.org" "~/Sync/notes/meetings.org_archive"))))))
+    (org-agenda-files (file-expand-wildcards (concat org-directory "/*.org")))
+    (org-agenda-skip-deadline-if-done t)
+    (org-agenda-skip-deadline-prewarning-if-scheduled t)
+    (org-agenda-skip-scheduled-if-deadline-is-shown t)
+    (org-agenda-skip-scheduled-if-done t)
+    (org-agenda-window-setup 'current-window)
+    (org-archive-location "%s_archive::datetree/* Archived Tasks")
+    (org-babel-python-command "python3")
+    (org-confirm-babel-evaluate nil)
+    (org-default-notes-file (concat org-directory "/capture.org"))
+    (org-ellipsis " ▾")
+    (org-image-actual-width nil)
+    (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
+                         (sequence "|" "CANCELLED(c)")))
+    :config
+    (require 'org-habit)
+    (advice-add 'org-open-at-point :before 'evil-set-jump)
+    (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
+    (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
+    (add-to-list 'org-modules 'habits)
+    (setq org-capture-templates
+          '(("a" "Private Appointments" entry (file+headline
+                                               (lambda ()
+                                                 (concat org-directory "/appointments.org"))
+                                               "Private")
+             "* %?")
+            ("f" "Fitness")
+            ("fj" "Workout Journal Entry"
+             entry (file+datetree (lambda () (concat org-directory "/fitness.org"))
+                                  "Gym" "Workout Journal")
+             "* %U %?")
+            ("fw" "Gewicht Eintrag" table-line
+             (id "weight-table")
+             "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)
+            ("k" "Keyboard WPM" table-line
+             (id "wpm-progress-ferris")
+             "| %u | %^{WPM} | %^{Accuracy} | %^{Consistency}"  :immediate-finish t)
+            ("t" "Todos")
+            ("tt" "Todo" entry (file+headline
+                                (lambda ()
+                                  (concat org-directory "/todos.org"))
+                                "Inbox")
+             "* TODO %?")
+            ("w" "Work")
+            ("wa" "Appointments" entry (file+headline
+                                        (lambda ()
+                                          (concat org-directory "/appointments.org"))
+                                        "Work")
+             "* %?")
+            ("wm" "Meetings")
+            ("wmm" "New Meeting" entry (file+headline
+                                        (lambda ()
+                                          (concat org-directory "/meetings.org"))
+                                        "Work")
+             (file "~/Sync/notes/templates/meeting.org"))
+            ("wmd" "Daily" entry (file+headline
                                   (lambda ()
-                                    (concat org-directory "/todos.org"))
-                                  "Inbox")
-               "* TODO %?")
-              ("w" "Work")
-              ("wa" "Appointments" entry (file+headline
-                                          (lambda ()
-                                            (concat org-directory "/appointments.org"))
-                                          "Work")
-               "* %?")
-              ("wm" "Meetings")
-              ("wmm" "New Meeting" entry (file+headline
+                                    (concat org-directory "/meetings.org"))
+                                  "DevOps Daily")
+             (file  "templates/repeating-meeting.org"))
+            ("wme" "Extended Sync" entry (file+headline
                                           (lambda ()
                                             (concat org-directory "/meetings.org"))
-                                          "Work")
-               (file "~/Sync/notes/templates/meeting.org"))
-              ("wmd" "Daily" entry (file+headline
-                                    (lambda ()
-                                      (concat org-directory "/meetings.org"))
-                                    "DevOps Daily")
-               (file  "templates/repeating-meeting.org"))
-              ("wme" "Extended Sync" entry (file+headline
-                                            (lambda ()
-                                              (concat org-directory "/meetings.org"))
-                                            "Extended Sync")
-               (file  "templates/repeating-meeting.org"))
-              ("wmf" "Refinement" entry (file+headline
-                                         (lambda ()
-                                           (concat org-directory "/meetings.org"))
-                                         "Refinement")
-               (file  "templates/repeating-meeting.org"))
-              ("wmr" "Retro" entry (file+headline
-                                    (lambda ()
-                                      (concat org-directory "/meetings.org"))
-                                    "Retro")
-               (file  "templates/repeating-meeting.org"))
-              ("wms" "Platform Sync between DataPlatform and PE" entry (file+headline
-                                                                        (lambda ()
-                                                                          (concat org-directory "/meetings.org"))
-                                                                        "Platform Sync between DataPlatform and PE")
-               (file  "templates/repeating-meeting.org"))
-              ("wmt" "Tech BiWeekly" entry (file+headline
-                                            (lambda ()
-                                              (concat org-directory "/meetings.org"))
-                                            "Tech BiWeekly")
-               (file repeating-meeting-file))
-              ("wt" "Todo Work" entry (file+headline
+                                          "Extended Sync")
+             (file  "templates/repeating-meeting.org"))
+            ("wmf" "Refinement" entry (file+headline
                                        (lambda ()
-                                         (concat org-directory "/work.org"))
-                                       "Todos")
-               "* TODO %?"))))
+                                         (concat org-directory "/meetings.org"))
+                                       "Refinement")
+             (file  "templates/repeating-meeting.org"))
+            ("wmr" "Retro" entry (file+headline
+                                  (lambda ()
+                                    (concat org-directory "/meetings.org"))
+                                  "Retro")
+             (file  "templates/repeating-meeting.org"))
+            ("wms" "Platform Sync between DataPlatform and PE" entry (file+headline
+                                                                      (lambda ()
+                                                                        (concat org-directory "/meetings.org"))
+                                                                      "Platform Sync between DataPlatform and PE")
+             (file  "templates/repeating-meeting.org"))
+            ("wmt" "Tech BiWeekly" entry (file+headline
+                                          (lambda ()
+                                            (concat org-directory "/meetings.org"))
+                                          "Tech BiWeekly")
+             (file repeating-meeting-file))
+            ("wt" "Todo Work" entry (file+headline
+                                     (lambda ()
+                                       (concat org-directory "/work.org"))
+                                     "Todos")
+             "* TODO %?"))))
 
-    (defun snow/rg-org (regexp)
-      "Do a REGEXP search in org files in the org directory."
-      (interactive "sRegexp: ")
-      (rg regexp "*.org" org-directory))
+  (defun snow/rg-org (regexp)
+    "Do a REGEXP search in org files in the org directory."
+    (interactive "sRegexp: ")
+    (rg regexp "*.org" org-directory))
 
-    (defun org-summary-todo (n-done n-not-done)
-      "Switch entry to DONE when all subentries are done, to TODO otherwise."
-      (let (org-log-done org-log-states)   ; turn off logging
-        (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-    (put 'dired-find-alternate-file 'disabled nil)
-  #+END_SRC
+  (defun org-summary-todo (n-done n-not-done)
+    "Switch entry to DONE when all subentries are done, to TODO otherwise."
+    (let (org-log-done org-log-states)   ; turn off logging
+      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+  (put 'dired-find-alternate-file 'disabled nil)
+#+END_SRC
 
 ** Babel Tangle Config
-   #+BEGIN_SRC emacs-lisp
-     (defun snow/org-babel-tangle-config ()
-       (when (string-equal (buffer-file-name)
-                           (expand-file-name "~/workspace/snow/roles/emacs/files/init.org"))
-         ;; Dynamic scoping to the rescue
-         (let ((org-confirm-babel-evaluate nil))
-           (org-babel-tangle))))
+#+BEGIN_SRC emacs-lisp
+  (defun snow/org-babel-tangle-config ()
+    (when (string-equal (buffer-file-name)
+                        (expand-file-name "~/workspace/snow/roles/emacs/files/init.org"))
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
 
-     (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'snow/org-babel-tangle-config)))
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'snow/org-babel-tangle-config)))
 
-   #+END_SRC
+#+END_SRC
 ** Holiday Settings
-   Only show the typical german holidays
-   #+BEGIN_SRC emacs-lisp
-     (setq solar-n-hemi-seasons
-           '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
+Only show the typical german holidays
+#+BEGIN_SRC emacs-lisp
+  (setq solar-n-hemi-seasons
+        '("Frühlingsanfang" "Sommeranfang" "Herbstanfang" "Winteranfang"))
 
-     (setq holiday-general-holidays
-           '((holiday-fixed 1 1 "Neujahr")
-             (holiday-fixed 5 1 "1. Mai")
-             (holiday-fixed 10 3 "Tag der Deutschen Einheit")))
+  (setq holiday-general-holidays
+        '((holiday-fixed 1 1 "Neujahr")
+          (holiday-fixed 5 1 "1. Mai")
+          (holiday-fixed 10 3 "Tag der Deutschen Einheit")))
 
-     (setq holiday-christian-holidays
-           '((holiday-float 12 0 -4 "1. Advent" 24)
-             (holiday-float 12 0 -3 "2. Advent" 24)
-             (holiday-float 12 0 -2 "3. Advent" 24)
-             (holiday-float 12 0 -1 "4. Advent" 24)
-             (holiday-fixed 12 25 "1. Weihnachtstag")
-             (holiday-fixed 12 26 "2. Weihnachtstag")
-             (holiday-fixed 1 6 "Heilige Drei Könige")
-             (holiday-easter-etc -48 "Rosenmontag")
-             (holiday-easter-etc -3 "Gründonnerstag")
-             (holiday-easter-etc  -2 "Karfreitag")
-             (holiday-easter-etc   0 "Ostersonntag")
-             (holiday-easter-etc  +1 "Ostermontag")
-             (holiday-easter-etc +39 "Christi Himmelfahrt")
-             (holiday-easter-etc +49 "Pfingstsonntag")
-             (holiday-easter-etc +50 "Pfingstmontag")
-             (holiday-easter-etc +60 "Fronleichnam")
-             (holiday-fixed 8 15 "Mariae Himmelfahrt")
-             (holiday-fixed 11 1 "Allerheiligen")
-             (holiday-float 11 3 1 "Buss- und Bettag" 16)
-             (holiday-float 11 0 1 "Totensonntag" 20)))
+  (setq holiday-christian-holidays
+        '((holiday-float 12 0 -4 "1. Advent" 24)
+          (holiday-float 12 0 -3 "2. Advent" 24)
+          (holiday-float 12 0 -2 "3. Advent" 24)
+          (holiday-float 12 0 -1 "4. Advent" 24)
+          (holiday-fixed 12 25 "1. Weihnachtstag")
+          (holiday-fixed 12 26 "2. Weihnachtstag")
+          (holiday-fixed 1 6 "Heilige Drei Könige")
+          (holiday-easter-etc -48 "Rosenmontag")
+          (holiday-easter-etc -3 "Gründonnerstag")
+          (holiday-easter-etc  -2 "Karfreitag")
+          (holiday-easter-etc   0 "Ostersonntag")
+          (holiday-easter-etc  +1 "Ostermontag")
+          (holiday-easter-etc +39 "Christi Himmelfahrt")
+          (holiday-easter-etc +49 "Pfingstsonntag")
+          (holiday-easter-etc +50 "Pfingstmontag")
+          (holiday-easter-etc +60 "Fronleichnam")
+          (holiday-fixed 8 15 "Mariae Himmelfahrt")
+          (holiday-fixed 11 1 "Allerheiligen")
+          (holiday-float 11 3 1 "Buss- und Bettag" 16)
+          (holiday-float 11 0 1 "Totensonntag" 20)))
 
-     (setq holiday-hebrew-holidays nil)
-     (setq holiday-islamic-holidays nil)
-     (setq holiday-bahai-holidays nil)
-     (setq holiday-oriental-holidays nil)
+  (setq holiday-hebrew-holidays nil)
+  (setq holiday-islamic-holidays nil)
+  (setq holiday-bahai-holidays nil)
+  (setq holiday-oriental-holidays nil)
 
-   #+END_SRC
+#+END_SRC
 ** Babel
-   #+BEGIN_SRC emacs-lisp
-     (use-package ob-async)
-     (use-package ob-typescript)
+#+BEGIN_SRC emacs-lisp
+  (use-package ob-async)
+  (use-package ob-typescript)
 
-     (org-babel-do-load-languages
-      'org-babel-load-languages
-      '((emacs-lisp . t)
-        (eshell . t)
-        (gnuplot . t)
-        ;; (ledger . t)
-        (python . t)
-        (shell . t)
-        (typescript . t)))
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (eshell . t)
+     (gnuplot . t)
+     ;; (ledger . t)
+     (python . t)
+     (shell . t)
+     (typescript . t)))
 
-   #+END_SRC
+#+END_SRC
 ** Org Modern
 
-   #+BEGIN_SRC emacs-lisp
-     (use-package org-modern
-       :after org
-       :hook (org-mode . org-modern-mode))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package org-modern
+    :after org
+    :hook (org-mode . org-modern-mode))
+#+END_SRC
 ** Roam
-   #+BEGIN_SRC emacs-lisp
-     (use-package org-roam
-       :init
-       (setq org-roam-v2-ack t)
-       :custom
-       (org-roam-directory "~/Sync/notes/roam")
-       (org-roam-completion-everywhere t)
-       (org-roam-capture-templates
-        '(("b" "book notes" plain (file "~/Sync/notes/roam/templates/booknote.org")
-           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-           :unnarrowed t)
-          ("d" "default" plain
-           "%?"
-           :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
-           :unnarrowed t)))
-       :config
-       (org-roam-db-autosync-mode))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package org-roam
+    :init
+    (setq org-roam-v2-ack t)
+    :custom
+    (org-roam-directory "~/Sync/notes/roam")
+    (org-roam-completion-everywhere t)
+    (org-roam-capture-templates
+     '(("b" "book notes" plain (file "~/Sync/notes/roam/templates/booknote.org")
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+        :unnarrowed t)
+       ("d" "default" plain
+        "%?"
+        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+        :unnarrowed t)))
+    :config
+    (org-roam-db-autosync-mode))
+#+END_SRC
 ** Tree Slide
-   #+BEGIN_SRC emacs-lisp
-     (defun snow/org-start-presentation ()
-       (interactive)
-       (org-tree-slide-mode 1)
-       (setq text-scale-mode-amount 1)
-       (text-scale-mode 1))
+#+BEGIN_SRC emacs-lisp
+  (defun snow/org-start-presentation ()
+    (interactive)
+    (org-tree-slide-mode 1)
+    (setq text-scale-mode-amount 1)
+    (text-scale-mode 1))
 
-     (defun snow/org-end-presentation ()
-       (interactive)
-       (text-scale-mode 0)
-       (org-tree-slide-mode 0))
+  (defun snow/org-end-presentation ()
+    (interactive)
+    (text-scale-mode 0)
+    (org-tree-slide-mode 0))
 
-     (use-package org-tree-slide
-       :defer t
-       :after org
-       :commands org-tree-slide-mode
-       :config
-       (evil-define-key 'normal org-tree-slide-mode-map
-         (kbd "q") 'snow/org-end-presentation
-         (kbd "<right>") 'org-tree-slide-move-next-tree
-         (kbd "<left>") 'org-tree-slide-move-previous-tree))
-   #+END_SRC
+  (use-package org-tree-slide
+    :defer t
+    :after org
+    :commands org-tree-slide-mode
+    :config
+    (evil-define-key 'normal org-tree-slide-mode-map
+      (kbd "q") 'snow/org-end-presentation
+      (kbd "<right>") 'org-tree-slide-move-next-tree
+      (kbd "<left>") 'org-tree-slide-move-previous-tree))
+#+END_SRC
 * Spelling
-  #+BEGIN_SRC emacs-lisp
-    (setq ispell-program-name "aspell")
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (setq ispell-program-name "aspell")
+#+END_SRC
 
 * Keybindings
-  #+BEGIN_SRC emacs-lisp
-    (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
-  #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+#+END_SRC
 
 ** Evil
-   #+BEGIN_SRC emacs-lisp
-     (use-package undo-tree
-       :custom
-       (undo-tree-auto-save-history nil)
-       :config
-       (global-undo-tree-mode))
+#+BEGIN_SRC emacs-lisp
+  (use-package undo-tree
+    :custom
+    (undo-tree-auto-save-history nil)
+    :config
+    (global-undo-tree-mode))
 
-     (defun snow/evil-yank-highlight-advice (orig-fn beg end &rest args)
-       "Highlight yanked region."
-       (pulse-momentary-highlight-region beg end)
-       (apply orig-fn beg end args))
+  (defun snow/evil-yank-highlight-advice (orig-fn beg end &rest args)
+    "Highlight yanked region."
+    (pulse-momentary-highlight-region beg end)
+    (apply orig-fn beg end args))
 
-     (use-package evil
-       :after undo-tree
-       :custom
-       (evil-want-C-u-scroll t)
-       (evil-want-keybinding nil)
-       (evil-want-Y-yank-to-eol t)
-       (evil-search-module 'evil-search)
-       (evil-undo-system 'undo-tree)
-       :config
-       (advice-add 'evil-yank :around 'snow/evil-yank-highlight-advice)
-       (evil-mode))
+  (use-package evil
+    :after undo-tree
+    :custom
+    (evil-want-C-u-scroll t)
+    (evil-want-keybinding nil)
+    (evil-want-Y-yank-to-eol t)
+    (evil-search-module 'evil-search)
+    (evil-undo-system 'undo-tree)
+    :config
+    (advice-add 'evil-yank :around 'snow/evil-yank-highlight-advice)
+    (evil-mode))
 
-     (use-package evil-collection
-       :after evil
-       :config
-       (evil-collection-init '(calc
-                               calendar
-                               dashboard
-                               dired
-                               ediff
-                               eshell
-                               forge
-                               helpful
-                               info
-                               magit
-                               mu4e
-                               package-menu
-                               pass
-                               proced
-                               rg
-                               ripgrep
-                               term
-                               xref)))
+  (use-package evil-collection
+    :after evil
+    :config
+    (evil-collection-init '(calc
+                            calendar
+                            dashboard
+                            dired
+                            ediff
+                            eshell
+                            forge
+                            helpful
+                            info
+                            magit
+                            mu4e
+                            package-menu
+                            pass
+                            proced
+                            rg
+                            ripgrep
+                            term
+                            xref)))
 
-     (use-package evil-commentary
-       :after evil
-       :config
-       (evil-commentary-mode))
+  (use-package evil-commentary
+    :after evil
+    :config
+    (evil-commentary-mode))
 
-     (use-package evil-numbers
-       :after evil)
+  (use-package evil-numbers
+    :after evil)
 
-     (use-package evil-org
-       :after org
-       :hook
-       (org-mode . evil-org-mode)
-       :config
-       (add-hook 'evil-org-mode-hook
-                 (lambda ()
-                   (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))))
-       (require 'evil-org-agenda)
-       (evil-org-agenda-set-keys))
+  (use-package evil-org
+    :after org
+    :hook
+    (org-mode . evil-org-mode)
+    :config
+    (add-hook 'evil-org-mode-hook
+              (lambda ()
+                (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))))
+    (require 'evil-org-agenda)
+    (evil-org-agenda-set-keys))
 
-     (use-package evil-surround
-       :after evil
-       :custom
-       (global-evil-surround-mode 1))
+  (use-package evil-surround
+    :after evil
+    :custom
+    (global-evil-surround-mode 1))
 
-   #+END_SRC
+#+END_SRC
 
 ** General
-   #+BEGIN_SRC emacs-lisp
-     (use-package general
-       :after consult
-       :config
-       (general-evil-setup t)
-       (general-define-key
-        "C-+" 'text-scale-increase
-        "C--" 'text-scale-decrease
-        ;; "C-k" 'previous-line
-        )
+#+BEGIN_SRC emacs-lisp
+  (use-package general
+    :after consult
+    :config
+    (general-evil-setup t)
+    (general-define-key
+     "C-+" 'text-scale-increase
+     "C--" 'text-scale-decrease
+     ;; "C-k" 'previous-line
+     )
 
-       ;; general normal mappings
-       (general-nmap
-         "C-c +" 'evil-numbers/inc-at-pt
-         "C-c -" 'evil-numbers/dec-at-pt)
+    ;; general normal mappings
+    (general-nmap
+      "C-c +" 'evil-numbers/inc-at-pt
+      "C-c -" 'evil-numbers/dec-at-pt)
 
-       ;; org-mode mappings
-       (general-define-key
-        :keymaps 'org-mode-map
-        :states 'normal
-        "RET"  'org-open-at-point)
+    ;; org-mode mappings
+    (general-define-key
+     :keymaps 'org-mode-map
+     :states 'normal
+     "RET"  'org-open-at-point)
 
-       ;; org-agenda-mode mappings
-       (general-define-key
-        :keymaps 'org-agenda-mode-map
-        "<"  'org-agenda-earlier
-        ">"  'org-agenda-later)
+    ;; org-agenda-mode mappings
+    (general-define-key
+     :keymaps 'org-agenda-mode-map
+     "<"  'org-agenda-earlier
+     ">"  'org-agenda-later)
 
-       ;; emacs-lisp-mode mappings
-       (general-define-key
-        :states 'visual
-        :keymaps 'emacs-lisp-mode-map
-        "e" 'eval-region)
+    ;; emacs-lisp-mode mappings
+    (general-define-key
+     :states 'visual
+     :keymaps 'emacs-lisp-mode-map
+     "e" 'eval-region)
 
-       ;; evil-insert-state mappings
-       (general-define-key
-        :keymaps 'evil-insert-state-map
-        "C-o" 'company-complete
-        "C-y" 'yas-expand)
+    ;; evil-insert-state mappings
+    (general-define-key
+     :keymaps 'evil-insert-state-map
+     "C-o" 'company-complete
+     "C-y" 'yas-expand)
 
 
-       ;; leader key mappings
-       (general-create-definer snow/leader-keys
-         :states '(normal motion)
-         :keymaps 'override
-         :prefix "SPC")
+    ;; leader key mappings
+    (general-create-definer snow/leader-keys
+      :states '(normal motion)
+      :keymaps 'override
+      :prefix "SPC")
 
-       (snow/leader-keys
-         ;; general
-         ;; applications
-         "a" '(:ignore t :which-key "applications")
-         "aa" '(:ignore t :which-key "aws")
-         "aaa" 'aws
-         "ac"  'calc
-         "aal" 'aws-login
-         "ak" 'kubel
-         "am" 'mu4e
-         "ap" 'pass
+    (snow/leader-keys
+      ;; general
+      ;; applications
+      "a" '(:ignore t :which-key "applications")
+      "aa" '(:ignore t :which-key "aws")
+      "aaa" 'aws
+      "ac"  'calc
+      "aal" 'aws-login
+      "ak" 'kubel
+      "am" 'mu4e
+      "ap" 'pass
 
-         "b" 'consult-buffer
-         "c" (lambda ()
-               (interactive)
-               (find-file "~/workspace/snow/roles/emacs/files/init.org"))
-         "e" 'dired-jump
+      "b" 'consult-buffer
+      "c" (lambda ()
+            (interactive)
+            (find-file "~/workspace/snow/roles/emacs/files/init.org"))
+      "e" 'dired-jump
 
-         ;; find
-         "f"  '(:ignore t :which-key "find")
-         "fd" 'dired
-         "ff" 'find-file
-         "fi" 'consult-imenu
-         "fr" 'rg
-         "fs" 'consult-line
+      ;; find
+      "f"  '(:ignore t :which-key "find")
+      "fd" 'dired
+      "ff" 'find-file
+      "fi" 'consult-imenu
+      "fr" 'rg
+      "fs" 'consult-line
 
-         ;; git
-         "g"  '(:ignore t :which-key "Git")
-         "gg" 'magit
-         "gb" 'magit-blame
-         "gc" 'magit-clone
-         "gd" 'magit-diff
-         "gl" 'git-link
-         "gw" 'browse-at-remote
+      ;; git
+      "g"  '(:ignore t :which-key "Git")
+      "gg" 'magit
+      "gb" 'magit-blame
+      "gc" 'magit-clone
+      "gd" 'magit-diff
+      "gl" 'git-link
+      "gw" 'browse-at-remote
 
-         ;; help
-         "h" '(:ignore t :which-key "Help")
-         "ha" 'consult-apropos
-         "hf" 'describe-function
-         "hk" 'describe-key
-         "hi" 'info
-         "hp" 'describe-package
-         "hs" 'describe-symbol
-         "hv" 'describe-variable
+      ;; help
+      "h" '(:ignore t :which-key "Help")
+      "ha" 'consult-apropos
+      "hf" 'describe-function
+      "hk" 'describe-key
+      "hi" 'info
+      "hp" 'describe-package
+      "hs" 'describe-symbol
+      "hv" 'describe-variable
 
-         ;; language-server-protocol
-         "l" '(:ignore t :which-key "LSP")
-         "ld" 'lsp-find-definition
-         "lf" 'lsp-format-buffer
-         "li" 'lsp-organize-imports
-         "ln" 'lsp-rename
-         "lr" 'lsp-find-references
-         "ls" 'lsp-describe-session
-         "lt" 'consult-imenu
+      ;; language-server-protocol
+      "l" '(:ignore t :which-key "LSP")
+      "ld" 'lsp-find-definition
+      "lf" 'lsp-format-buffer
+      "li" 'lsp-organize-imports
+      "ln" 'lsp-rename
+      "lr" 'lsp-find-references
+      "ls" 'lsp-describe-session
+      "lt" 'consult-imenu
 
-         ;; org mode
-         "o"    '(:ignore t :which-key "Org Mode")
-         "oa"   'org-agenda
-         "oc"   'org-capture
-         "or"   '(:ignore t :which-key "Roam")
-         "ord"  '(:ignore t :which-key "Daily")
-         "ordt" 'org-roam-dailies-capture-today
-         "ordT" 'org-roam-dailies-goto-today
-         "ordy" 'org-roam-dailies-capture-yesterday
-         "ordY" 'org-roam-dailies-goto-yesterday
-         "ordd" 'org-roam-dailies-capture-date
-         "ordD" 'org-roam-dailies-goto-date
-         "orf"  'org-roam-node-find
-         "ort"  'org-roam-buffer-toggle
-         "os"   'snow/rg-org
+      ;; org mode
+      "o"    '(:ignore t :which-key "Org Mode")
+      "oa"   'org-agenda
+      "oc"   'org-capture
+      "or"   '(:ignore t :which-key "Roam")
+      "ord"  '(:ignore t :which-key "Daily")
+      "ordt" 'org-roam-dailies-capture-today
+      "ordT" 'org-roam-dailies-goto-today
+      "ordy" 'org-roam-dailies-capture-yesterday
+      "ordY" 'org-roam-dailies-goto-yesterday
+      "ordd" 'org-roam-dailies-capture-date
+      "ordD" 'org-roam-dailies-goto-date
+      "orf"  'org-roam-node-find
+      "ort"  'org-roam-buffer-toggle
+      "os"   'snow/rg-org
 
-         ;;tab-bar-mode
-         "t" '(:ignore t :which-key "Tabs")
-         "tc" 'tab-close
-         "tn" 'tab-new
-         "tr" 'tab-bar-rename-tab
-         "tt" 'tab-bar-select-tab-by-name
+      ;;tab-bar-mode
+      "t" '(:ignore t :which-key "Tabs")
+      "tc" 'tab-close
+      "tn" 'tab-new
+      "tr" 'tab-bar-rename-tab
+      "tt" 'tab-bar-select-tab-by-name
 
-         "w" '(:ignore t :which-key "Window")
-         "ww" 'hydra-scale-window/body
-         "wf" 'hydra-scale-font/body
+      "w" '(:ignore t :which-key "Window")
+      "ww" 'hydra-scale-window/body
+      "wf" 'hydra-scale-font/body
 
-         "y" 'yas-insert-snippet
+      "y" 'yas-insert-snippet
 
-         "/"  'rg-menu
-         ":"  'execute-extended-command
-         )
+      "/"  'rg-menu
+      ":"  'execute-extended-command
+      )
 
-       ;; local-leader key mappings
-       (general-create-definer snow/local-leader-keys
-         :prefix ",")
+    ;; local-leader key mappings
+    (general-create-definer snow/local-leader-keys
+      :prefix ",")
 
-       ;; dart-mode
-       (snow/local-leader-keys
-         :states 'normal
-         :keymaps 'dart-mode-map
-         "h" 'flutter-run-or-hot-reload
-         "r" 'flutter-hot-restart
-         )
+    ;; dart-mode
+    (snow/local-leader-keys
+      :states 'normal
+      :keymaps 'dart-mode-map
+      "h" 'flutter-run-or-hot-reload
+      "r" 'flutter-hot-restart
+      )
 
-       ;; json-mode
-       (snow/local-leader-keys
-         :states 'normal
-         :keymaps 'json-mode-map
-         "f" 'json-pretty-print-buffer
-         )
-       ;; jsonnet-mode
-       (snow/local-leader-keys
-         :states 'normal
-         :keymaps 'jsonnet-mode-map
-         "f" 'jsonnet-reformat-buffer
-         )
-       ;; emacs-lisp-mode
-       (snow/local-leader-keys
-         :states 'normal
-         :keymaps 'emacs-lisp-mode-map
-         "e" '(:ignore t :which-key "eval")
-         "eb" 'eval-buffer
-         "ee" 'eval-last-sexp
-         "ef" 'eval-defun
-         "l" 'package-lint-current-buffer
-         )
+    ;; json-mode
+    (snow/local-leader-keys
+      :states 'normal
+      :keymaps 'json-mode-map
+      "f" 'json-pretty-print-buffer
+      )
+    ;; jsonnet-mode
+    (snow/local-leader-keys
+      :states 'normal
+      :keymaps 'jsonnet-mode-map
+      "f" 'jsonnet-reformat-buffer
+      )
+    ;; emacs-lisp-mode
+    (snow/local-leader-keys
+      :states 'normal
+      :keymaps 'emacs-lisp-mode-map
+      "e" '(:ignore t :which-key "eval")
+      "eb" 'eval-buffer
+      "ee" 'eval-last-sexp
+      "ef" 'eval-defun
+      "l" 'package-lint-current-buffer
+      )
 
-       ;; ledger-mode
-       (snow/local-leader-keys
-         :states 'normal
-         :keymaps 'ledger-mode-map
-         "r" 'ledger-reconcile
-         "a" 'ledger-add-transaction
-         "c" 'ledger-occur
-         "p" 'ledger-report
-         )
+    ;; ledger-mode
+    (snow/local-leader-keys
+      :states 'normal
+      :keymaps 'ledger-mode-map
+      "r" 'ledger-reconcile
+      "a" 'ledger-add-transaction
+      "c" 'ledger-occur
+      "p" 'ledger-report
+      )
 
-       ;; lisp-interaction-mode
-       (snow/local-leader-keys
-         :states 'normal
-         :keymaps 'lisp-interaction-mode-map
-         "e" 'eval-print-last-sexp
-         )
+    ;; lisp-interaction-mode
+    (snow/local-leader-keys
+      :states 'normal
+      :keymaps 'lisp-interaction-mode-map
+      "e" 'eval-print-last-sexp
+      )
 
-       ;; mu4e-compose-mode
-       (snow/local-leader-keys
-         :states 'normal
-         :keymaps 'mu4e-compose-mode-map
-         "a" 'mml-attach-file
-         "cc" 'message-goto-cc
-         "bcc" 'message-goto-bcc)
+    ;; mu4e-compose-mode
+    (snow/local-leader-keys
+      :states 'normal
+      :keymaps 'mu4e-compose-mode-map
+      "a" 'mml-attach-file
+      "cc" 'message-goto-cc
+      "bcc" 'message-goto-bcc)
 
-       ;; org-mode
-       (snow/local-leader-keys
-         :states 'normal
-         :keymaps 'org-mode-map
-         "RET" 'org-open-at-point
-         "g"   '(:ignore t :which-key "go to")
-         "gg"  'consult-org-heading
-         "gp"  'org-previous-visible-heading
-         "i"   'org-toggle-inline-images
-         "l"   'org-insert-link
-         "o"   'org-agenda-open-link
-         "p"   'org-plot/gnuplot
-         "r"   '(:ignore t :which-key "Org Roam")
-         "ra"  'org-roam-alias-add
-         "ri"  'org-roam-node-insert
-         "t"   'org-set-tags-command
-         ","   'org-ctrl-c-ctrl-c
-         "0"   'snow/org-start-presentation
-         "$"   'org-archive-subtree
-         )
+    ;; org-mode
+    (snow/local-leader-keys
+      :states 'normal
+      :keymaps 'org-mode-map
+      "RET" 'org-open-at-point
+      "g"   '(:ignore t :which-key "go to")
+      "gg"  'consult-org-heading
+      "gp"  'org-previous-visible-heading
+      "i"   'org-toggle-inline-images
+      "l"   'org-insert-link
+      "o"   'org-agenda-open-link
+      "p"   'org-plot/gnuplot
+      "r"   '(:ignore t :which-key "Org Roam")
+      "ra"  'org-roam-alias-add
+      "ri"  'org-roam-node-insert
+      "t"   'org-set-tags-command
+      ","   'org-ctrl-c-ctrl-c
+      "0"   'snow/org-start-presentation
+      "$"   'org-archive-subtree
+      )
 
-       ;; vterm-mode
-       (snow/local-leader-keys
-         :states 'normal
-         :keymaps 'vterm-mode-map
-         "p" 'vterm-yank
-         :config
-         (setq vterm-shell "/opt/homebrew/bin/fish")
-         )
-       )
-   #+END_SRC
+    ;; vterm-mode
+    (snow/local-leader-keys
+      :states 'normal
+      :keymaps 'vterm-mode-map
+      "p" 'vterm-yank
+      :config
+      (setq vterm-shell "/opt/homebrew/bin/fish")
+      )
+    )
+#+END_SRC
 
 ** Hydra
-   #+BEGIN_SRC emacs-lisp
-     (use-package hydra)
+#+BEGIN_SRC emacs-lisp
+  (use-package hydra)
 
-     (defhydra hydra-scale-window (:timeout 4)
-       "scale window"
-       ("l" enlarge-window-horizontally "h+")
-       ("h" shrink-window-horizontally "h-")
-       ("k" enlarge-window "v+")
-       ("j" shrink-window "v-")
-       ("q" nil "finished" :exit t))
+  (defhydra hydra-scale-window (:timeout 4)
+    "scale window"
+    ("l" enlarge-window-horizontally "h+")
+    ("h" shrink-window-horizontally "h-")
+    ("k" enlarge-window "v+")
+    ("j" shrink-window "v-")
+    ("q" nil "finished" :exit t))
 
-     (defhydra hydra-scale-font (:timeout 4)
-       "scale text"
-       ("j" text-scale-increase "+")
-       ("k" text-scale-decrease "-")
-       ("q" nil "finished" :exit t))
-   #+END_SRC
+  (defhydra hydra-scale-font (:timeout 4)
+    "scale text"
+    ("j" text-scale-increase "+")
+    ("k" text-scale-decrease "-")
+    ("q" nil "finished" :exit t))
+#+END_SRC
 * IRC
-  #+BEGIN_SRC emacs-lisp
-    (use-package erc
-      :custom
-      (erc-prompt-for-password nil)
-      (erc-modules '(autojoin fill notifications stamp track))
-      (erc-autojoin-timing 'ident)
-      (erc-autojoin-channels-alist '(("libera.chat" "#systemcrafters" "#emacs")))
-      (erc-rename-buffers t)
-      (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY"))
-      (erc-hide-list '("JOIN" "NICK" "PART" "QUIT" "MODE" "AWAY"))
-      (erc-timestamp-only-if-changed-flag nil)
-      (erc-timestamp-format "%H:%M ")
-      (erc-insert-timestamp-function 'erc-insert-timestamp-left)
-      (erc-fill-prefix "      ")
-      (erc-fill-column 120)
-      :config
-      (setq erc-prompt-for-nickserv-password nil))
+#+BEGIN_SRC emacs-lisp
+  (use-package erc
+    :custom
+    (erc-prompt-for-password nil)
+    (erc-modules '(autojoin fill notifications stamp track))
+    (erc-autojoin-timing 'ident)
+    (erc-autojoin-channels-alist '(("libera.chat" "#systemcrafters" "#emacs")))
+    (erc-rename-buffers t)
+    (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY"))
+    (erc-hide-list '("JOIN" "NICK" "PART" "QUIT" "MODE" "AWAY"))
+    (erc-timestamp-only-if-changed-flag nil)
+    (erc-timestamp-format "%H:%M ")
+    (erc-insert-timestamp-function 'erc-insert-timestamp-left)
+    (erc-fill-prefix "      ")
+    (erc-fill-column 120)
+    :config
+    (setq erc-prompt-for-nickserv-password nil))
 
-    (use-package erc-hl-nicks
-      :after erc
-      :config
-      (add-to-list 'erc-modules 'hl-nicks))
+  (use-package erc-hl-nicks
+    :after erc
+    :config
+    (add-to-list 'erc-modules 'hl-nicks))
 
-    (defun snow/erc ()
-      "Join ERC with default settings."
-      (interactive)
-      (erc-tls
-       :server "irc.libera.chat"
-       :port "6697"
-       :nick "snowiow"))
-  #+END_SRC
+  (defun snow/erc ()
+    "Join ERC with default settings."
+    (interactive)
+    (erc-tls
+     :server "irc.libera.chat"
+     :port "6697"
+     :nick "snowiow"))
+#+END_SRC
 
 * Languages
 ** Clojure
-   #+BEGIN_SRC emacs-lisp
-     (use-package cider)
-     (use-package clojure-mode)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package cider)
+  (use-package clojure-mode)
+#+END_SRC
 ** Dart
-   #+BEGIN_SRC emacs-lisp
-     (use-package dart-mode
-       :hook
-       (dart-mode . flutter-test-mode))
+#+BEGIN_SRC emacs-lisp
+  (use-package dart-mode
+    :hook
+    (dart-mode . flutter-test-mode))
 
-     (use-package flutter
-       :after dart-mode
-       :custom
-       (flutter-sdk-path "~/flutter/"))
+  (use-package flutter
+    :after dart-mode
+    :custom
+    (flutter-sdk-path "~/flutter/"))
 
-     (use-package flutter-l10n-flycheck
-       :after flutter
-       :config
-       (flutter-l10n-flycheck-setup))
+  (use-package flutter-l10n-flycheck
+    :after flutter
+    :config
+    (flutter-l10n-flycheck-setup))
 
-     (use-package lsp-dart
-       :after lsp
-       :hook
-       (dart-mode . lsp))
-   #+END_SRC
+  (use-package lsp-dart
+    :after lsp
+    :hook
+    (dart-mode . lsp))
+#+END_SRC
 ** Docker
-   #+BEGIN_SRC emacs-lisp
-     (use-package dockerfile-mode)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package dockerfile-mode)
+#+END_SRC
 ** Elisp
-   #+BEGIN_SRC emacs-lisp
-     (use-package package-lint)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package package-lint)
+#+END_SRC
 ** Go
-   #+BEGIN_SRC emacs-lisp
-     (use-package go-mode)
+#+BEGIN_SRC emacs-lisp
+  (use-package go-mode)
 
-     (use-package go-tag)
+  (use-package go-tag)
 
-     (use-package gotests
-       :load-path "~/.emacs.d/packages/GoTests-Emacs")
-   #+END_SRC
+  (use-package gotests
+    :load-path "~/.emacs.d/packages/GoTests-Emacs")
+#+END_SRC
 ** Json
-   #+BEGIN_SRC emacs-lisp
-     (use-package json-mode
-       :config
-       (add-hook 'json-mode-hook (function (lambda ()
-                                             (setq evil-shift-width 2)))))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package json-mode
+    :config
+    (add-hook 'json-mode-hook (function (lambda ()
+                                          (setq evil-shift-width 2)))))
+#+END_SRC
 ** Jsonnet
-   #+BEGIN_SRC emacs-lisp
-     (use-package jsonnet-mode)
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package jsonnet-mode)
+#+END_SRC
 ** Ledger
-   #+BEGIN_SRC emacs-lisp
+#+BEGIN_SRC emacs-lisp
 
-     (use-package ledger-mode)
-   #+END_SRC
+  (use-package ledger-mode)
+#+END_SRC
 ** Markdown
-   #+BEGIN_SRC emacs-lisp
-     (use-package markdown-mode
-       :after (flyspell-mode auto-fill-mode)
-       :mode (("README\\.md\\'" . gfm-mode)
-              ("\\.md\\'" . markdown-mode)
-              ("\\.markdown\\'" . markdown-mode))
-       :init (setq markdown-command "multimarkdown")
-       :hook
-       (markdown-mode . flyspell-mode)
-       (markdown-mode . auto-fill-mode))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package markdown-mode
+    :after (flyspell-mode auto-fill-mode)
+    :mode (("README\\.md\\'" . gfm-mode)
+           ("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "multimarkdown")
+    :hook
+    (markdown-mode . flyspell-mode)
+    (markdown-mode . auto-fill-mode))
+#+END_SRC
 ** Python
-   #+BEGIN_SRC emacs-lisp
-     (use-package pyvenv
-       :diminish
-       :config
-       (setq pyvenv-mode-line-indicator
-             '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
-       (pyvenv-mode +1))
+#+BEGIN_SRC emacs-lisp
+  (use-package pyvenv
+    :diminish
+    :config
+    (setq pyvenv-mode-line-indicator
+          '(pyvenv-virtual-env-name ("[venv:" pyvenv-virtual-env-name "] ")))
+    (pyvenv-mode +1))
 
-     (use-package python-mode)
-   #+END_SRC
+  (use-package python-mode)
+#+END_SRC
 ** Terraform
-   #+BEGIN_SRC emacs-lisp
-     (use-package terraform-mode
-       :hook
-       (terraform-mode . terraform-format-on-save-mode))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package terraform-mode
+    :hook
+    (terraform-mode . terraform-format-on-save-mode))
+#+END_SRC
 ** Typescript
-   #+BEGIN_SRC emacs-lisp
-     (use-package typescript-mode
-       :custom
-       (typescript-indent-level 2))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package typescript-mode
+    :custom
+    (typescript-indent-level 2))
+#+END_SRC
 ** Yaml
-   #+BEGIN_SRC emacs-lisp
-     (use-package yaml-mode
-       :after highlight-indent-guides-mode
-       :config
-       (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
-       (add-hook 'yaml-mode-hook (function (lambda ()
-                                             (setq evil-shift-width 2))))
-       :hook
-       (yaml-mode . highlight-indent-guides-mode))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package yaml-mode
+    :after highlight-indent-guides-mode
+    :config
+    (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
+    (add-hook 'yaml-mode-hook (function (lambda ()
+                                          (setq evil-shift-width 2))))
+    :hook
+    (yaml-mode . highlight-indent-guides-mode))
+#+END_SRC
 * Navigation
-  #+BEGIN_SRC emacs-lisp
-        (use-package vertico
-          :init
-          (vertico-mode)
-          :custom
-          (vertico-cycle t)
-          :bind
-          (:map vertico-map
-                ("C-j" . vertico-next)
-                ("C-k" . vertico-previous)
-                ("C-^" . vertico-first)
-                ("C-$" . vertico-last)
-                ("C-e" . vertico-exit-input)))
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package vertico
+  ;;   :init
+  ;;   (vertico-mode)
+  ;;   :custom
+  ;;   (vertico-cycle t)
+  ;;   :bind
+  ;;   (:map vertico-map
+  ;;         ("C-j" . vertico-next)
+  ;;         ("C-k" . vertico-previous)
+  ;;         ("C-^" . vertico-first)
+  ;;         ("C-$" . vertico-last)
+  ;;         ("C-e" . vertico-exit-input)))
 
-        (use-package orderless
-          :init
-          (setq completion-styles '(orderless basic)
-                completion-category-defaults nil
-                completion-category-overrides '((file (styles partial-completion)))))
+  (use-package icomplete
+    :ensure nil
+    :init
+    (icomplete-vertical-mode t)
+    :bind (:map icomplete-vertical-mode-minibuffer-map
+                ("<return>" . 'icomplete-force-complete-and-exit))
+    :config
+    (define-key minibuffer-local-completion-map " " 'self-insert-command)
+    (setq icomplete-show-matches-on-no-input t))
 
-        (use-package marginalia
-          :bind (:map minibuffer-local-map
-                      ("M-A" . marginalia-cycle))
-          :init
-          (marginalia-mode))
+  (use-package orderless
+    :init
+    (setq completion-styles '(orderless basic)
+          completion-category-defaults nil
+          completion-category-overrides '((file (styles partial-completion)))))
 
-        (use-package consult)
+  (use-package marginalia
+    :bind (:map minibuffer-local-map
+                ("M-A" . marginalia-cycle))
+    :init
+    (marginalia-mode))
 
-        (use-package embark
-          :bind
-          (("C-a" . embark-act)       
-           ("C-e" . embark-dwim)       
-           ("C-h B" . embark-bindings)))
+  (use-package consult)
 
-        (use-package embark-consult
-          :ensure t
-          :after (embark consult))
+  (use-package embark
+    :bind
+    (("C-a" . embark-act)       
+     ("C-e" . embark-dwim)       
+     ("C-h B" . embark-bindings)))
 
-        (defun snow/dired-open-locally ()
-          "Make a local file copy of the remote file under the cursor in dired and
-                           opens it.  Mainly used to open pdfs or other complex formats From remote machines"
-          (interactive)
-          (let* ((filename (dired-get-filename nil t))
-                 (local-tmp-file (file-local-copy filename)))
-            (find-file local-tmp-file)))
+  (use-package embark-consult
+    :ensure t
+    :after (embark consult))
 
-        (use-package dired
-          :ensure nil
-          :commands (dired dired-jump)
-          :config
-          (evil-collection-define-key 'normal 'dired-mode-map
-            "h" 'dired-up-directory
-            "l" 'dired-find-file
-            "L" 'dired-display-file
-            "M" 'snow/dired-open-locally))
-  #+END_SRC
+  (defun snow/dired-open-locally ()
+    "Make a local file copy of the remote file under the cursor in dired and
+                                 opens it.  Mainly used to open pdfs or other complex formats From remote machines"
+    (interactive)
+    (let* ((filename (dired-get-filename nil t))
+           (local-tmp-file (file-local-copy filename)))
+      (find-file local-tmp-file)))
+
+  (use-package dired
+    :ensure nil
+    :commands (dired dired-jump)
+    :config
+    (evil-collection-define-key 'normal 'dired-mode-map
+      "h" 'dired-up-directory
+      "l" 'dired-find-file
+      "L" 'dired-display-file
+      "M" 'snow/dired-open-locally))
+#+END_SRC
+
+#+RESULTS:
+: t
 
 * Programming
 ** Linting
-   #+BEGIN_SRC emacs-lisp
-     (use-package flycheck
-       :init
-       (global-flycheck-mode)
-       :custom
-       (flycheck-check-syntax-automatically '(save new-line mode-enabled)))
-   #+END_SRC
+#+BEGIN_SRC emacs-lisp
+  (use-package flycheck
+    :init
+    (global-flycheck-mode)
+    :custom
+    (flycheck-check-syntax-automatically '(save new-line mode-enabled)))
+#+END_SRC
 ** LSP Mode
-   #+BEGIN_SRC emacs-lisp
-     (setq gc-cons-threshold 100000000)
-     (setq read-process-output-max (* 1024 1024)) ;; 1mb
+#+BEGIN_SRC emacs-lisp
+  (setq gc-cons-threshold 100000000)
+  (setq read-process-output-max (* 1024 1024)) ;; 1mb
 
-     (use-package lsp-mode
-       :commands lsp
-       :hook
-       (go-mode . lsp)
-       (python-mode . lsp)
-       (javascript-mode . lsp)
-       ;; (terraform-mode . lsp) ;; currently not working properly
-       (typescript-mode . lsp)
-       :init
-       (setq lsp-headerline-breadcrumb-enable t)
-       :config
-       (setq lsp-file-watch-threshold 5000))
-   #+END_SRC
+  (use-package lsp-mode
+    :commands lsp
+    :hook
+    (go-mode . lsp)
+    (python-mode . lsp)
+    (javascript-mode . lsp)
+    ;; (terraform-mode . lsp) ;; currently not working properly
+    (typescript-mode . lsp)
+    :init
+    (setq lsp-headerline-breadcrumb-enable t)
+    :config
+    (setq lsp-file-watch-threshold 5000))
+#+END_SRC
 ** Tree Sitter
-   #+BEGIN_SRC emacs-lisp
-     ;; (use-package tree-sitter
-     ;;   :config
-     ;;   (global-tree-sitter-mode)
-     ;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package tree-sitter
+  ;;   :config
+  ;;   (global-tree-sitter-mode)
+  ;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
-     ;; (use-package tree-sitter-langs)
-   #+END_SRC
+  ;; (use-package tree-sitter-langs)
+#+END_SRC
 * Project Management
 
 ** project.el
@@ -1106,14 +1119,9 @@ This snippet adds an advice around the =project-switch-project= function to auto
 * Shell
 ** Eshell
 #+BEGIN_SRC emacs-lisp
-  (defun snow/eshell-config ()
-    (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
-    (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
-    (define-key eshell-mode-map (kbd "<down>") 'eshell-next-input)
-    (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history))
-
   (defun snow/eshell-prompt ()
-    (let ((current-branch (magit-get-current-branch))
+    (let (
+          (current-branch (magit-get-current-branch))
           (aws-vault (getenv "AWS_VAULT"))
           (k8s-context (shell-command-to-string "kubectl config current-context")))
       (concat
@@ -1130,15 +1138,23 @@ This snippet adds an advice around the =project-switch-project= function to auto
        "\n"
        (propertize (eshell/pwd) 'face `(:foreground "#819fbb"))
        "\n"
-       (propertize "$ " 'face `(:foreground "white"))
-       )))
+       (propertize "$ " 'face `(:foreground "white")))))
+
+  (defun snow/eshell-config ()
+    (eshell-hist-initialize)
+    (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
+    (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
+    (define-key eshell-mode-map (kbd "<down>") 'eshell-next-input)
+    (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history))
 
   (use-package eshell
     :hook
     (eshell-first-time-mode . snow/eshell-config)
     (eshell-pre-command . eshell-save-some-history)
     :custom
-    (eshell-prompt-function 'snow/eshell-prompt))
+    (eshell-prompt-function 'snow/eshell-prompt)
+                                          ; needs to match the custum prompt
+    (eshell-prompt-regexp "^$ "))
 
   (use-package esh-autosuggest
     :hook (eshell-mode . esh-autosuggest-mode)
