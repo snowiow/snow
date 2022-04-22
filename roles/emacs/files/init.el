@@ -356,7 +356,6 @@
  '((emacs-lisp . t)
    (eshell . t)
    (gnuplot . t)
-   ;; (ledger . t)
    (python . t)
    (shell . t)
    (typescript . t)))
@@ -783,7 +782,8 @@
 (use-package json-mode
   :config
   (add-hook 'json-mode-hook (function (lambda ()
-                                        (setq evil-shift-width 2)))))
+                                        (setq evil-shift-width 2
+                                              js-indent-level 2)))))
 
 (use-package jsonnet-mode)
 
