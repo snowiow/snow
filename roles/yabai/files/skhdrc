@@ -2,10 +2,10 @@
 alt - return : open -n /Applications/Alacritty.app
 
 # focus window
-alt - h : yabai -m window --focus west
-alt - j : yabai -m window --focus south
-alt - k : yabai -m window --focus north
-alt - l : yabai -m window --focus east
+alt - m : yabai -m window --focus west
+alt - n : yabai -m window --focus south
+alt - e : yabai -m window --focus north
+alt - i : yabai -m window --focus east
 
 # swap window
 # ctrl + cmd - h : yabai -m window --swap west
@@ -166,13 +166,13 @@ ctrl + alt - d : yabai -m space --layout float
 ctrl + alt - s : yabai -m space --layout stack
 
 # stack cycling
-alt - p : yabai -m query --spaces --space \
+alt - l : yabai -m query --spaces --space \
             | jq -re ".index" \
             | xargs -I{} yabai -m query --windows --space {} \
             | jq -sre "add | map(select(.minimized != 1)) | sort_by(.display, .frame.y, .frame.x, .id) | reverse | nth(index(map(select(.focused == 1))) - 1).id" \
             | xargs -I{} yabai -m window --focus {}
 
-alt - n : yabai -m query --spaces --space \
+alt - h : yabai -m query --spaces --space \
             | jq -re ".index" \
             | xargs -I{} yabai -m query --windows --space {} \
             | jq -sre "add | map(select(.minimized != 1)) | sort_by(.display, .frame.y, .frame.y, .id) | nth(index(map(select(.focused == 1))) - 1).id" \

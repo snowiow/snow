@@ -9,7 +9,16 @@
 (use-package use-package-ensure-system-package
   :ensure t)
 
-(server-start)
+(use-package emacs
+  :custom
+  (global-linum-mode t)
+  :bind
+  ("C-c m" . windmove-left)
+  ("C-c i" . windmove-right)
+  ("C-c e" . windmove-up)
+  ("C-c n" . windmove-down)
+  :config
+  (server-start))
 
 (setq tags-revert-without-query 1)
 
@@ -92,7 +101,9 @@
   (company-minimum-prefix-length 1)
   :hook
   (after-init . global-company-mode)
-  :bind (:map company-active-map
+  :bind
+  ("C-o" . company-complete)
+  (:map company-active-map
               ("M-n" . nil)
               ("M-p" . nil)
               ("C-n" . company-select-next)
@@ -113,11 +124,11 @@
   (clojure-mode . rainbow-delimiters-mode)
   (emacs-lisp-mode . rainbow-delimiters-mode))
 
-(use-package linum-relative
-  :custom
-  (linum-relative-backend 'display-line-numbers-mode)
-  :config
-  (linum-relative-global-mode))
+;; (use-package linum-relative
+;;   :custom
+;;   (linum-relative-backend 'display-line-numbers-mode)
+;;   :config
+;;   (linum-relative-global-mode))
 
 (use-package highlight-indent-guides
   :custom
@@ -152,6 +163,7 @@
                         (compilation-mode :noselect t)
                         (("^\\*eshell.*?\\*" "^\\*vterm.*?\\*") :regexp t :other t :select t)
                         (" *transient*" :align below)
+                        ("*Completions*" :align above :select t)
                         ))
   (setq shackle-default-rule '(:select t))
   (shackle-mode t))
@@ -406,11 +418,11 @@
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
 
-(use-package undo-tree
-  :custom
-  (undo-tree-auto-save-history nil)
-  :config
-  (global-undo-tree-mode))
+;; (use-package undo-tree
+;;   :custom
+;;   (undo-tree-auto-save-history nil)
+;;   :config
+;;   (global-undo-tree-mode))
 
 (defun snow/evil-yank-highlight-advice (orig-fn beg end &rest args)
   "Highlight yanked region."
@@ -427,29 +439,30 @@
   (evil-undo-system 'undo-tree)
   :config
   (advice-add 'evil-yank :around 'snow/evil-yank-highlight-advice)
-  (evil-mode))
+  ;; (evil-mode)
+  )
 
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init '(calc
-                          calendar
-                          dashboard
-                          dired
-                          ediff
-                          eshell
-                          forge
-                          helpful
-                          info
-                          magit
-                          mu4e
-                          package-menu
-                          pass
-                          proced
-                          rg
-                          ripgrep
-                          term
-                          xref)))
+;; (use-package evil-collection
+;;   :after evil
+;;   :config
+;;   (evil-collection-init '(calc
+;;                           calendar
+;;                           dashboard
+;;                           dired
+;;                           ediff
+;;                           eshell
+;;                           forge
+;;                           helpful
+;;                           info
+;;                           magit
+;;                           mu4e
+;;                           package-menu
+;;                           pass
+;;                           proced
+;;                           rg
+;;                           ripgrep
+;;                           term
+;;                           xref)))
 
 (use-package evil-commentary
   :after evil
@@ -575,6 +588,9 @@
     "lr" 'lsp-find-references
     "ls" 'lsp-describe-session
     "lt" 'consult-imenu
+
+    ;; project mode
+    "p"    project-prefix-map
 
     ;; org mode
     "o"    '(:ignore t :which-key "Org Mode")
@@ -716,6 +732,161 @@
   ("k" text-scale-decrease "-")
   ("q" nil "finished" :exit t))
 
+(defun meow-setup ()
+    (setq meow-cheatsheet-layout meow-cheatsheet-layout-colemak)
+    (meow-motion-overwrite-define-key
+     ;; Use e to move up, n to move down.
+     ;; Since special modes usually use n to move down, we only overwrite e here.
+     '("e" . meow-prev)
+     '("<escape>" . ignore))
+    (meow-leader-define-key
+     '("?" . meow-cheatsheet)
+     ;; To execute the originally e in MOTION state, use SPC e.
+     '("e" . "H-e")
+     '("1" . meow-digit-argument)
+     '("2" . meow-digit-argument)
+     '("3" . meow-digit-argument)
+     '("4" . meow-digit-argument)
+     '("5" . meow-digit-argument)
+     '("6" . meow-digit-argument)
+     '("7" . meow-digit-argument)
+     '("8" . meow-digit-argument)
+     '("9" . meow-digit-argument)
+     '("0" . meow-digit-argument)
+     ;; major modes
+     '("a a a" . aws)
+     '("a a l" . aws-login)
+     '("a a i" . aws-organizations-get-account-id)
+     '("a a n" . aws-organizations-get-account-name)
+     '("a c" . calc)
+     '("a k" . kubel)
+     '("a m" . mu4e)
+     '("a p" . pass)
+     ;; LSP Mode
+     '("l d" . lsp-find-definition)
+     '("l f" . lsp-format-buffer)
+     '("l i" . lsp-organize-imports)
+     '("l n" . lsp-rename)
+     '("l r" . lsp-find-references)
+     '("l s" . lsp-describe-session)
+     '("l t" . consult-imenu)
+     ;; org mode
+     '("o a"     . org-agenda)
+     '("o c"     . org-capture)
+     '("o r d t" . org-roam-dailies-capture-today)
+     '("o r d T" . org-roam-dailies-goto-today)
+     '("o r d y" . org-roam-dailies-capture-yesterday)
+     '("o r d Y" . org-roam-dailies-goto-yesterday)
+     '("o r d d" . org-roam-dailies-capture-date)
+     '("o r d D" . org-roam-dailies-goto-date)
+     '("o r f"   . org-roam-node-find)
+     '("o r t"   . org-roam-buffer-toggle)
+     '("o s"     . snow/rg-org)
+     ;; project mode
+     '("p b" . project-switch-to-buffer)
+     '("p c" . project-compile)
+     '("p e" . project-eshell)
+     '("p f" . project-find-file)
+     '("p s" . project-find-regexp)
+     '("p g" . magit-status)
+     '("p p" . project-switch-project)
+     '("p r" . project-query-replace-regexp)
+     ;; tab management
+     '("t c" . tab-close)
+     '("t n" . tab-new)
+     '("t r" . tab-bar-rename-tab)
+     '("t t" . tab-bar-select-tab-by-name)
+     ;; window movement
+     '("w m" . windmove-left)
+     '("w n" . windmove-down)
+     '("w e" . windmove-up)
+     '("w i" . windmove-right)
+     '("w s" . split-window-below)
+     '("w v" . split-window-right)
+     '("w o" . delete-other-windows)
+     '("w q" . delete-window)
+     '("w =" . balance-windows))
+    (meow-normal-define-key
+     '("0" . meow-expand-0)
+     '("1" . meow-expand-1)
+     '("2" . meow-expand-2)
+     '("3" . meow-expand-3)
+     '("4" . meow-expand-4)
+     '("5" . meow-expand-5)
+     '("6" . meow-expand-6)
+     '("7" . meow-expand-7)
+     '("8" . meow-expand-8)
+     '("9" . meow-expand-9)
+     '("-" . negative-argument)
+     '(";" . meow-reverse)
+     '("," . meow-inner-of-thing)
+     '("." . meow-bounds-of-thing)
+     '("[" . meow-beginning-of-thing)
+     '("]" . meow-end-of-thing)
+     '("/" . meow-visit)
+     '("s" . meow-append)
+     '("S" . meow-open-below)
+     '("b" . meow-back-word)
+     '("B" . meow-back-symbol)
+     '("c" . meow-change)
+     '("C" . meow-comment)
+     '("d" . meow-delete)
+     '("D" . meow-page-down)
+     '("e" . meow-prev)
+     '("E" . meow-prev-expand)
+     '("f" . meow-find)
+     '("F" . meow-page-up)
+     '("g" . meow-cancel-selection)
+     '("G" . meow-grab)
+     '("m" . meow-left)
+     '("M" . meow-left-expand)
+     '("i" . meow-right)
+     '("I" . meow-right-expand)
+     '("j" . meow-join)
+     '("k" . meow-kill)
+     '("l" . meow-line)
+     '("L" . meow-goto-line)
+     '("h" . meow-mark-word)
+     '("H" . meow-mark-symbol)
+     '("n" . meow-next)
+     '("N" . meow-next-expand)
+     '("o" . meow-block)
+     '("O" . meow-to-block)
+     '("p" . meow-yank)
+     '("P" . meow-clipboard-yank)
+     '("q" . meow-quit)
+     '("r" . meow-replace)
+     '("a" . meow-insert)
+     '("A" . meow-open-above)
+     '("t" . meow-till)
+     '("u" . meow-undo)
+     '("U" . meow-undo-in-selection)
+     '("v" . meow-search)
+     '("w" . meow-next-word)
+     '("W" . meow-next-symbol)
+     '("x" . meow-delete)
+     '("X" . meow-backward-delete)
+     '("y" . meow-save)
+     '("Y" . meow-clipboard-save)
+     '("z" . meow-pop-selection)
+     '("'" . repeat)
+     '("=" . meow-indent)
+     '("!" . meow-find-ref)
+     '("<escape>" . ignore)
+     ))
+
+  (use-package meow
+    :custom
+    (meow-use-cursor-position-hack t)
+    :config
+    (meow-setup)
+    (meow-global-mode 1)
+    (meow-thing-register 'tags
+                         '(regexp "<.+>" "</.+>")
+                         '(regexp "<.+>" "</.+>"))
+(add-to-list 'meow-char-thing-table '(?t . tags))
+    )
+
 (use-package erc
   :custom
   (erc-prompt-for-password nil)
@@ -726,7 +897,7 @@
   (erc-track-exclude-types '("JOIN" "NICK" "QUIT" "MODE" "AWAY"))
   (erc-hide-list '("JOIN" "NICK" "PART" "QUIT" "MODE" "AWAY"))
   (erc-timestamp-only-if-changed-flag nil)
-  (erc-timestamp-format "%H:%M ")
+ (erc-timestamp-format "%H:%M ")
   (erc-insert-timestamp-function 'erc-insert-timestamp-left)
   (erc-fill-prefix "      ")
   (erc-fill-column 120)
@@ -825,19 +996,6 @@
   :hook
   (yaml-mode . highlight-indent-guides-mode))
 
-;; (use-package vertico
-;;   :init
-;;   (vertico-mode)
-;;   :custom
-;;   (vertico-cycle t)
-;;   :bind
-;;   (:map vertico-map
-;;         ("C-j" . vertico-next)
-;;         ("C-k" . vertico-previous)
-;;         ("C-^" . vertico-first)
-;;         ("C-$" . vertico-last)
-;;         ("C-e" . vertico-exit-input)))
-
 (use-package icomplete
   :ensure nil
   :init
@@ -863,6 +1021,10 @@
 (use-package consult)
 
 (use-package embark
+  :custom
+  (embark-quit-after-action nil)
+  :config
+  (setq prefix-help-command #'embark-prefix-help-command)
   :bind
   (("C-a" . embark-act)       
    ("C-e" . embark-dwim)       
@@ -883,6 +1045,9 @@
 (use-package dired
   :ensure nil
   :commands (dired dired-jump)
+  :bind (:map dired-mode-map
+  ("m" . dired-up-directory)
+  ("i" . dired-find-file))
   :config
   (evil-collection-define-key 'normal 'dired-mode-map
     "h" 'dired-up-directory
@@ -918,6 +1083,10 @@
 ;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
 ;; (use-package tree-sitter-langs)
+
+;; (use-package project
+;;   :ensure nil
+;;   :bind-keymap ("C-c p" . project-prefix-map))
 
 (cl-defmethod project-root ((project (head local)))
   (cdr project))
@@ -1003,7 +1172,9 @@
   :custom
   (auth-sources '(password-store)))
 
-(use-package browse-at-remote)
+(use-package browse-at-remote
+  :bind
+  ("C-c g w" . browse-at-remote))
 
 (use-package forge)
 
@@ -1013,7 +1184,11 @@
 
 (use-package github-review)
 
-(use-package magit)
+(use-package magit
+  :bind
+  ("C-c g g" . magit-status)
+  ("C-c g c" . magit-clone)
+  ("C-c g b" . magit-blame))
 
 (use-package mu4e
   :ensure nil
@@ -1095,7 +1270,8 @@
   :load-path "~/.emacs.d/packages/awscli"
   :custom
   (aws-vault t)
-  (aws-output "yaml"))
+  (aws-output "yaml")
+  (aws-organizations-account "moia"))
 
 (use-package aws-evil
   :after aws-mode

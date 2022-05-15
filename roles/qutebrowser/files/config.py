@@ -2020,6 +2020,7 @@ c.url.searchengines = {
     'ddg': 'https://duckduckgo.com/?q={}',
     'g': 'https://www.google.com/search?hl=en&q={}',
     's': 'https://searx.be/search?q={}',
+    'gh': 'https://github.com/search?q={}'
 }
 
 ## Page(s) to open at the start.
