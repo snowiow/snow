@@ -12,6 +12,7 @@
 (use-package emacs
   :custom
   (global-linum-mode t)
+  (xref-search-program 'ripgrep)
   :bind
   ("C-c m" . windmove-left)
   ("C-c i" . windmove-right)
@@ -28,6 +29,10 @@
 (setq ring-bell-function 'ignore)
 
 (use-package helpful
+  :bind
+  ("C-h f" .  helpful-callable)
+  ("C-h v" . helpful-variable)
+  ( "C-h k" . helpful-key)
   :custom
   (counsel-describe-function-function #'helpful-callable)
   (counsel-describe-variable-function #'helpful-variable))
@@ -74,6 +79,7 @@
                       :height 140))
 
 (setq mac-option-modifier 'super)
+(setq mac-right-option-modifier nil)
 (setq mac-command-modifier 'meta)
 
 (use-package exec-path-from-shell
@@ -305,10 +311,6 @@
                                    "Todos")
            "* TODO %?"))))
 
-(defun snow/rg-org (regexp)
-  "Do a REGEXP search in org files in the org directory."
-  (interactive "sRegexp: ")
-  (rg regexp "*.org" org-directory))
 
 (defun org-summary-todo (n-done n-not-done)
   "Switch entry to DONE when all subentries are done, to TODO otherwise."
@@ -488,233 +490,233 @@
   :custom
   (global-evil-surround-mode 1))
 
-(use-package general
-  :after consult
-  :config
-  (general-evil-setup t)
-  (general-define-key
-   "C-+" 'text-scale-increase
-   "C--" 'text-scale-decrease
-   ;; "C-k" 'previous-line
-   )
+;; (use-package general
+;;   :after consult
+;;   :config
+;;   (general-evil-setup t)
+;;   (general-define-key
+;;    "C-+" 'text-scale-increase
+;;    "C--" 'text-scale-decrease
+;;    ;; "C-k" 'previous-line
+;;    )
 
-  ;; general normal mappings
-  (general-nmap
-    "C-c +" 'evil-numbers/inc-at-pt
-    "C-c -" 'evil-numbers/dec-at-pt)
+;;   ;; general normal mappings
+;;   (general-nmap
+;;     "C-c +" 'evil-numbers/inc-at-pt
+;;     "C-c -" 'evil-numbers/dec-at-pt)
 
-  ;; org-mode mappings
-  (general-define-key
-   :keymaps 'org-mode-map
-   :states 'normal
-   "RET"  'org-open-at-point)
+;;   ;; org-mode mappings
+;;   (general-define-key
+;;    :keymaps 'org-mode-map
+;;    :states 'normal
+;;    "RET"  'org-open-at-point)
 
-  ;; org-agenda-mode mappings
-  (general-define-key
-   :keymaps 'org-agenda-mode-map
-   "<"  'org-agenda-earlier
-   ">"  'org-agenda-later)
+;;   ;; org-agenda-mode mappings
+;;   (general-define-key
+;;    :keymaps 'org-agenda-mode-map
+;;    "<"  'org-agenda-earlier
+;;    ">"  'org-agenda-later)
 
-  ;; emacs-lisp-mode mappings
-  (general-define-key
-   :states 'visual
-   :keymaps 'emacs-lisp-mode-map
-   "e" 'eval-region)
+;;   ;; emacs-lisp-mode mappings
+;;   (general-define-key
+;;    :states 'visual
+;;    :keymaps 'emacs-lisp-mode-map
+;;    "e" 'eval-region)
 
-  ;; evil-insert-state mappings
-  (general-define-key
-   :keymaps 'evil-insert-state-map
-   "C-o" 'company-complete
-   "C-y" 'yas-expand)
+;;   ;; evil-insert-state mappings
+;;   (general-define-key
+;;    :keymaps 'evil-insert-state-map
+;;    "C-o" 'company-complete
+;;    "C-y" 'yas-expand)
 
 
-  ;; leader key mappings
-  (general-create-definer snow/leader-keys
-    :states '(normal motion)
-    :keymaps 'override
-    :prefix "SPC")
+;;   ;; leader key mappings
+;;   (general-create-definer snow/leader-keys
+;;     :states '(normal motion)
+;;     :keymaps 'override
+;;     :prefix "SPC")
 
-  (snow/leader-keys
-    ;; general
-    ;; applications
-    "a" '(:ignore t :which-key "applications")
-    "aa" '(:ignore t :which-key "aws")
-    "aaa" 'aws
-    "ac"  'calc
-    "aal" 'aws-login
-    "ak" 'kubel
-    "am" 'mu4e
-    "ap" 'pass
+;;   (snow/leader-keys
+;;     ;; general
+;;     ;; applications
+;;     "a" '(:ignore t :which-key "applications")
+;;     "aa" '(:ignore t :which-key "aws")
+;;     "aaa" 'aws
+;;     "ac"  'calc
+;;     "aal" 'aws-login
+;;     "ak" 'kubel
+;;     "am" 'mu4e
+;;     "ap" 'pass
 
-    "b" 'consult-buffer
-    "c" (lambda ()
-          (interactive)
-          (find-file "~/workspace/snow/roles/emacs/files/init.org"))
-    "e" 'dired-jump
+;;     "b" 'consult-buffer
+;;     "c" (lambda ()
+;;           (interactive)
+;;           (find-file "~/workspace/snow/roles/emacs/files/init.org"))
+;;     "e" 'dired-jump
 
-    ;; find
-    "f"  '(:ignore t :which-key "find")
-    "fd" 'dired
-    "ff" 'find-file
-    "fi" 'consult-imenu
-    "fr" 'rg
-    "fs" 'consult-line
+;;     ;; find
+;;     "f"  '(:ignore t :which-key "find")
+;;     "fd" 'dired
+;;     "ff" 'find-file
+;;     "fi" 'consult-imenu
+;;     "fr" 'rg
+;;     "fs" 'consult-line
 
-    ;; git
-    "g"  '(:ignore t :which-key "Git")
-    "gg" 'magit
-    "gb" 'magit-blame
-    "gc" 'magit-clone
-    "gd" 'magit-diff
-    "gl" 'git-link
-    "gw" 'browse-at-remote
+;;     ;; git
+;;     "g"  '(:ignore t :which-key "Git")
+;;     "gg" 'magit
+;;     "gb" 'magit-blame
+;;     "gc" 'magit-clone
+;;     "gd" 'magit-diff
+;;     "gl" 'git-link
+;;     "gw" 'browse-at-remote
 
-    ;; help
-    "h" '(:ignore t :which-key "Help")
-    "ha" 'consult-apropos
-    "hf" 'describe-function
-    "hk" 'describe-key
-    "hi" 'info
-    "hp" 'describe-package
-    "hs" 'describe-symbol
-    "hv" 'describe-variable
+;;     ;; help
+;;     "h" '(:ignore t :which-key "Help")
+;;     "ha" 'consult-apropos
+;;     "hf" 'describe-function
+;;     "hk" 'describe-key
+;;     "hi" 'info
+;;     "hp" 'describe-package
+;;     "hs" 'describe-symbol
+;;     "hv" 'describe-variable
 
-    ;; language-server-protocol
-    "l" '(:ignore t :which-key "LSP")
-    "ld" 'lsp-find-definition
-    "lf" 'lsp-format-buffer
-    "li" 'lsp-organize-imports
-    "ln" 'lsp-rename
-    "lr" 'lsp-find-references
-    "ls" 'lsp-describe-session
-    "lt" 'consult-imenu
+;;     ;; language-server-protocol
+;;     "l" '(:ignore t :which-key "LSP")
+;;     "ld" 'lsp-find-definition
+;;     "lf" 'lsp-format-buffer
+;;     "li" 'lsp-organize-imports
+;;     "ln" 'lsp-rename
+;;     "lr" 'lsp-find-references
+;;     "ls" 'lsp-describe-session
+;;     "lt" 'consult-imenu
 
-    ;; project mode
-    "p"    project-prefix-map
+;;     ;; project mode
+;;     "p"    project-prefix-map
 
-    ;; org mode
-    "o"    '(:ignore t :which-key "Org Mode")
-    "oa"   'org-agenda
-    "oc"   'org-capture
-    "or"   '(:ignore t :which-key "Roam")
-    "ord"  '(:ignore t :which-key "Daily")
-    "ordt" 'org-roam-dailies-capture-today
-    "ordT" 'org-roam-dailies-goto-today
-    "ordy" 'org-roam-dailies-capture-yesterday
-    "ordY" 'org-roam-dailies-goto-yesterday
-    "ordd" 'org-roam-dailies-capture-date
-    "ordD" 'org-roam-dailies-goto-date
-    "orf"  'org-roam-node-find
-    "ort"  'org-roam-buffer-toggle
-    "os"   'snow/rg-org
+;;     ;; org mode
+;;     "o"    '(:ignore t :which-key "Org Mode")
+;;     "oa"   'org-agenda
+;;     "oc"   'org-capture
+;;     "or"   '(:ignore t :which-key "Roam")
+;;     "ord"  '(:ignore t :which-key "Daily")
+;;     "ordt" 'org-roam-dailies-capture-today
+;;     "ordT" 'org-roam-dailies-goto-today
+;;     "ordy" 'org-roam-dailies-capture-yesterday
+;;     "ordY" 'org-roam-dailies-goto-yesterday
+;;     "ordd" 'org-roam-dailies-capture-date
+;;     "ordD" 'org-roam-dailies-goto-date
+;;     "orf"  'org-roam-node-find
+;;     "ort"  'org-roam-buffer-toggle
+;;     "os"   'snow/rg-org
 
-    ;;tab-bar-mode
-    "t" '(:ignore t :which-key "Tabs")
-    "tc" 'tab-close
-    "tn" 'tab-new
-    "tr" 'tab-bar-rename-tab
-    "tt" 'tab-bar-select-tab-by-name
+;;     ;;tab-bar-mode
+;;     "t" '(:ignore t :which-key "Tabs")
+;;     "tc" 'tab-close
+;;     "tn" 'tab-new
+;;     "tr" 'tab-bar-rename-tab
+;;     "tt" 'tab-bar-select-tab-by-name
 
-    "w" '(:ignore t :which-key "Window")
-    "ww" 'hydra-scale-window/body
-    "wf" 'hydra-scale-font/body
+;;     "w" '(:ignore t :which-key "Window")
+;;     "ww" 'hydra-scale-window/body
+;;     "wf" 'hydra-scale-font/body
 
-    "y" 'yas-insert-snippet
+;;     "y" 'yas-insert-snippet
 
-    "/"  'rg-menu
-    ":"  'execute-extended-command
-    )
+;;     "/"  'rg-menu
+;;     ":"  'execute-extended-command
+;;     )
 
-  ;; local-leader key mappings
-  (general-create-definer snow/local-leader-keys
-    :prefix ",")
+;;   ;; local-leader key mappings
+;;   (general-create-definer snow/local-leader-keys
+;;     :prefix ",")
 
-  ;; dart-mode
-  (snow/local-leader-keys
-    :states 'normal
-    :keymaps 'dart-mode-map
-    "h" 'flutter-run-or-hot-reload
-    "r" 'flutter-hot-restart
-    )
+;;   ;; dart-mode
+;;   (snow/local-leader-keys
+;;     :states 'normal
+;;     :keymaps 'dart-mode-map
+;;     "h" 'flutter-run-or-hot-reload
+;;     "r" 'flutter-hot-restart
+;;     )
 
-  ;; json-mode
-  (snow/local-leader-keys
-    :states 'normal
-    :keymaps 'json-mode-map
-    "f" 'json-pretty-print-buffer
-    )
-  ;; jsonnet-mode
-  (snow/local-leader-keys
-    :states 'normal
-    :keymaps 'jsonnet-mode-map
-    "f" 'jsonnet-reformat-buffer
-    )
-  ;; emacs-lisp-mode
-  (snow/local-leader-keys
-    :states 'normal
-    :keymaps 'emacs-lisp-mode-map
-    "e" '(:ignore t :which-key "eval")
-    "eb" 'eval-buffer
-    "ee" 'eval-last-sexp
-    "ef" 'eval-defun
-    "l" 'package-lint-current-buffer
-    )
+;;   ;; json-mode
+;;   (snow/local-leader-keys
+;;     :states 'normal
+;;     :keymaps 'json-mode-map
+;;     "f" 'json-pretty-print-buffer
+;;     )
+;;   ;; jsonnet-mode
+;;   (snow/local-leader-keys
+;;     :states 'normal
+;;     :keymaps 'jsonnet-mode-map
+;;     "f" 'jsonnet-reformat-buffer
+;;     )
+;;   ;; emacs-lisp-mode
+;;   (snow/local-leader-keys
+;;     :states 'normal
+;;     :keymaps 'emacs-lisp-mode-map
+;;     "e" '(:ignore t :which-key "eval")
+;;     "eb" 'eval-buffer
+;;     "ee" 'eval-last-sexp
+;;     "ef" 'eval-defun
+;;     "l" 'package-lint-current-buffer
+;;     )
 
-  ;; ledger-mode
-  (snow/local-leader-keys
-    :states 'normal
-    :keymaps 'ledger-mode-map
-    "r" 'ledger-reconcile
-    "a" 'ledger-add-transaction
-    "c" 'ledger-occur
-    "p" 'ledger-report
-    )
+;;   ;; ledger-mode
+;;   (snow/local-leader-keys
+;;     :states 'normal
+;;     :keymaps 'ledger-mode-map
+;;     "r" 'ledger-reconcile
+;;     "a" 'ledger-add-transaction
+;;     "c" 'ledger-occur
+;;     "p" 'ledger-report
+;;     )
 
-  ;; lisp-interaction-mode
-  (snow/local-leader-keys
-    :states 'normal
-    :keymaps 'lisp-interaction-mode-map
-    "e" 'eval-print-last-sexp
-    )
+;;   ;; lisp-interaction-mode
+;;   (snow/local-leader-keys
+;;     :states 'normal
+;;     :keymaps 'lisp-interaction-mode-map
+;;     "e" 'eval-print-last-sexp
+;;     )
 
-  ;; mu4e-compose-mode
-  (snow/local-leader-keys
-    :states 'normal
-    :keymaps 'mu4e-compose-mode-map
-    "a" 'mml-attach-file
-    "cc" 'message-goto-cc
-    "bcc" 'message-goto-bcc)
+;;   ;; mu4e-compose-mode
+;;   (snow/local-leader-keys
+;;     :states 'normal
+;;     :keymaps 'mu4e-compose-mode-map
+;;     "a" 'mml-attach-file
+;;     "cc" 'message-goto-cc
+;;     "bcc" 'message-goto-bcc)
 
-  ;; org-mode
-  (snow/local-leader-keys
-    :states 'normal
-    :keymaps 'org-mode-map
-    "RET" 'org-open-at-point
-    "g"   '(:ignore t :which-key "go to")
-    "gg"  'consult-org-heading
-    "gp"  'org-previous-visible-heading
-    "i"   'org-toggle-inline-images
-    "l"   'org-insert-link
-    "o"   'org-agenda-open-link
-    "p"   'org-plot/gnuplot
-    "r"   '(:ignore t :which-key "Org Roam")
-    "ra"  'org-roam-alias-add
-    "ri"  'org-roam-node-insert
-    "t"   'org-set-tags-command
-    ","   'org-ctrl-c-ctrl-c
-    "0"   'snow/org-start-presentation
-    "$"   'org-archive-subtree
-    )
+;;   ;; org-mode
+;;   (snow/local-leader-keys
+;;     :states 'normal
+;;     :keymaps 'org-mode-map
+;;     "RET" 'org-open-at-point
+;;     "g"   '(:ignore t :which-key "go to")
+;;     "gg"  'consult-org-heading
+;;     "gp"  'org-previous-visible-heading
+;;     "i"   'org-toggle-inline-images
+;;     "l"   'org-insert-link
+;;     "o"   'org-agenda-open-link
+;;     "p"   'org-plot/gnuplot
+;;     "r"   '(:ignore t :which-key "Org Roam")
+;;     "ra"  'org-roam-alias-add
+;;     "ri"  'org-roam-node-insert
+;;     "t"   'org-set-tags-command
+;;     ","   'org-ctrl-c-ctrl-c
+;;     "0"   'snow/org-start-presentation
+;;     "$"   'org-archive-subtree
+;;     )
 
-  ;; vterm-mode
-  (snow/local-leader-keys
-    :states 'normal
-    :keymaps 'vterm-mode-map
-    "p" 'vterm-yank
-    :config
-    (setq vterm-shell "/opt/homebrew/bin/fish")
-    )
-  )
+;;   ;; vterm-mode
+;;   (snow/local-leader-keys
+;;     :states 'normal
+;;     :keymaps 'vterm-mode-map
+;;     "p" 'vterm-yank
+;;     :config
+;;     (setq vterm-shell "/opt/homebrew/bin/fish")
+;;     )
+;;   )
 
 (use-package hydra)
 
@@ -733,159 +735,153 @@
   ("q" nil "finished" :exit t))
 
 (defun meow-setup ()
-    (setq meow-cheatsheet-layout meow-cheatsheet-layout-colemak)
-    (meow-motion-overwrite-define-key
-     ;; Use e to move up, n to move down.
-     ;; Since special modes usually use n to move down, we only overwrite e here.
-     '("e" . meow-prev)
-     '("<escape>" . ignore))
-    (meow-leader-define-key
-     '("?" . meow-cheatsheet)
-     ;; To execute the originally e in MOTION state, use SPC e.
-     '("e" . "H-e")
-     '("1" . meow-digit-argument)
-     '("2" . meow-digit-argument)
-     '("3" . meow-digit-argument)
-     '("4" . meow-digit-argument)
-     '("5" . meow-digit-argument)
-     '("6" . meow-digit-argument)
-     '("7" . meow-digit-argument)
-     '("8" . meow-digit-argument)
-     '("9" . meow-digit-argument)
-     '("0" . meow-digit-argument)
-     ;; major modes
-     '("a a a" . aws)
-     '("a a l" . aws-login)
-     '("a a i" . aws-organizations-get-account-id)
-     '("a a n" . aws-organizations-get-account-name)
-     '("a c" . calc)
-     '("a k" . kubel)
-     '("a m" . mu4e)
-     '("a p" . pass)
-     ;; LSP Mode
-     '("l d" . lsp-find-definition)
-     '("l f" . lsp-format-buffer)
-     '("l i" . lsp-organize-imports)
-     '("l n" . lsp-rename)
-     '("l r" . lsp-find-references)
-     '("l s" . lsp-describe-session)
-     '("l t" . consult-imenu)
-     ;; org mode
-     '("o a"     . org-agenda)
-     '("o c"     . org-capture)
-     '("o r d t" . org-roam-dailies-capture-today)
-     '("o r d T" . org-roam-dailies-goto-today)
-     '("o r d y" . org-roam-dailies-capture-yesterday)
-     '("o r d Y" . org-roam-dailies-goto-yesterday)
-     '("o r d d" . org-roam-dailies-capture-date)
-     '("o r d D" . org-roam-dailies-goto-date)
-     '("o r f"   . org-roam-node-find)
-     '("o r t"   . org-roam-buffer-toggle)
-     '("o s"     . snow/rg-org)
-     ;; project mode
-     '("p b" . project-switch-to-buffer)
-     '("p c" . project-compile)
-     '("p e" . project-eshell)
-     '("p f" . project-find-file)
-     '("p s" . project-find-regexp)
-     '("p g" . magit-status)
-     '("p p" . project-switch-project)
-     '("p r" . project-query-replace-regexp)
-     ;; tab management
-     '("t c" . tab-close)
-     '("t n" . tab-new)
-     '("t r" . tab-bar-rename-tab)
-     '("t t" . tab-bar-select-tab-by-name)
-     ;; window movement
-     '("w m" . windmove-left)
-     '("w n" . windmove-down)
-     '("w e" . windmove-up)
-     '("w i" . windmove-right)
-     '("w s" . split-window-below)
-     '("w v" . split-window-right)
-     '("w o" . delete-other-windows)
-     '("w q" . delete-window)
-     '("w =" . balance-windows))
-    (meow-normal-define-key
-     '("0" . meow-expand-0)
-     '("1" . meow-expand-1)
-     '("2" . meow-expand-2)
-     '("3" . meow-expand-3)
-     '("4" . meow-expand-4)
-     '("5" . meow-expand-5)
-     '("6" . meow-expand-6)
-     '("7" . meow-expand-7)
-     '("8" . meow-expand-8)
-     '("9" . meow-expand-9)
-     '("-" . negative-argument)
-     '(";" . meow-reverse)
-     '("," . meow-inner-of-thing)
-     '("." . meow-bounds-of-thing)
-     '("[" . meow-beginning-of-thing)
-     '("]" . meow-end-of-thing)
-     '("/" . meow-visit)
-     '("s" . meow-append)
-     '("S" . meow-open-below)
-     '("b" . meow-back-word)
-     '("B" . meow-back-symbol)
-     '("c" . meow-change)
-     '("C" . meow-comment)
-     '("d" . meow-delete)
-     '("D" . meow-page-down)
-     '("e" . meow-prev)
-     '("E" . meow-prev-expand)
-     '("f" . meow-find)
-     '("F" . meow-page-up)
-     '("g" . meow-cancel-selection)
-     '("G" . meow-grab)
-     '("m" . meow-left)
-     '("M" . meow-left-expand)
-     '("i" . meow-right)
-     '("I" . meow-right-expand)
-     '("j" . meow-join)
-     '("k" . meow-kill)
-     '("l" . meow-line)
-     '("L" . meow-goto-line)
-     '("h" . meow-mark-word)
-     '("H" . meow-mark-symbol)
-     '("n" . meow-next)
-     '("N" . meow-next-expand)
-     '("o" . meow-block)
-     '("O" . meow-to-block)
-     '("p" . meow-yank)
-     '("P" . meow-clipboard-yank)
-     '("q" . meow-quit)
-     '("r" . meow-replace)
-     '("a" . meow-insert)
-     '("A" . meow-open-above)
-     '("t" . meow-till)
-     '("u" . meow-undo)
-     '("U" . meow-undo-in-selection)
-     '("v" . meow-search)
-     '("w" . meow-next-word)
-     '("W" . meow-next-symbol)
-     '("x" . meow-delete)
-     '("X" . meow-backward-delete)
-     '("y" . meow-save)
-     '("Y" . meow-clipboard-save)
-     '("z" . meow-pop-selection)
-     '("'" . repeat)
-     '("=" . meow-indent)
-     '("!" . meow-find-ref)
-     '("<escape>" . ignore)
-     ))
+  (setq meow-cheatsheet-layout meow-cheatsheet-layout-colemak)
+  (meow-motion-overwrite-define-key
+   ;; Use e to move up, n to move down.
+   ;; Since special modes usually use n to move down, we only overwrite e here.
+   '("e" . meow-prev)
+   '("<escape>" . ignore))
+  (meow-leader-define-key
+   '("?" . meow-cheatsheet)
+   ;; To execute the originally e in MOTION state, use SPC e.
+   '("e" . "H-e")
+   '("1" . meow-digit-argument)
+   '("2" . meow-digit-argument)
+   '("3" . meow-digit-argument)
+   '("4" . meow-digit-argument)
+   '("5" . meow-digit-argument)
+   '("6" . meow-digit-argument)
+   '("7" . meow-digit-argument)
+   '("8" . meow-digit-argument)
+   '("9" . meow-digit-argument)
+   '("0" . meow-digit-argument)
+   ;; major modes
+   '("a a a" . aws)
+   '("a a l" . aws-login)
+   '("a a i" . aws-organizations-get-account-id)
+   '("a a n" . aws-organizations-get-account-name)
+   '("a c" . calc)
+   '("a k" . kubel)
+   '("a m" . mu4e)
+   '("a p" . pass)
+   ;; LSP Mode
+   '("l d" . lsp-find-definition)
+   '("l f" . lsp-format-buffer)
+   '("l i" . lsp-organize-imports)
+   '("l n" . lsp-rename)
+   '("l r" . lsp-find-references)
+   '("l s" . lsp-describe-session)
+   '("l t" . consult-imenu)
+   ;; org mode
+   '("o a"     . org-agenda)
+   '("o c"     . org-capture)
+   '("o r d t" . org-roam-dailies-capture-today)
+   '("o r d T" . org-roam-dailies-goto-today)
+   '("o r d y" . org-roam-dailies-capture-yesterday)
+   '("o r d Y" . org-roam-dailies-goto-yesterday)
+   '("o r d d" . org-roam-dailies-capture-date)
+   '("o r d D" . org-roam-dailies-goto-date)
+   '("o r f"   . org-roam-node-find)
+   '("o r t"   . org-roam-buffer-toggle)
+   '("o s"     . snow/rg-org)
+   ;; project mode
+   (cons "p" project-prefix-map)
+   ;; tab management
+   '("t c" . tab-close)
+   '("t n" . tab-new)
+   '("t r" . tab-bar-rename-tab)
+   '("t t" . tab-bar-select-tab-by-name)
+   ;; window movement
+   '("w m" . windmove-left)
+   '("w n" . windmove-down)
+   '("w e" . windmove-up)
+   '("w i" . windmove-right)
+   '("w s" . split-window-below)
+   '("w v" . split-window-right)
+   '("w o" . delete-other-windows)
+   '("w q" . delete-window)
+   '("w =" . balance-windows))
+  (meow-normal-define-key
+   '("0" . meow-expand-0)
+   '("1" . meow-expand-1)
+   '("2" . meow-expand-2)
+   '("3" . meow-expand-3)
+   '("4" . meow-expand-4)
+   '("5" . meow-expand-5)
+   '("6" . meow-expand-6)
+   '("7" . meow-expand-7)
+   '("8" . meow-expand-8)
+   '("9" . meow-expand-9)
+   '("-" . negative-argument)
+   '(";" . meow-reverse)
+   '("," . meow-inner-of-thing)
+   '("." . meow-bounds-of-thing)
+   '("[" . meow-beginning-of-thing)
+   '("]" . meow-end-of-thing)
+   '("/" . meow-visit)
+   '("s" . meow-append)
+   '("S" . meow-open-below)
+   '("b" . meow-back-word)
+   '("B" . meow-back-symbol)
+   '("c" . meow-change)
+   '("C" . meow-comment)
+   '("d" . meow-delete)
+   '("D" . meow-page-down)
+   '("e" . meow-prev)
+   '("E" . meow-prev-expand)
+   '("f" . meow-find)
+   '("F" . meow-page-up)
+   '("g" . meow-cancel-selection)
+   '("G" . meow-grab)
+   '("m" . meow-left)
+   '("M" . meow-left-expand)
+   '("i" . meow-right)
+   '("I" . meow-right-expand)
+   '("j" . meow-join)
+   '("k" . meow-kill)
+   '("l" . meow-line)
+   '("L" . meow-goto-line)
+   '("h" . meow-mark-word)
+   '("H" . meow-mark-symbol)
+   '("n" . meow-next)
+   '("N" . meow-next-expand)
+   '("o" . meow-block)
+   '("O" . meow-to-block)
+   '("p" . meow-yank)
+   '("P" . meow-clipboard-yank)
+   '("q" . meow-quit)
+   '("r" . meow-replace)
+   '("a" . meow-insert)
+   '("A" . meow-open-above)
+   '("t" . meow-till)
+   '("u" . meow-undo)
+   '("U" . meow-undo-in-selection)
+   '("v" . meow-search)
+   '("w" . meow-next-word)
+   '("W" . meow-next-symbol)
+   '("x" . meow-delete)
+   '("X" . meow-backward-delete)
+   '("y" . meow-save)
+   '("Y" . meow-clipboard-save)
+   '("z" . meow-pop-selection)
+   '("'" . repeat)
+   '("=" . meow-indent)
+   '("!" . meow-find-ref)
+   '("<escape>" . ignore)
+   ))
 
-  (use-package meow
-    :custom
-    (meow-use-cursor-position-hack t)
-    :config
-    (meow-setup)
-    (meow-global-mode 1)
-    (meow-thing-register 'tags
-                         '(regexp "<.+>" "</.+>")
-                         '(regexp "<.+>" "</.+>"))
-(add-to-list 'meow-char-thing-table '(?t . tags))
-    )
+(use-package meow
+  :custom
+  (meow-use-cursor-position-hack t)
+  (meow-expand-exclude-mode-list nil)
+  :config
+  (meow-setup)
+  (meow-global-mode 1)
+  (meow-thing-register 'apostrophe
+                       '(regexp "'" "'")
+                       '(regexp "'" "'"))
+  (meow-motion-overwrite-define-key '("n" . next-line))
+  (add-to-list 'meow-char-thing-table '(?' . apostrophe)))
 
 (use-package erc
   :custom
@@ -1047,13 +1043,13 @@
   :commands (dired dired-jump)
   :bind (:map dired-mode-map
   ("m" . dired-up-directory)
-  ("i" . dired-find-file))
-  :config
-  (evil-collection-define-key 'normal 'dired-mode-map
-    "h" 'dired-up-directory
-    "l" 'dired-find-file
-    "L" 'dired-display-file
-    "M" 'snow/dired-open-locally))
+  ("i" . dired-find-file)))
+  ;; :config
+  ;; (evil-collection-define-key 'normal 'dired-mode-map
+  ;;   "h" 'dired-up-directory
+  ;;   "l" 'dired-find-file
+  ;;   "L" 'dired-display-file
+  ;;   "M" 'snow/dired-open-locally))
 
 (use-package flycheck
   :init
@@ -1084,9 +1080,10 @@
 
 ;; (use-package tree-sitter-langs)
 
-;; (use-package project
-;;   :ensure nil
-;;   :bind-keymap ("C-c p" . project-prefix-map))
+(use-package project
+  :ensure nil
+  :bind (:map project-prefix-map
+              ("R" . 'snow/rg-project)))
 
 (cl-defmethod project-root ((project (head local)))
   (cdr project))
@@ -1138,7 +1135,7 @@
   (define-key eshell-mode-map (kbd "<tab>") 'completion-at-point)
   (define-key eshell-mode-map (kbd "<up>") 'eshell-previous-input)
   (define-key eshell-mode-map (kbd "<down>") 'eshell-next-input)
-  (evil-define-key '(normal insert visual) eshell-mode-map (kbd "C-r") 'consult-history))
+  (define-key eshell-mode-map (kbd "C-r") 'consult-history))
 
 (use-package eshell
   :hook
@@ -1161,7 +1158,11 @@
   :custom
   (eshell-syntax-highlighting-global-mode +1))
 
-(use-package tramp)
+(use-package tramp
+  :custom
+  (tramp-default-method "ssh")
+  (tramp-default-user "snow")
+  (tramp-default-host "cloudpi"))
 
 (use-package vterm)
 
@@ -1229,7 +1230,26 @@
   (yas-global-mode 1))
 
 (use-package ripgrep)
+
 (use-package rg)
+
+(rg-define-search snow/rg-org
+  :query ask
+  :format regexp
+  :files "*.org"
+  :case-fold-search smart
+  :dir org-directory
+  :confirm prefix)
+
+(rg-define-search snow/rg-project
+  :query ask
+  :format regexp
+  :files ""
+  :case-fold-search smart
+  :dir (if (project-current) (project-root (project-current))
+         default-directory)
+  :confirm prefix
+  :flags ("--hidden -g !.git"))
 
 (use-package openwith
   :config

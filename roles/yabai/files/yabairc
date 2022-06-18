@@ -42,5 +42,6 @@ yabai -m rule --add label=discord app=Discord manage=on
 yabai -m rule --add label=teams app="Microsoft Teams" manage=on
 yabai -m rule --add label=teams app="Microsoft Teams Helper (Renderer)" manage=on
 yabai -m rule --add label=teams app="Microsoft Outlook" manage=on
+yabai -m rule --add label=teams app=Spotify manage=on
 
 echo "yabai configuration loaded.."
