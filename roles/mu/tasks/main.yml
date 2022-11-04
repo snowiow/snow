@@ -5,12 +5,12 @@
     install_options: with-emacs
   when: ansible_facts['os_family'] == "Darwin"
 
-- name: install mu on Arch Linux
+- name: install mu on Linux
   become: yes
   package:
     name: mu4e
     state: present
-  when: ansible_facts['os_family'] == "ArchLinux"
+  when: ansible_facts['system'] == "Linux"
 
 - name: sync mail dir with mu
   command: mu init --maildir=~/Mail --my-address=marcel.patzwahl@posteo.de

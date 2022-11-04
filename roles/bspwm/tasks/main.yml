@@ -1,25 +1,41 @@
 - name: make sure bspwm is installed
+  become: yes
   package:
     name:
       - bspwm
       - sxhkd
     state: present
 
-- name: download polybar
+- name: make sure polybar is installed on Ubuntu
+  become: yes
+  package:
+    name:
+      - polybar
+    state: present
+  when: ansible_facts['os_family'] == "Debian"
+
+- name: download polybar on Arch
   git:
     repo: https://aur.archlinux.org/polybar.git
     dest: ~/workspace/polybar
+  when: ansible_facts['os_family'] == "Archlinux"
 
-- name: check if polybar was downloaded
+- name: check if polybar was downloaded on Arch
   stat:
     path: ~/workspace/polybar
   register: polybar
+  when: ansible_facts['os_family'] == "Archlinux"
 
-- name: install polybar
+- name: install polybar on Arch
   command: makepkg -si --noconfirm
   args:
     chdir: ~/workspace/polybar
-  when: polybar.stat.exists
+  when: (ansible_facts['os_family'] == "Archlinux") and polybar.stat.exists
+
+- name: make sure bspwm config directory is present
+  file:
+    path: ~/.config/bspwm
+    state: directory
 
 - name: symlink dotfile
   file:
@@ -37,6 +53,11 @@
     follow: false
     force: yes
 
+- name: make sure polybar config directory is present
+  file:
+    path: ~/.config/polybar
+    state: directory
+
 - name: symlink polybar config
   file:
     src: "{{ ansible_env.PWD }}/roles/bspwm/files/config"
@@ -52,6 +73,12 @@
     state: link
     follow: false
     force: yes
+  when: ansible_facts['os_family'] == "Archlinux"
+
+- name: make sure shxkd config directory is present
+  file:
+    path: ~/.config/sxhkd
+    state: directory
 
 - name: symlink shxkdrc
   file:

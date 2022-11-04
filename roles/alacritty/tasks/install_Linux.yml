@@ -1,0 +1,45 @@
+- name: Download Alacritty Repo
+  ansible.builtin.git:
+    repo: git@github.com:alacritty/alacritty.git
+    dest: ~/workspace/alacritty
+    version: v0.11.0
+
+- name: Install rustup
+  shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+
+- name: Make sure Alacritty dependencies are installed
+  package:
+    name:
+      - cmake 
+      - pkg-config 
+      - libfreetype6-dev 
+      - libfontconfig1-dev 
+      - libxcb-xfixes0-dev 
+      - libxkbcommon-dev 
+      - python3
+    state: present
+  become: yes
+
+- name: Build Alacritty
+  shell:
+    chdir: ~/workspace/alacritty
+    cmd: cargo build --release
+
+- name: Copy Alacritty to bin
+  ansible.builtin.copy:
+    src: "{{ ansible_env.HOME }}/workspace/alacritty/target/release/alacritty"
+    dest: /usr/local/bin
+    mode: a+x
+  become: yes
+
+- name: Copy Alacritty svg
+  ansible.builtin.copy:
+    src: "{{ ansible_env.HOME }}/workspace/alacritty/extra/logo/alacritty-term.svg"
+    dest: /usr/share/pixmaps/Alacritty.svg
+  become: yes
+
+- name: Alacritty Desktop File Install
+  shell: 
+    chdir: "{{ ansible_env.HOME }}/workspace/alacritty"
+    cmd: desktop-file-install extra/linux/Alacritty.desktop && update-desktop-database
+  become: yes

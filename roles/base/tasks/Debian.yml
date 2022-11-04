@@ -1,0 +1,20 @@
+- name: make sure packages are installed
+  package:
+    name:
+      - fzf
+      - pass
+      - curl
+    state: present
+  become: yes
+
+
+- name: download and extract iosevka-term font
+  become: yes
+  ansible.builtin.unarchive:
+    src: https://github.com/be5invis/Iosevka/releases/download/v16.3.6/super-ttc-sgr-iosevka-term-16.3.6.zip
+    dest: /usr/local/share/fonts/
+    remote_src: yes
+
+- name: Refresh Font Cache
+  become: yes
+  shell: fc-cache

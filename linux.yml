@@ -6,7 +6,7 @@
     - base
     - locale
     - git
-    - gnupg
+      #    - gnupg
     - dunst
     - bspwm
     - fish
