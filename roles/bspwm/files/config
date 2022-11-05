@@ -33,8 +33,7 @@ module-margin-left = 1
 module-margin-right = 2
 
 font-0 = Iosevka Term:pixelsize=10;1
-font-1 = "Font Awesome 5 Free Solid:pixelsize=10;1"
-font-2 = "Font Awesome 5 Brands Regular:pixelsize=10;1"
+font-1 = " FontAwesome:style=Regular"
 
 modules-left = bspwm
 modules-center = xwindow
@@ -390,14 +389,14 @@ screenchange-reload = true
 ; margin-bottom = 5
 
 ; vim:ft=dosini
-[module/arch-update]
-type = custom/script
+; [module/arch-update]
+; type = custom/script
 
-; Available tokens:
-;   %counter%
-; Command to be executed (using "/usr/bin/env sh -c [command]")
-exec = /home/snow-i3/.local/bin/arch-updates.sh
-format-prefix = " "
-; Seconds to sleep between updates
-; Default: 2 (0 if `tail = true`)
-interval = 3600
+; ; Available tokens:
+; ;   %counter%
+; ; Command to be executed (using "/usr/bin/env sh -c [command]")
+; exec = /home/snow-i3/.local/bin/arch-updates.sh
+; format-prefix = " "
+; ; Seconds to sleep between updates
+; ; Default: 2 (0 if `tail = true`)
+; interval = 3600

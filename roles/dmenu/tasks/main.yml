@@ -11,6 +11,7 @@
       - libx11-dev
       - libxinerama-dev
       - libxft-dev
+      - fonts-font-awesome
     state: present
   become: yes
 
