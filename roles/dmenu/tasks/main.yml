@@ -5,6 +5,15 @@
     version: snow
     accept_hostkey: yes
 
+- name: Install necessary libraries for dmenu
+  package:
+    name:
+      - libx11-dev
+      - libxinerama-dev
+      - libxft-dev
+    state: present
+  become: yes
+
 - name: make and make install dmenu
   make:
     chdir: "/home/{{ ansible_user_id }}/workspace/dmenu"

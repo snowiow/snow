@@ -1,5 +1,46 @@
-- name: install emacs on linux
+- name: install emacs dependencies on linux
   package:
-    name: emacs
+    name: 
+      - libtool
+      - libgccjit0 
+      - libgccjit-10-dev
+      - texinfo
+      - build-essential 
+      - libx11-dev 
+      - libxpm-dev 
+      - libjpeg-dev 
+      - libpng-dev 
+      - libgif-dev 
+      - libtiff-dev 
+      - libgtk2.0-dev 
+      - libncurses-dev
+      - libgnutls28-dev
     state: present
   become: yes
+
+- name: Include version vars
+  include_vars: "{{ playbook_dir }}/versions.yaml"
+
+- name: Clone Emacs
+  git:
+    repo: https://git.savannah.gnu.org/git/emacs.git
+    dest: ~/workspace/emacs
+    version: "emacs-{{ emacs }}"
+
+- name: Configure Emacs
+  shell:
+    cmd: |
+      ./autogen.sh
+      ./configure
+    chdir: ~/workspace/emacs
+
+- name: Build Emacs
+  make:
+    chdir: ~/workspace/emacs
+
+- name: Install Emacs
+  make:
+    chdir: "/home/{{ ansible_user_id }}/workspace/emacs"
+    target: install
+  become: yes
+

@@ -4,6 +4,7 @@
       - fzf
       - pass
       - curl
+      - htop
     state: present
   become: yes
 

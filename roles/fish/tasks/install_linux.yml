@@ -9,3 +9,15 @@
     name: "{{ ansible_env.USER }}"
     shell: /usr/bin/fish
   become: yes
+
+- name: Include version vars
+  include_vars: "{{ playbook_dir }}/versions.yaml"
+
+- name: Download kubectl
+  shell:
+    cmd: curl -LO "https://dl.k8s.io/release/v{{ kubectl }}/bin/linux/amd64/kubectl"
+
+- name: Install kubectl
+  shell:
+    cmd: install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+  become: yes

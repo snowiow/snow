@@ -1,8 +1,11 @@
+- name: Include version vars
+  include_vars: "{{ playbook_dir }}/versions.yaml"
+
 - name: Download Alacritty Repo
   ansible.builtin.git:
     repo: git@github.com:alacritty/alacritty.git
     dest: ~/workspace/alacritty
-    version: v0.11.0
+    version: "v{{ alacritty }}"
 
 - name: Install rustup
   shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
