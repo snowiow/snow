@@ -1,0 +1,28 @@
+- name: Include version vars
+  include_vars: "{{ playbook_dir }}/versions.yaml"
+  
+- name: create bin directory if not exists
+  file:
+    path: "{{ playbook_dir }}/bin"
+    state: directory
+    
+- name: Download aws-vault
+  shell:
+    "curl -L -o bin/aws-vault https://github.com/99designs/aws-vault/releases/download/v{{ aws_vault }}/aws-vault-linux-amd64"
+
+- name: Move aws-vault to bin
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/bin/aws-vault"
+    dest: /usr/local/bin/aws-vault
+    mode: 755
+  become: yes
+
+- name: Download aws-cfg-generator
+  shell: "curl -L -o bin/aws-cfg-generator https://github.com/moia-oss/aws-cfg-generator/releases/download/v{{ aws_cfg_generator }}/linux-amd64-aws-cfg-generator"
+    
+- name: Move aws-cfg-generator to bin
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/bin/aws-cfg-generator"
+    dest: /usr/local/bin/aws-cfg-generator
+    mode: 755
+  become: yes

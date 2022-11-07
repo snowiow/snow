@@ -13,11 +13,16 @@
 - name: Include version vars
   include_vars: "{{ playbook_dir }}/versions.yaml"
 
+- name: create bin directory if not exists
+  file:
+    path: "{{ playbook_dir }}/bin"
+    state: directory
+
 - name: Download kubectl
   shell:
-    cmd: curl -LO "https://dl.k8s.io/release/v{{ kubectl }}/bin/linux/amd64/kubectl"
+    cmd: "curl -L -o bin/kubectl https://dl.k8s.io/release/v{{ kubectl }}/bin/linux/amd64/kubectl"
 
 - name: Install kubectl
   shell:
-    cmd: install -o root -g root -m 0755 kubectl /usr/local/bin/kubectl
+    cmd: install -o root -g root -m 0755 bin/kubectl /usr/local/bin/kubectl
   become: yes

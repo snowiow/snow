@@ -222,7 +222,7 @@
     # Xev might be helpful to find names for keys.
 
     # Close notification.
-    close = ctrl+space
+    close = mod3+space
 
     # Close all notifications.
     close_all = ctrl+shift+space

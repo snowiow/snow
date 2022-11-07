@@ -8,7 +8,7 @@ secondary = #e60053
 alert = #bd2c40
 
 [bar/main]
-monitor = ${env:MONITOR:eDP1}
+monitor = ${env:MONITOR:eDP-1}
 width = 100%
 height = 20
 offset-x = 0
@@ -210,7 +210,7 @@ ramp-signal-3 = 😊
 ramp-signal-4 = 😃
 ramp-signal-5 = 😈
 format-disconnected = <label-disconnected>
-interface = wlp3s0
+interface = wlp0s20f3
 interval = 3.0
 
 format-connected-underline = #9f78e1
