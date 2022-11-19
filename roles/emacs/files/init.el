@@ -430,16 +430,16 @@
 
 (defhydra hydra-scale-window (:timeout 4)
   "scale window"
-  ("l" enlarge-window-horizontally "h+")
-  ("h" shrink-window-horizontally "h-")
-  ("k" enlarge-window "v+")
-  ("j" shrink-window "v-")
+  ("m" enlarge-window-horizontally "h+")
+  ("i" shrink-window-horizontally "h-")
+  ("n" enlarge-window "v+")
+  ("e" shrink-window "v-")
   ("q" nil "finished" :exit t))
 
 (defhydra hydra-scale-font (:timeout 4)
   "scale text"
-  ("j" text-scale-increase "+")
-  ("k" text-scale-decrease "-")
+  ("n" text-scale-increase "+")
+  ("e" text-scale-decrease "-")
   ("q" nil "finished" :exit t))
 
 (defun meow-setup ()
@@ -508,7 +508,10 @@
    '("w v" . split-window-right)
    '("w o" . delete-other-windows)
    '("w q" . delete-window)
-   '("w =" . balance-windows))
+   '("w =" . balance-windows)
+    ;; Hydras
+   '("y f" . hydra-scale-font/body)
+   '("h w" . hydra-scale-window/body))
   (meow-normal-define-key
    '("0" . meow-expand-0)
    '("1" . meow-expand-1)
@@ -665,7 +668,7 @@
 (use-package ledger-mode)
 
 (use-package markdown-mode
-  :after (flyspell-mode auto-fill-mode)
+  :after (flyspell-mode)
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))

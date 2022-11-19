@@ -3,3 +3,13 @@
   package:
     name: qutebrowser
     state: present
+    
+- name: symlink qutebrowser dotfiles
+  file:
+    src: "{{ ansible_env.PWD }}/roles/qutebrowser/files/{{ item }}"
+    path: "~/.config/qutebrowser/{{ item }}"
+    state: link
+    force: yes
+  loop:
+    - config.py
+    - quickmarks

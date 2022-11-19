@@ -12,7 +12,8 @@
 - name: syncthing copy systemd service
   copy:
     src: "syncthing.service"
-    dest: "~/.config/systemd/user/syncthing.service"
+    dest: "/etc/systemd/system/syncthing.service"
+  become: yes
 
 - name: enable syncthing service
   systemd:

@@ -1,0 +1,5 @@
+#!/bin/bash
+feh --bg-scale ~/Sync/wallpaper/gnu_smoking.png
+exec bspwm &
+setxkbmap -layout eu &
+dunst

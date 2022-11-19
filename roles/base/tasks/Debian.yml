@@ -5,6 +5,7 @@
       - pass
       - curl
       - htop
+      - ripgrep
     state: present
   become: yes
 
