@@ -1,0 +1,43 @@
+#! /usr/bin/env bash
+
+help() {
+    echo "Usage: bank-to-ledger [file] [account]"
+    echo " file: the CSV file with transactions to read in"
+    echo " account: the account to calculate the transactions against"
+    echo " -h (print this message)"
+    echo "Example: bank-to-ledger my-transactions.csv assets"
+    echo -e "\nTo further edit transactions pipe the output into an editor of your choice"
+    echo "For example: bank-to-ledger my-transactions.csv assets | vim"
+}
+
+while getopts ':h' opt; do
+    case $opt in
+        h)
+            help
+            exit
+            ;;
+    esac
+done
+
+if [ -z $1 ] || [ -z $2 ]
+  then
+    echo "No transaction CSV or account given!"
+    help
+    exit
+fi
+
+tail -n +8 $1                                                   | # remove original header
+    tac                                                         | # reverse the entry order
+    iconv -f ISO8859-1 -t utf8                                  |
+    sed -E 's/(-?)([0-9]+)\.([0-9]+),([0-9]+)/\1\2\3,\4/g'      | # remove dots from amounts
+    sed -E 's/(-?)([0-9]+),([0-9]+)/\1\2\.\3 EUR/g'             | # from de to en number format
+    sed -E 's/,/ /g'                                            | # substitute commas with whitspaces
+    sed -E 's/"//g'                                             | # remove quotation marks
+    sed -E 's/;/,/g'                                            | # use commas as separators instead of semicolon
+    cut -d , -f 1,4,8                                           | # keep only relevant columns
+    sed -E '1s/^/date,desc,amount\n/'                           | # append ledger header
+    ledger convert /dev/stdin \
+        --invert \
+        --input-date-format "%d.%m.%Y" \
+        --account $2 \
+        --file "~/Sync/ledger/main.ledger" | cat
