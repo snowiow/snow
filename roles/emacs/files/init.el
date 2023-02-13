@@ -1,6 +1,7 @@
 (require 'package)
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
+        ("elpa" . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")))
 
 (package-initialize)
@@ -11,7 +12,7 @@
 
 (use-package emacs
   :custom
-  (global-linum-mode t)
+  ;; (global-linum-mode t)
 
   (xref-search-program 'ripgrep)
   :bind
@@ -100,6 +101,11 @@
 
 (global-visual-line-mode t)
 
+(use-package editorconfig
+  :ensure t
+  :config
+  (editorconfig-mode 1))
+
 (use-package company
   :custom
   (company-dabbrev-downcase nil)
@@ -116,9 +122,7 @@
               ("C-n" . company-select-next)
               ("C-p" . company-select-previous)
               ("C-p" . company-select-previous)
-              ("C-d" . company-show-doc-buffer))
-:config
-(company-global-mode))
+              ("C-d" . company-show-doc-buffer)))
 
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
@@ -137,15 +141,329 @@
   (clojure-mode . rainbow-delimiters-mode)
   (emacs-lisp-mode . rainbow-delimiters-mode))
 
-;; (use-package linum-relative
-;;   :custom
-;;   (linum-relative-backend 'display-line-numbers-mode)
-;;   :config
-;;   (linum-relative-global-mode))
+(use-package linum-relative
+  :custom
+  (linum-relative-backend 'display-line-numbers-mode)
+  :config
+  (linum-relative-global-mode))
 
 (use-package highlight-indent-guides
   :custom
   (highlight-indent-guides-method 'character))
+
+(use-package undo-tree
+  :custom
+  (undo-tree-auto-save-history nil)
+  :config
+  (global-undo-tree-mode))
+
+(defun snow/evil-yank-highlight-advice (orig-fn beg end &rest args)
+  "Highlight yanked region."
+  (pulse-momentary-highlight-region beg end)
+  (apply orig-fn beg end args))
+
+(use-package evil
+  :after undo-tree
+  :custom
+  (evil-want-C-u-scroll t)
+  (evil-want-keybinding nil)
+  (evil-want-Y-yank-to-eol t)
+  (evil-search-module 'evil-search)
+  (evil-undo-system 'undo-tree)
+  :config
+  (advice-add 'evil-yank :around 'snow/evil-yank-highlight-advice)
+  (evil-mode)
+  )
+
+(use-package evil-collection
+  :after evil
+  :config
+  (evil-collection-init '(calc
+                          calendar
+                          dashboard
+                          dired
+                          ediff
+                          eshell
+                          forge
+                          helpful
+                          info
+                          magit
+                          mu4e
+                          package-menu
+                          pass
+                          proced
+                          rg
+                          ripgrep
+                          term
+                          xref)))
+
+(use-package evil-commentary
+  :after evil
+  :config
+  (evil-commentary-mode))
+
+(use-package evil-numbers
+  :after evil)
+
+(use-package evil-org
+  :after org
+  :hook
+  (org-mode . evil-org-mode)
+  :config
+  (add-hook 'evil-org-mode-hook
+            (lambda ()
+              (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))))
+  (require 'evil-org-agenda)
+  (evil-org-agenda-set-keys))
+
+(use-package evil-surround
+  :after evil
+  :custom
+  (global-evil-surround-mode 1))
+
+(use-package general
+  :after consult
+  :config
+  (general-evil-setup t)
+  (general-define-key
+   "C-+" 'text-scale-increase
+   "C--" 'text-scale-decrease
+   ;; "C-k" 'previous-line
+   )
+
+  ;; general normal mappings
+  (general-nmap
+    "C-c +" 'evil-numbers/inc-at-pt
+    "C-c -" 'evil-numbers/dec-at-pt)
+
+  ;; org-mode mappings
+  (general-define-key
+   :keymaps 'org-mode-map
+   :states 'normal
+   "RET"  'org-open-at-point)
+
+  ;; org-agenda-mode mappings
+  (general-define-key
+   :keymaps 'org-agenda-mode-map
+   "<"  'org-agenda-earlier
+   ">"  'org-agenda-later)
+
+  ;; emacs-lisp-mode mappings
+  (general-define-key
+   :states 'visual
+   :keymaps 'emacs-lisp-mode-map
+   "e" 'eval-region)
+
+  ;; evil-insert-state mappings
+  (general-define-key
+   :keymaps 'evil-insert-state-map
+   "C-o" 'company-complete
+   "C-y" 'yas-expand)
+
+
+  ;; leader key mappings
+  (general-create-definer snow/leader-keys
+    :states '(normal motion)
+    :keymaps 'override
+    :prefix "SPC")
+
+  (snow/leader-keys
+    ;; general
+    ;; applications
+    "a" '(:ignore t :which-key "applications")
+    "aa" '(:ignore t :which-key "aws")
+    "aaa" 'aws
+    "ac"  'calc
+    "aal" 'aws-login
+    "aan"  'aws-organizations-get-account-name
+    "aai" 'aws-organizations-get-account-id
+    "ak" 'kubel
+    "am" 'mu4e
+    "ap" 'pass
+
+    "b" 'consult-buffer
+    "c" (lambda ()
+          (interactive)
+          (find-file "~/workspace/snow/roles/emacs/files/init.org"))
+    "e" 'dired-jump
+
+    ;; find
+    "f"  '(:ignore t :which-key "find")
+    "fd" 'dired
+    "ff" 'find-file
+    "fi" 'consult-imenu
+    "fr" 'rg
+    "fs" 'consult-line
+
+    ;; git
+    "g"  '(:ignore t :which-key "Git")
+    "gg" 'magit
+    "gb" 'magit-blame
+    "gc" 'magit-clone
+    "gd" 'magit-diff
+    "gl" 'git-link
+    "gw" 'browse-at-remote
+
+    ;; help
+    "h" '(:ignore t :which-key "Help")
+    "ha" 'consult-apropos
+    "hf" 'describe-function
+    "hk" 'describe-key
+    "hi" 'info
+    "hp" 'describe-package
+    "hs" 'describe-symbol
+    "hv" 'describe-variable
+
+    ;; language-server-protocol
+    "l" '(:ignore t :which-key "LSP")
+    "ld" 'lsp-find-definition
+    "lf" 'lsp-format-buffer
+    "li" 'lsp-organize-imports
+    "ln" 'lsp-rename
+    "lr" 'lsp-find-references
+    "ls" 'lsp-describe-session
+    "lt" 'consult-imenu
+
+    ;; project mode
+    "p"    project-prefix-map
+
+    ;; org mode
+    "o"    '(:ignore t :which-key "Org Mode")
+    "oa"   'org-agenda
+    "oc"   'org-capture
+    "or"   '(:ignore t :which-key "Roam")
+    "ord"  '(:ignore t :which-key "Daily")
+    "ordt" 'org-roam-dailies-capture-today
+    "ordT" 'org-roam-dailies-goto-today
+    "ordy" 'org-roam-dailies-capture-yesterday
+    "ordY" 'org-roam-dailies-goto-yesterday
+    "ordd" 'org-roam-dailies-capture-date
+    "ordD" 'org-roam-dailies-goto-date
+    "orf"  'org-roam-node-find
+    "ort"  'org-roam-buffer-toggle
+    "os"   'snow/rg-org
+
+    ;;tab-bar-mode
+    "t" '(:ignore t :which-key "Tabs")
+    "tc" 'tab-close
+    "tn" 'tab-new
+    "tr" 'tab-bar-rename-tab
+    "tt" 'tab-bar-select-tab-by-name
+
+    "wm" 'windmove-left
+    "wn" 'windmove-down
+    "we" 'windmove-up
+    "wi" 'windmove-right
+    "ws" 'split-window-below
+    "wv" 'split-window-right
+    "wo" 'delete-other-windows
+    "wq" 'delete-window
+    "w=" 'balance-windows
+
+    "y" 'yas-insert-snippet
+
+    "/"  'rg-menu
+    ":"  'execute-extended-command
+    )
+
+  ;; local-leader key mappings
+  (general-create-definer snow/local-leader-keys
+    :prefix ",")
+
+  ;; dart-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'dart-mode-map
+    "h" 'flutter-run-or-hot-reload
+    "r" 'flutter-hot-restart
+    )
+
+  ;; json-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'json-mode-map
+    "f" 'json-pretty-print-buffer
+    )
+  ;; jsonnet-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'jsonnet-mode-map
+    "f" 'jsonnet-reformat-buffer
+    )
+  ;; emacs-lisp-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'emacs-lisp-mode-map
+    "e" '(:ignore t :which-key "eval")
+    "eb" 'eval-buffer
+    "ee" 'eval-last-sexp
+    "ef" 'eval-defun
+    "l" 'package-lint-current-buffer
+    )
+
+  ;; ledger-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'ledger-mode-map
+    "r" 'ledger-reconcile
+    "a" 'ledger-add-transaction
+    "c" 'ledger-occur
+    "p" 'ledger-report
+    )
+
+  ;; lisp-interaction-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'lisp-interaction-mode-map
+    "e" 'eval-print-last-sexp
+    )
+
+  ;; mu4e-compose-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'mu4e-compose-mode-map
+    "a" 'mml-attach-file
+    "cc" 'message-goto-cc
+    "bcc" 'message-goto-bcc)
+
+  ;; org-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'org-mode-map
+    "RET" 'org-open-at-point
+    "g"   '(:ignore t :which-key "go to")
+    "gg"  'consult-org-heading
+    "gp"  'org-previous-visible-heading
+    "i"   'org-toggle-inline-images
+    "l"   'org-insert-link
+    "o"   'org-agenda-open-link
+    "p"   'org-plot/gnuplot
+    "r"   '(:ignore t :which-key "Org Roam")
+    "ra"  'org-roam-alias-add
+    "ri"  'org-roam-node-insert
+    "t"   'org-set-tags-command
+    ","   'org-ctrl-c-ctrl-c
+    "0"   'snow/org-start-presentation
+    "$"   'org-archive-subtree
+    )
+
+  ;; text-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'text-mode-map
+    "b" 'snow/branch-name-to-commit-msg  
+    )
+  ;; vterm-mode
+  (snow/local-leader-keys
+    :states 'normal
+    :keymaps 'vterm-mode-map
+    "p" 'vterm-yank
+    :config
+    (setq vterm-shell "/opt/homebrew/bin/fish")
+    )
+  )
+
+(use-package string-inflection)
 
 (use-package popper
   :after (shackle project)
@@ -296,6 +614,11 @@
                                        (concat org-directory "/meetings.org"))
                                      "Refinement")
            (file  "templates/repeating-meeting.org"))
+          ("wmi" "Interview" entry (file+headline
+                                     (lambda ()
+                                       (concat org-directory "/meetings.org"))
+                                     "Work")
+           (file  "templates/interview.org"))
           ("wmr" "Retro" entry (file+headline
                                 (lambda ()
                                   (concat org-directory "/meetings.org"))
@@ -581,18 +904,18 @@
    '("<escape>" . ignore)
    ))
 
-(use-package meow
-  :custom
-  (meow-expand-exclude-mode-list nil)
-  (meow-motion-remap-prefix "C-M-")
-  :config
-  (meow-setup)
-  (meow-global-mode 1)
-  (meow-thing-register 'apostrophe
-                       '(regexp "'" "'")
-                       '(regexp "'" "'"))
-  (meow-motion-overwrite-define-key '("n" . next-line))
-  (add-to-list 'meow-char-thing-table '(?' . apostrophe)))
+;; (use-package meow
+;;   :custom
+;;   (meow-expand-exclude-mode-list nil)
+;;   (meow-motion-remap-prefix "C-M-")
+;;   :config
+;;   (meow-setup)
+;;   (meow-global-mode 1)
+;;   (meow-thing-register 'apostrophe
+;;                        '(regexp "'" "'")
+;;                        '(regexp "'" "'"))
+;;   (meow-motion-overwrite-define-key '("n" . next-line))
+;;   (add-to-list 'meow-char-thing-table '(?' . apostrophe)))
 
 (use-package erc
   :custom
@@ -677,6 +1000,15 @@
   (markdown-mode . flyspell-mode)
   (markdown-mode . auto-fill-mode))
 
+(use-package plantuml-mode
+ :config
+(add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
+(add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode)))
+
+(use-package protobuf-mode
+ :config
+(add-to-list 'auto-mode-alist '("\\.proto\\'" . protobuf-mode)))
+
 (use-package pyvenv
   :diminish
   :config
@@ -750,17 +1082,20 @@
     (find-file local-tmp-file)))
 
 (use-package dired
+  :after (evil evil-collection)
   :ensure nil
   :commands (dired dired-jump)
-  :bind (:map dired-mode-map
-  ("m" . dired-up-directory)
-  ("i" . dired-find-file)))
-  ;; :config
-  ;; (evil-collection-define-key 'normal 'dired-mode-map
-  ;;   "h" 'dired-up-directory
-  ;;   "l" 'dired-find-file
-  ;;   "L" 'dired-display-file
-  ;;   "M" 'snow/dired-open-locally))
+  ;; :bind (:map dired-mode-map
+  ;; ("m" . dired-up-directory)
+  ;; ("i" . dired-find-file))
+  :config
+  (evil-collection-define-key 'normal 'dired-mode-map
+    "m" 'dired-up-directory
+    "n" 'evil-next-line
+    "e" 'evil-previous-line
+    "i" 'dired-find-file
+    "L" 'dired-display-file
+    "M" 'snow/dired-open-locally))
 
 (use-package flycheck
   :init
@@ -905,7 +1240,7 @@
 
 (use-package mu4e
   :ensure nil
-  :load-path "/opt/homebrew/share/emacs/site-lisp/mu/mu4e/"
+  :load-path "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.8.7"
   :custom
   (mu4e-update-interval (* 30 60))
   (mu4e-get-mail-command "offlineimap")
@@ -934,6 +1269,7 @@
         ("N" . kubel-set-namespace))
   :config
   (setq kubel-use-namespace-list 'on))
+(use-package kubel-evil)
 
 (use-package yasnippet
   :bind
@@ -976,9 +1312,14 @@
   (openwith-mode t))
 
 (use-package dashboard
+  :after org
   :custom
   (dashboard-startup-banner 'logo)
   (tab-bar-new-tab-choice "*dashboard*")
+  (dashboard-projects-backend 'project-el)
+  (dashboard-agenda-sort-strategy '(time-down))
+  (dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
+  (dashboard-week-agenda nil)
   (dashboard-items '((agenda . 5)
                      (projects . 5)
                      (recents  . 5)))
@@ -1000,12 +1341,20 @@
               (proced-toggle-auto-update t))))
 
 (use-package aws-mode
-  :load-path "~/.emacs.d/packages/awscli"
+  :load-path "~/.emacs.d/packages/aws.el"
   :custom
   (aws-vault t)
   (aws-output "yaml")
   (aws-organizations-account "moia"))
 
-;; (use-package aws-evil
-;;   :after aws-mode
-;;   :load-path "~/.emacs.d/packages/awscli")
+(use-package aws-evil
+  :after aws-mode
+  :load-path "~/.emacs.d/packages/awscli")
+
+(defun snow/branch-name-to-commit-msg ()
+ (interactive)
+ (let* ((branch (magit-get-current-branch))
+       (commit-msg (replace-regexp-in-string "MOIA \\([0-9]+\\) " "MOIA-\\1: "
+           (string-replace "-" " "
+           (string-replace "moia" "MOIA" branch)))))
+    (insert commit-msg)))

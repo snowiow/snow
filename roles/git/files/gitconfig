@@ -3,7 +3,7 @@
 	name = snowiow
 	signingkey = 239BB790F0301DA4
 [core]
-	editor = nvim
+	editor = vim
 	excludesfile = ~/.gitignore_global
 [web]
 	browser = qutebrowser

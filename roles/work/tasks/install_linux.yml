@@ -38,3 +38,40 @@
     dest: /usr/local/bin/aws-cfg-generator
     mode: 755
   become: yes
+  
+- name: create helm download directory
+  file:
+    path: "{{ playbook_dir }}/bin/helm"
+    state: directory
+
+- name: Download Helm
+  shell:
+    "curl -L -o bin/helm/helm.tar.gz https://get.helm.sh/helm-v{{ helm }}-linux-amd64.tar.gz"
+    
+- name: Extract Helm
+  ansible.builtin.unarchive:
+    src: "{{ playbook_dir }}/bin/helm/helm.tar.gz"
+    dest: "{{ playbook_dir }}/bin/helm"
+
+- name: Copy helm to /usr/local/bin
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/bin/helm/linux-amd64/helm"
+    dest: /usr/local/bin/helm
+    mode: 755
+  become: yes
+  
+- name: Download Cue
+  shell:
+    "curl -L -o bin/cue.tar.gz https://github.com/cue-lang/cue/releases/download/v{{ cue }}/cue_v{{ cue }}_linux_amd64.tar.gz"
+    
+- name: Extract Cue
+  ansible.builtin.unarchive:
+    src: "{{ playbook_dir }}/bin/cue.tar.gz"
+    dest: "{{ playbook_dir }}/bin"
+
+- name: Copy cue to /usr/local/bin
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/bin/cue"
+    dest: /usr/local/bin/cue
+    mode: 755
+  become: yes

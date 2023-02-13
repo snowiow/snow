@@ -14,3 +14,4 @@
     force: yes
   loop:
     - bank-to-ledger
+    - dkb-to-ledger

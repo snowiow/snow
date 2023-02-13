@@ -1,27 +1,27 @@
 - name: install offlineimap on Arch Linux
   become: yes
   package:
-    name: offlineimap
+    name: offlineimap3
     state: present
 
-# - name: create systemd user directory
-#   file:
-#     path: ~/.config/systemd/user
-#     state: directory
+- name: create systemd user directory
+  file:
+    path: ~/.config/systemd/user
+    state: directory
 
-# - name: create template
-#   template:
-#     src: offlineimap.s2
-#     dest: "~/.config/systemd/user/offlineimap.service"
+- name: create template
+  template:
+    src: offlineimap.s2
+    dest: "~/.config/systemd/user/offlineimap.service"
 
-# - name: offlineimap copy systemd timer and service
-#   copy:
-#     src: offlineimap.timer
-#     dest: "~/.config/systemd/user/offlineimap.timer"
+- name: offlineimap copy systemd timer and service
+  copy:
+    src: offlineimap.timer
+    dest: "~/.config/systemd/user/offlineimap.timer"
 
-# - name: enable offlineimap timer
-#   systemd:
-#     name: offlineimap.timer
-#     state: started
-#     enabled: yes
-#     scope: user
+- name: enable offlineimap timer
+  systemd:
+    name: offlineimap.timer
+    state: started
+    enabled: yes
+    scope: user
