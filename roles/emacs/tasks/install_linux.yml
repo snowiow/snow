@@ -15,6 +15,7 @@
       - libgtk2.0-dev 
       - libncurses-dev
       - libgnutls28-dev
+      - libsqlite3-dev
     state: present
   become: yes
 

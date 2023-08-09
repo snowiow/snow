@@ -10,6 +10,8 @@
 (use-package use-package-ensure-system-package
   :ensure t)
 
+(use-package sqlite3)
+
 (use-package emacs
   :custom
   ;; (global-linum-mode t)
@@ -315,13 +317,18 @@
     "hv" 'describe-variable
 
     ;; language-server-protocol
-    "l" '(:ignore t :which-key "LSP")
-    "ld" 'lsp-find-definition
-    "lf" 'lsp-format-buffer
-    "li" 'lsp-organize-imports
-    "ln" 'lsp-rename
-    "lr" 'lsp-find-references
-    "ls" 'lsp-describe-session
+    "l" '(:ignore t :which-key "Eglot")
+    ;; "ld" 'lsp-find-definition
+    ;; "lf" 'lsp-format-buffer
+    ;; "li" 'lsp-organize-imports
+    ;; "ln" 'lsp-rename
+    ;; "lr" 'lsp-find-references
+    ;; "ls" 'lsp-describe-session
+    "ld" 'xref-find-definitions
+    "lf" 'eglot-format-buffer
+    "li" 'eglot-code-action-organize-imports
+    "ln" 'eglot-rename
+    "lr" 'xref-find-references
     "lt" 'consult-imenu
 
     ;; project mode
@@ -796,13 +803,13 @@
    '("a m" . mu4e)
    '("a p" . pass)
    ;; LSP Mode
-   '("l d" . lsp-find-definition)
-   '("l f" . lsp-format-buffer)
-   '("l i" . lsp-organize-imports)
-   '("l n" . lsp-rename)
-   '("l r" . lsp-find-references)
-   '("l s" . lsp-describe-session)
-   '("l t" . consult-imenu)
+   ;; '("l d" . lsp-find-definition)
+   ;; '("l f" . lsp-format-buffer)
+   ;; '("l i" . lsp-organize-imports)
+   ;; '("l n" . lsp-rename)
+   ;; '("l r" . lsp-find-references)
+   ;; '("l s" . lsp-describe-session)
+   ;; '("l t" . consult-imenu)
    ;; org mode
    '("o a"     . org-agenda)
    '("o c"     . org-capture)
@@ -950,6 +957,8 @@
 (use-package cider)
 (use-package clojure-mode)
 
+(use-package cue-mode)
+
 (use-package dart-mode
   :hook
   (dart-mode . flutter-test-mode))
@@ -964,16 +973,18 @@
   :config
   (flutter-l10n-flycheck-setup))
 
-(use-package lsp-dart
-  :after lsp
-  :hook
-  (dart-mode . lsp))
+;; (use-package lsp-dart
+;;   :after lsp
+;;   :hook
+;;   (dart-mode . lsp))
 
 (use-package dockerfile-mode)
 
 (use-package package-lint)
 
-(use-package go-mode)
+(use-package go-mode
+  :hook
+  (go-mode . eglot-ensure))
 
 (use-package go-tag)
 
@@ -1024,10 +1035,12 @@
 
 (use-package typescript-mode
   :custom
-  (typescript-indent-level 2))
+  (typescript-indent-level 2)
+  :hook
+  (typescript-mode . eglot-ensure))
 
 (use-package yaml-mode
-  :after highlight-indent-guides
+  :after (highlight-indent-guides flycheck)
   :config
   (add-to-list 'auto-mode-alist '("\\.yml\\'" . yaml-mode))
   :hook
@@ -1101,30 +1114,65 @@
   :init
   (global-flycheck-mode)
   :custom
-  (flycheck-check-syntax-automatically '(save new-line mode-enabled)))
-
-(setq gc-cons-threshold 100000000)
-(setq read-process-output-max (* 1024 1024)) ;; 1mb
-
-(use-package lsp-mode
-  :commands lsp
-  :hook
-  (go-mode . lsp)
-  (python-mode . lsp)
-  (javascript-mode . lsp)
-  ;; (terraform-mode . lsp) ;; currently not working properly
-  (typescript-mode . lsp)
-  :init
-  (setq lsp-headerline-breadcrumb-enable t)
+  (flycheck-check-syntax-automatically '(save new-line mode-enabled))
   :config
-  (setq lsp-file-watch-threshold 5000))
+  (define-derived-mode cfn-json-mode js-mode
+    "CFN-JSON"
+    "Simple mode to edit CloudFormation template in JSON format."
+    (setq js-indent-level 2))
 
-;; (use-package tree-sitter
+  (add-to-list 'magic-mode-alist
+               '("\\({\n *\\)? *[\"']AWSTemplateFormatVersion" . cfn-json-mode))
+
+  ;; Set up a mode for YAML based templates if yaml-mode is installed
+  ;; Get yaml-mode here https://github.com/yoshiki/yaml-mode
+    (define-derived-mode cfn-yaml-mode yaml-mode
+      "CFN-YAML"
+      "Simple mode to edit CloudFormation template in YAML format.")
+
+    (add-to-list 'magic-mode-alist
+                 '("\\(---\n\\)?AWSTemplateFormatVersion:" . cfn-yaml-mode))
+
+  ;; Set up cfn-lint integration if flycheck is installed
+  ;; Get flycheck here https://www.flycheck.org/
+  (when (featurep 'flycheck)
+    (flycheck-define-checker cfn-lint
+      "AWS CloudFormation linter using cfn-lint.
+
+Install cfn-lint first: pip install cfn-lint
+
+See `https://github.com/aws-cloudformation/cfn-python-lint'."
+
+      :command ("cfn-lint" "-f" "parseable" source)
+      :error-patterns ((warning line-start (file-name) ":" line ":" column
+                                ":" (one-or-more digit) ":" (one-or-more digit) ":"
+                                (id "W" (one-or-more digit)) ":" (message) line-end)
+                       (error line-start (file-name) ":" line ":" column
+                              ":" (one-or-more digit) ":" (one-or-more digit) ":"
+                              (id "E" (one-or-more digit)) ":" (message) line-end))
+      :modes (cfn-json-mode cfn-yaml-mode))
+
+    (add-to-list 'flycheck-checkers 'cfn-lint)
+    (add-hook 'cfn-json-mode-hook 'flycheck-mode)
+    (add-hook 'cfn-yaml-mode-hook 'flycheck-mode)))
+
+;; Set up a mode for JSON based templates
+
+;; (setq gc-cons-threshold 100000000)
+;; (setq read-process-output-max (* 1024 1024)) ;; 1mb
+
+;; (use-package lsp-mode
+;;   :commands lsp
+;;   :hook
+;;   (go-mode . lsp)
+;;   (python-mode . lsp)
+;;   (javascript-mode . lsp)
+;;   ;; (terraform-mode . lsp) ;; currently not working properly
+;;   (typescript-mode . lsp)
+;;   :init
+;;   (setq lsp-headerline-breadcrumb-enable t)
 ;;   :config
-;;   (global-tree-sitter-mode)
-;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-
-;; (use-package tree-sitter-langs)
+;;   (setq lsp-file-watch-threshold 5000))
 
 (use-package project
   :ensure nil
@@ -1232,6 +1280,7 @@
 
 (use-package github-review)
 
+(use-package emacsql-sqlite-module)
 (use-package magit
   :bind
   ("C-c g g" . magit-status)
@@ -1345,7 +1394,7 @@
   :custom
   (aws-vault t)
   (aws-output "yaml")
-  (aws-organizations-account "moia"))
+  (aws-organizations-account "Moia-Master"))
 
 (use-package aws-evil
   :after aws-mode

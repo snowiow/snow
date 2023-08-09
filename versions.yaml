@@ -1,8 +1,8 @@
 alacritty: 0.11.0
-cue: 0.4.3
-emacs: 28.2
+cue: 0.5.0
+emacs: 29.1
 kubectl: 1.25.0
 helm: 3.10.2
-aws_vault: 6.6.0
+aws_vault: 7.2.0
 aws_cfg_generator: 2.3.0
 

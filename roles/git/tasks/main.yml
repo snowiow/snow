@@ -17,3 +17,10 @@
     path: ~/.gitconfig
     state: link
     force: yes
+
+- name: symlink global gitignore
+  file:
+    src: "{{ ansible_env.PWD }}/roles/git/files/gitignore_global"
+    path: ~/.gitignore_global
+    state: link
+    force: yes

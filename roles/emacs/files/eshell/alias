@@ -2,4 +2,5 @@ alias docker podman
 alias get-oom kubectl get pod -A -o json | jq '.items[] | select(.status.containerStatuses[].lastState.terminated.reason == "OOMKilled") | { namespace: .metadata.namespace, name: .metadata.name, terminatedAt: .status.containerStatuses[].lastState.terminated.finishedAt} | select( .terminatedAt != null)'
 alias k kubectl $*
 alias ave aws-vault exec $*
+alias ase aws-sso exec -p $*
 alias custodian-run aws-vault exec $1 -- docker run -it -v ${pwd}/output:/home/custodian/output -v ${pwd}/$2:/home/custodian/policy.yml -v ${cd ~ && pwd}/.aws/config:/home/custodian/.aws/config -e AWS_DEFAULT_REGION -e AWS_ACCESS_KEY_ID -e AWS_SECRET_ACCESS_KEY -e AWS_SESSION_TOKEN cloudcustodian/c7n run --dryrun -v -s /home/custodian/output /home/custodian/policy.yml
