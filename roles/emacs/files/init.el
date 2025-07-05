@@ -1336,7 +1336,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   (message-send-mail-function 'smtpmail-send-it)
   :config
   (mu4e t)
-  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser)))
+  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t))
 
 (use-package kubel
   :bind
@@ -1389,14 +1389,11 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 (use-package dashboard
   :after org
   :custom
-  (dashboard-startup-banner 'logo)
+  (dashboard-startup-banner (expand-file-name "~/workspace/snow/img/banner.png"))
   (tab-bar-new-tab-choice "*dashboard*")
   (dashboard-projects-backend 'project-el)
-  (dashboard-agenda-sort-strategy '(time-down))
-  (dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
   (dashboard-week-agenda nil)
-  (dashboard-items '((agenda . 5)
-                     (projects . 5)
+  (dashboard-items '((projects . 5)
                      (recents  . 5)))
   :config
   (dashboard-setup-startup-hook))
@@ -1420,7 +1417,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :custom
   (aws-vault t)
   (aws-output "yaml")
-  (aws-organizations-account "Moia-Master:pe-infra-engineer-m"))
+  (aws-organizations-account "Moia-Master"))
 
 (use-package aws-evil
   :after aws-mode
