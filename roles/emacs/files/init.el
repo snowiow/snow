@@ -1389,14 +1389,11 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 (use-package dashboard
   :after org
   :custom
-  (dashboard-startup-banner 'logo)
+  (dashboard-startup-banner (expand-file-name "~/workspace/snow/img/banner.png"))
   (tab-bar-new-tab-choice "*dashboard*")
   (dashboard-projects-backend 'project-el)
-  (dashboard-agenda-sort-strategy '(time-down))
-  (dashboard-filter-agenda-entry 'dashboard-no-filter-agenda)
   (dashboard-week-agenda nil)
-  (dashboard-items '((agenda . 5)
-                     (projects . 5)
+  (dashboard-items '((projects . 5)
                      (recents  . 5)))
   :config
   (dashboard-setup-startup-hook))
