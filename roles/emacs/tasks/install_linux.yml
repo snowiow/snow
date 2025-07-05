@@ -32,7 +32,7 @@
   shell:
     cmd: |
       ./autogen.sh
-      ./configure
+      ./configure --with-xml2
     chdir: ~/workspace/emacs
 
 - name: Build Emacs

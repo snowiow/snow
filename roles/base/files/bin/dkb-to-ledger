@@ -29,15 +29,16 @@ fi
 tail -n +8 $1                                                   | # remove original header
     tac                                                         | # reverse the entry order
     iconv -f ISO8859-1 -t utf8                                  |
-    sed -E 's/(-?)([0-9]+)\.([0-9]+),([0-9]+)/\1\2\3,\4/g'      | # remove dots from amounts
+    sed -E 's/(-?)([0-9]+)\.([0-9]+),([0-9]+)/\1\2\3,\4/g'      | # remove dots from comma amounts
+    sed -E 's/(-?)([0-9]+)\.([0-9]{3})/\1\2\3 EUR/g'                | # remove dots from amounts 
     sed -E 's/(-?)([0-9]+),([0-9]+)/\1\2\.\3 EUR/g'             | # from de to en number format
     sed -E 's/,/ /g'                                            | # substitute commas with whitspaces
     sed -E 's/"//g'                                             | # remove quotation marks
     sed -E 's/;/,/g'                                            | # use commas as separators instead of semicolon
-    cut -d , -f 1,4,8                                           | # keep only relevant columns
+    cut -d , -f 1,5,9                                           | # keep only relevant columns
     sed -E '1s/^/date,desc,amount\n/'                           | # append ledger header
     ledger convert /dev/stdin \
         --invert \
-        --input-date-format "%d.%m.%Y" \
+        --input-date-format "%d.%m.%y" \
         --account $2 \
         --file "~/Sync/ledger/main.ledger" | cat

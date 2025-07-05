@@ -29,6 +29,28 @@
     mode: 755
   become: yes
 
+- name: Download terraform
+  shell:
+    "curl -L -o bin/terraform.zip https://releases.hashicorp.com/terraform/{{ terraform }}/terraform_{{ terraform }}_linux_amd64.zip"
+
+- name: Move terraform to bin
+  ansible.builtin.unarchive:
+    src: "{{ playbook_dir }}/bin/terraform.zip"
+    dest: /usr/local/bin
+    remote_src: yes
+  become: yes
+
+- name: Download aws-sso
+  shell:
+    "curl -L -o bin/aws-sso https://github.com/synfinatic/aws-sso-cli/releases/download/v{{ aws_sso }}/aws-sso-{{ aws_sso }}-linux-amd64"
+
+- name: Move aws-sso to bin
+  ansible.builtin.copy:
+    src: "{{ playbook_dir }}/bin/aws-sso"
+    dest: /usr/local/bin/aws-sso
+    mode: 755
+  become: yes
+
 - name: Download aws-cfg-generator
   shell: "curl -L -o bin/aws-cfg-generator https://github.com/moia-oss/aws-cfg-generator/releases/download/v{{ aws_cfg_generator }}/linux-amd64-aws-cfg-generator"
     

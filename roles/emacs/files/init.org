@@ -17,16 +17,17 @@
   (use-package use-package-ensure-system-package
     :ensure t)
 #+END_SRC
-* Prequisites
+* Defaults
 #+BEGIN_SRC emacs-lisp
-  (use-package sqlite3)
+(setq-default
+    display-line-numbers-type 'relative)
+(global-display-line-numbers-mode)
 #+END_SRC
-* Emacs Server
+* Emacs
+This is a pseudo package specifying all emacs builtin settings
 #+BEGIN_SRC emacs-lisp
   (use-package emacs
     :custom
-    ;; (global-linum-mode t)
-
     (xref-search-program 'ripgrep)
     :bind
     ("C-c m" . windmove-left)
@@ -118,7 +119,6 @@ Due to differnt resolutions on Mac the font should be displayed bigger
     (set-face-attribute 'default nil
                         :family "Iosevka Term"
                         :height 140))
- 
 #+END_SRC
 * Mac OSX Settings
 Set option to super and commant to meta
@@ -213,15 +213,6 @@ Have something similar to vim-surround.
     :hook
     (clojure-mode . rainbow-delimiters-mode)
     (emacs-lisp-mode . rainbow-delimiters-mode))
-#+END_SRC
-
-** Relative Line Numbers
-#+BEGIN_SRC emacs-lisp
-  (use-package linum-relative
-    :custom
-    (linum-relative-backend 'display-line-numbers-mode)
-    :config
-    (linum-relative-global-mode))
 #+END_SRC
 
 ** Indent Guides
@@ -367,9 +358,14 @@ Have something similar to vim-surround.
       "ap" 'pass
 
       "b" 'consult-buffer
-      "c" (lambda ()
-            (interactive)
-            (find-file "~/workspace/snow/roles/emacs/files/init.org"))
+      "c" '(:ignore t :which-key "copilot")
+      "cc" 'copilot-chat-display
+      "cd" 'copilot-chat-doc
+      "ce" 'copilot-chat-explain
+      "cf" 'copilot-chat-fix
+      "cr" 'copilot-chat-review
+      "co" 'copilot-chat-optimize
+      "ct" 'copilot-chat-test
       "e" 'dired-jump
 
       ;; find
@@ -407,6 +403,7 @@ Have something similar to vim-surround.
       ;; "ln" 'lsp-rename
       ;; "lr" 'lsp-find-references
       ;; "ls" 'lsp-describe-session
+      "lc" 'copilot-complete
       "ld" 'xref-find-definitions
       "lf" 'eglot-format-buffer
       "li" 'eglot-code-action-organize-imports
@@ -838,15 +835,19 @@ Only show the typical german holidays
     (setq org-roam-v2-ack t)
     :custom
     (org-roam-directory "~/Sync/notes/roam")
+    (org-roam-dailies-directory "journals/")
     (org-roam-completion-everywhere t)
     (org-roam-capture-templates
      '(("b" "book notes" plain (file "~/Sync/notes/roam/templates/booknote.org")
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+        :if-new (file+head "pages/${slug}.org" "#+title: ${title}\n")
         :unnarrowed t)
        ("d" "default" plain
         "%?"
-        :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+        :if-new (file+head "pages/${slug}.org" "#+title: ${title}\n")
         :unnarrowed t)))
+    (org-roam-dailies-capture-templates
+     '(("d" "default" entry "* %?"
+        :target (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
     :config
     (org-roam-db-autosync-mode))
 #+END_SRC
@@ -1361,6 +1362,35 @@ Only show the typical german holidays
 
 *** Eglot
 
+** Copilot
+
+#+BEGIN_SRC emacs-lisp
+      (use-package copilot
+        :hook
+        (prog-mode . copilot-mode)
+        (yaml-mode . copilot-mode)
+        :load-path "~/.emacs.d/packages/copilot.el"
+        :bind (:map copilot-completion-map
+                ("<tab>" . 'copilot-accept-completion)
+                ("TAB" . 'copilot-accept-completion)))
+#+END_SRC
+
+** Copilot Chat
+
+#+BEGIN_SRC emacs-lisp
+  (use-package shell-maker
+   :load-path "~/.emacs.d/packages/chatgpt-shell")
+  (use-package request)
+  (use-package copilot-chat
+    :load-path "~/.emacs.d/packages/copilot-chat.el"
+    :after (request shell-maker)
+    :custom
+    (copilot-chat-frontend 'org))
+    ;; :config
+    ;; (require 'copilot-chat-shell-maker)
+    ;; (push '(shell-maker . copilot-chat-shell-maker-init) copilot-chat-frontend-list)
+    ;; (copilot-chat-shell-maker-init))
+#+END_SRC
 * Project Management
 
 ** project.el
@@ -1494,7 +1524,7 @@ This snippet adds an advice around the =project-switch-project= function to auto
 
   (use-package github-review)
 
-  (use-package emacsql-sqlite-module)
+  (use-package emacsql)
   (use-package magit
     :bind
     ("C-c g g" . magit-status)
@@ -1505,7 +1535,7 @@ This snippet adds an advice around the =project-switch-project= function to auto
 #+BEGIN_SRC emacs-lisp
   (use-package mu4e
     :ensure nil
-    :load-path "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.8.7"
+    :load-path "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.12.9"
     :custom
     (mu4e-update-interval (* 30 60))
     (mu4e-get-mail-command "offlineimap")

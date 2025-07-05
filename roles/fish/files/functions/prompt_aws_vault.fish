@@ -1,6 +1,6 @@
 function prompt_aws_vault
-    if test -n "$AWS_VAULT"
+    if test -n "$AWS_SSO_PROFILE"
         set_color cyan
-        string join "" "[vault: " $AWS_VAULT "] "
+        string join "" "[aws: " $AWS_SSO_PROFILE "] "
     end
 end

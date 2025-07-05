@@ -10,12 +10,12 @@
 (use-package use-package-ensure-system-package
   :ensure t)
 
-(use-package sqlite3)
+(setq-default
+    display-line-numbers-type 'relative)
+(global-display-line-numbers-mode)
 
 (use-package emacs
   :custom
-  ;; (global-linum-mode t)
-
   (xref-search-program 'ripgrep)
   :bind
   ("C-c m" . windmove-left)
@@ -142,12 +142,6 @@
   :hook
   (clojure-mode . rainbow-delimiters-mode)
   (emacs-lisp-mode . rainbow-delimiters-mode))
-
-(use-package linum-relative
-  :custom
-  (linum-relative-backend 'display-line-numbers-mode)
-  :config
-  (linum-relative-global-mode))
 
 (use-package highlight-indent-guides
   :custom
@@ -284,9 +278,14 @@
     "ap" 'pass
 
     "b" 'consult-buffer
-    "c" (lambda ()
-          (interactive)
-          (find-file "~/workspace/snow/roles/emacs/files/init.org"))
+    "c" '(:ignore t :which-key "copilot")
+    "cc" 'copilot-chat-display
+    "cd" 'copilot-chat-doc
+    "ce" 'copilot-chat-explain
+    "cf" 'copilot-chat-fix
+    "cr" 'copilot-chat-review
+    "co" 'copilot-chat-optimize
+    "ct" 'copilot-chat-test
     "e" 'dired-jump
 
     ;; find
@@ -324,6 +323,7 @@
     ;; "ln" 'lsp-rename
     ;; "lr" 'lsp-find-references
     ;; "ls" 'lsp-describe-session
+    "lc" 'copilot-complete
     "ld" 'xref-find-definitions
     "lf" 'eglot-format-buffer
     "li" 'eglot-code-action-organize-imports
@@ -719,15 +719,19 @@
   (setq org-roam-v2-ack t)
   :custom
   (org-roam-directory "~/Sync/notes/roam")
+  (org-roam-dailies-directory "journals/")
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
    '(("b" "book notes" plain (file "~/Sync/notes/roam/templates/booknote.org")
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+      :if-new (file+head "pages/${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)
      ("d" "default" plain
       "%?"
-      :if-new (file+head "%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
+      :if-new (file+head "pages/${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)))
+  (org-roam-dailies-capture-templates
+   '(("d" "default" entry "* %?"
+      :target (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
   :config
   (org-roam-db-autosync-mode))
 
@@ -1174,6 +1178,28 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 ;;   :config
 ;;   (setq lsp-file-watch-threshold 5000))
 
+(use-package copilot
+  :hook
+  (prog-mode . copilot-mode)
+  (yaml-mode . copilot-mode)
+  :load-path "~/.emacs.d/packages/copilot.el"
+  :bind (:map copilot-completion-map
+          ("<tab>" . 'copilot-accept-completion)
+          ("TAB" . 'copilot-accept-completion)))
+
+(use-package shell-maker
+ :load-path "~/.emacs.d/packages/chatgpt-shell")
+(use-package request)
+(use-package copilot-chat
+  :load-path "~/.emacs.d/packages/copilot-chat.el"
+  :after (request shell-maker)
+  :custom
+  (copilot-chat-frontend 'org))
+  ;; :config
+  ;; (require 'copilot-chat-shell-maker)
+  ;; (push '(shell-maker . copilot-chat-shell-maker-init) copilot-chat-frontend-list)
+  ;; (copilot-chat-shell-maker-init))
+
 (use-package project
   :ensure nil
   :bind (:map project-prefix-map
@@ -1280,7 +1306,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 
 (use-package github-review)
 
-(use-package emacsql-sqlite-module)
+(use-package emacsql)
 (use-package magit
   :bind
   ("C-c g g" . magit-status)
@@ -1289,7 +1315,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 
 (use-package mu4e
   :ensure nil
-  :load-path "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.8.7"
+  :load-path "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.12.9"
   :custom
   (mu4e-update-interval (* 30 60))
   (mu4e-get-mail-command "offlineimap")
@@ -1310,7 +1336,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   (message-send-mail-function 'smtpmail-send-it)
   :config
   (mu4e t)
-  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t))
+  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser)))
 
 (use-package kubel
   :bind
@@ -1394,7 +1420,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :custom
   (aws-vault t)
   (aws-output "yaml")
-  (aws-organizations-account "Moia-Master"))
+  (aws-organizations-account "Moia-Master:pe-infra-engineer-m"))
 
 (use-package aws-evil
   :after aws-mode
