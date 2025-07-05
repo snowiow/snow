@@ -1336,7 +1336,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   (message-send-mail-function 'smtpmail-send-it)
   :config
   (mu4e t)
-  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser)))
+  (add-to-list 'mu4e-view-actions '("ViewInBrowser" . mu4e-action-view-in-browser) t))
 
 (use-package kubel
   :bind
@@ -1420,7 +1420,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :custom
   (aws-vault t)
   (aws-output "yaml")
-  (aws-organizations-account "Moia-Master:pe-infra-engineer-m"))
+  (aws-organizations-account "Moia-Master"))
 
 (use-package aws-evil
   :after aws-mode

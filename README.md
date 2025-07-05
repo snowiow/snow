@@ -1,4 +1,7 @@
 # My personal dotfiles
+<p align="center">
+    <img src="./img/banner.png" width="30%" height="30%">
+</p>
 
 ## Links to config files
 
