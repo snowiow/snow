@@ -3,7 +3,7 @@
     name: 
       - libtool
       - libgccjit0 
-      - libgccjit-10-dev
+      - libgccjit-15-dev
       - texinfo
       - build-essential 
       - libx11-dev 

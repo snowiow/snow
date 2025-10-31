@@ -24,6 +24,8 @@
   ("C-c n" . windmove-down)
   :config
   (server-start))
+(use-package polymode)
+(use-package aio)
 
 (setq tags-revert-without-query 1)
 
@@ -126,6 +128,9 @@
               ("C-p" . company-select-previous)
               ("C-d" . company-show-doc-buffer)))
 
+(use-package company-box
+  :hook (company-mode . company-box-mode))
+
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 
@@ -208,7 +213,7 @@
   :config
   (add-hook 'evil-org-mode-hook
             (lambda ()
-              (evil-org-set-key-theme '(textobjects insert navigation additional shift todo heading))))
+              (evil-org-set-key-theme '(textobjects insert navigation additional shift todo))))
   (require 'evil-org-agenda)
   (evil-org-agenda-set-keys))
 
@@ -218,7 +223,7 @@
   (global-evil-surround-mode 1))
 
 (use-package general
-  :after consult
+  :after consult 
   :config
   (general-evil-setup t)
   (general-define-key
@@ -339,13 +344,7 @@
     "oa"   'org-agenda
     "oc"   'org-capture
     "or"   '(:ignore t :which-key "Roam")
-    "ord"  '(:ignore t :which-key "Daily")
-    "ordt" 'org-roam-dailies-capture-today
-    "ordT" 'org-roam-dailies-goto-today
-    "ordy" 'org-roam-dailies-capture-yesterday
-    "ordY" 'org-roam-dailies-goto-yesterday
-    "ordd" 'org-roam-dailies-capture-date
-    "ordD" 'org-roam-dailies-goto-date
+    "ord"  'org-roam-dailies-map
     "orf"  'org-roam-node-find
     "ort"  'org-roam-buffer-toggle
     "os"   'snow/rg-org
@@ -422,9 +421,15 @@
   (snow/local-leader-keys
     :states 'normal
     :keymaps 'lisp-interaction-mode-map
-    "e" 'eval-print-last-sexp
-    )
-
+    "e" 'eval-print-last-sexp)
+  
+  ;; mu4e-view-mode
+  (snow/local-leader-keys
+      :states 'normal
+      :keymaps 'mu4e-view-mode-map
+      "h" 'mu4e-view-toggle-html
+      "a" 'mu4e-view-save-attachment)
+  
   ;; mu4e-compose-mode
   (snow/local-leader-keys
     :states 'normal
@@ -453,6 +458,12 @@
     "0"   'snow/org-start-presentation
     "$"   'org-archive-subtree
     )
+
+  ;; org-agenda
+  (snow/local-leader-keys
+    :states 'motion
+    :keymaps 'org-agenda-mode-map
+    "f" 'org-agenda-filter)
 
   ;; text-mode
   (snow/local-leader-keys
@@ -566,6 +577,11 @@
   (org-image-actual-width nil)
   (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
                        (sequence "|" "CANCELLED(c)")))
+  ;; (org-tag-alist '(
+  ;;                  ("work" . ?w)
+  ;;                  ("home" . ?p)
+  ;;                  ("coding" . ?c)
+  ;;                  ("blog" . ?b)))
   :config
   (require 'org-habit)
   (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
@@ -577,17 +593,6 @@
                                                (concat org-directory "/appointments.org"))
                                              "Private")
            "* %?")
-          ("f" "Fitness")
-          ("fj" "Workout Journal Entry"
-           entry (file+datetree (lambda () (concat org-directory "/fitness.org"))
-                                "Gym" "Workout Journal")
-           "* %U %?")
-          ("fw" "Gewicht Eintrag" table-line
-           (id "weight-table")
-           "| %u | %^{Gewicht} | %^{Körperfettanteil} | %^{Körperwasser} | %^{Muskelmasse} | %^{Knochenmasse} |"  :immediate-finish t)
-          ("k" "Keyboard WPM" table-line
-           (id "wpm-progress-ferris")
-           "| %u | %^{WPM} | %^{Accuracy} | %^{Consistency}"  :immediate-finish t)
           ("t" "Todos")
           ("tt" "Todo" entry (file+headline
                               (lambda ()
@@ -626,6 +631,11 @@
                                        (concat org-directory "/meetings.org"))
                                      "Work")
            (file  "templates/interview.org"))
+          ("wmo" "1on1" entry (file+headline
+                                (lambda ()
+                                  (concat org-directory "/meetings.org"))
+                                "1on1")
+           (file  "templates/repeating-meeting.org"))
           ("wmr" "Retro" entry (file+headline
                                 (lambda ()
                                   (concat org-directory "/meetings.org"))
@@ -644,7 +654,7 @@
           ("wt" "Todo Work" entry (file+headline
                                    (lambda ()
                                      (concat org-directory "/work.org"))
-                                   "Todos")
+                                   "Inbox")
            "* TODO %?"))))
 
 
@@ -715,6 +725,7 @@
   :hook (org-mode . org-modern-mode))
 
 (use-package org-roam
+  :after org
   :init
   (setq org-roam-v2-ack t)
   :custom
@@ -723,16 +734,21 @@
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
    '(("b" "book notes" plain (file "~/Sync/notes/roam/templates/booknote.org")
-      :if-new (file+head "pages/${slug}.org" "#+title: ${title}\n")
+      :target (file+head "pages/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)
      ("d" "default" plain
       "%?"
-      :if-new (file+head "pages/${slug}.org" "#+title: ${title}\n")
+      :target (file+head "pages/%<%Y%m%d%H%M%S>-${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)))
   (org-roam-dailies-capture-templates
-   '(("d" "default" entry "* %?"
-      :target (file+head "%<%Y-%m-%d>.org" "#+title: %<%Y-%m-%d>\n"))))
+   '(("j" "journal" plain "\n** %<%H:%M>: %?"
+      :target (file+head+olp "%<%Y-%m-%d>.org"
+                             "#+title: %<%Y-%m-%d>\n"
+                             ("Journal"))
+      :unnarrowed t
+      :immediate-finish nil)))
   :config
+  (require 'org-roam-dailies)
   (org-roam-db-autosync-mode))
 
 (defun snow/org-start-presentation ()
@@ -1133,7 +1149,7 @@
     (define-derived-mode cfn-yaml-mode yaml-mode
       "CFN-YAML"
       "Simple mode to edit CloudFormation template in YAML format.")
-
+  
     (add-to-list 'magic-mode-alist
                  '("\\(---\n\\)?AWSTemplateFormatVersion:" . cfn-yaml-mode))
 
@@ -1183,6 +1199,8 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   (prog-mode . copilot-mode)
   (yaml-mode . copilot-mode)
   :load-path "~/.emacs.d/packages/copilot.el"
+  :custom
+  (copilot-indent-offset-warning-disable t)
   :bind (:map copilot-completion-map
           ("<tab>" . 'copilot-accept-completion)
           ("TAB" . 'copilot-accept-completion)))
@@ -1190,15 +1208,11 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 (use-package shell-maker
  :load-path "~/.emacs.d/packages/chatgpt-shell")
 (use-package request)
+
 (use-package copilot-chat
-  :load-path "~/.emacs.d/packages/copilot-chat.el"
   :after (request shell-maker)
   :custom
   (copilot-chat-frontend 'org))
-  ;; :config
-  ;; (require 'copilot-chat-shell-maker)
-  ;; (push '(shell-maker . copilot-chat-shell-maker-init) copilot-chat-frontend-list)
-  ;; (copilot-chat-shell-maker-init))
 
 (use-package project
   :ensure nil
@@ -1308,6 +1322,8 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 
 (use-package emacsql)
 (use-package magit
+  :init
+  (setq magit-show-long-lines-warning nil)
   :bind
   ("C-c g g" . magit-status)
   ("C-c g c" . magit-clone)
@@ -1386,6 +1402,17 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
                '(file))))
   (openwith-mode t))
 
+(defun snow/dashboard-filter-agenda-today-or-earlier ()
+  "Exclude agenda items scheduled after today.
+Return nil to include the entry, return point to exclude it."
+  (let ((scheduled-time (org-get-scheduled-time (point)))
+        (end-of-today (org-time-string-to-time
+                       (format-time-string "%Y-%m-%d 23:59:59" (current-time)))))
+    ;; Exclude (return point) if scheduled time is after today
+    (when (and scheduled-time
+               (time-less-p end-of-today scheduled-time))
+      (point))))
+
 (use-package dashboard
   :after org
   :custom
@@ -1393,35 +1420,32 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   (tab-bar-new-tab-choice "*dashboard*")
   (dashboard-projects-backend 'project-el)
   (dashboard-week-agenda nil)
-  (dashboard-items '((projects . 5)
+  (dashboard-match-agenda-entry "+SCHEDULED<=\"<today>\"")
+  (dashboard-items '((agenda . 5)
+                     (projects . 5)
                      (recents  . 5)))
   :config
   (dashboard-setup-startup-hook))
 
 (use-package gnuplot)
-
-
-
-
 (use-package pass)
-
-
 (use-package proced
   :config
   (add-hook 'proced-mode-hook
             (lambda ()
               (proced-toggle-auto-update t))))
 
-(use-package aws-mode
+(use-package aws
   :load-path "~/.emacs.d/packages/aws.el"
+  :commands (aws aws-login)  ;; This will use the autoloads we added
   :custom
-  (aws-vault t)
+  (aws-login-method 'sso)
   (aws-output "yaml")
-  (aws-organizations-account "Moia-Master"))
+  (aws-organizations-account "Moia-Master:pe-infra-engineer-m"))
 
 (use-package aws-evil
-  :after aws-mode
-  :load-path "~/.emacs.d/packages/awscli")
+  :after aws
+  :load-path "~/.emacs.d/packages/aws.el")
 
 (defun snow/branch-name-to-commit-msg ()
  (interactive)
