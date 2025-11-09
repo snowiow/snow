@@ -141,3 +141,23 @@ XF86LaunchA
 
 XF86Explorer
     xinput disable 13
+
+# Emacs commands
+super + z
+      emacsclient -c -a 'emacs' -e '(dashboard-open)'
+super + space ; a
+      emacsclient -c -a 'emacs' -e '(org-agenda)'
+super + space ; c
+      emacsclient -c -a 'emacs' -e '(org-capture)'
+super + space ; d
+      emacsclient -c -a 'emacs' -e '(dired "~/")'
+super + space ; e
+      emacsclient -c -a 'emacs' -e '(dashboard-open)'
+super + space ; m
+      emacsclient -c -a 'emacs' -e '(mu4e)'
+super + space ; r
+      emacsclient -c -a 'emacs' -e '(org-roam-find-node)'
+super + space ; p
+      emacsclient -c -a 'emacs' -e '(pass)'
+super + space ; t
+      emacsclient -c -a 'emacs' -e '(eshell)'

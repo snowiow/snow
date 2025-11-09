@@ -23,7 +23,8 @@
   ("C-c e" . windmove-up)
   ("C-c n" . windmove-down)
   :config
-  (server-start))
+  ;; (server-start)
+  )
 (use-package polymode)
 (use-package aio)
 
@@ -76,12 +77,24 @@
 
 (load "~/.emacs.d/modeline-dark.el")
 
+(defvar snow/fixed-width-font "Iosevka Term"
+  "The font to use for monospaced (fixed width) text.")
+
+(defvar snow/variable-width-font "Iosevka Aile"
+  "The font to use for variable-pitch (document) text.")
+
 (if (eq system-type 'gnu/linux)
-    (set-face-attribute 'default nil
-                        :family "Iosevka Term"
+    (progn (set-face-attribute 'default nil
+                        :family snow/fixed-width-font
                         :height 120)
+           (set-face-attribute 'fixed-pitch nil
+                        :family snow/fixed-width-font
+                        :height 120)
+           (set-face-attribute 'variable-pitch nil
+                        :family snow/variable-width-font
+                        :height 120))
   (set-face-attribute 'default nil
-                      :family "Iosevka Term"
+                      :family snow/fixed-width-font
                       :height 140))
 
 (setq mac-option-modifier 'super)
@@ -91,6 +104,8 @@
 (use-package exec-path-from-shell
   :config
   (when (memq window-system '(mac ns x))
+    (exec-path-from-shell-initialize))
+  (when (daemonp)
     (exec-path-from-shell-initialize)))
 
 (setq backup-directory-alist `(("." . "~/tmp")))
@@ -160,8 +175,12 @@
 
 (defun snow/evil-yank-highlight-advice (orig-fn beg end &rest args)
   "Highlight yanked region."
-  (pulse-momentary-highlight-region beg end)
-  (apply orig-fn beg end args))
+  (apply orig-fn beg end args)
+  (let ((overlay (make-overlay beg end)))
+    (overlay-put overlay 'face 'highlight)
+    (run-with-timer 0.5 nil
+                    (lambda (ov) (delete-overlay ov))
+                    overlay)))
 
 (use-package evil
   :after undo-tree
@@ -174,13 +193,14 @@
   :config
   (advice-add 'evil-yank :around 'snow/evil-yank-highlight-advice)
   (evil-mode)
-  )
+  ;; Use Emacs state for calendar mode to preserve default keybindings
+  (evil-set-initial-state 'calendar-mode 'emacs))
 
 (use-package evil-collection
   :after evil
   :config
   (evil-collection-init '(calc
-                          calendar
+                          ;; calendar
                           dashboard
                           dired
                           ediff
@@ -215,7 +235,10 @@
             (lambda ()
               (evil-org-set-key-theme '(textobjects insert navigation additional shift todo))))
   (require 'evil-org-agenda)
-  (evil-org-agenda-set-keys))
+  (evil-org-agenda-set-keys)
+  ;; Fix: Deactivate mark after evil-org indent operations to prevent entering visual mode
+  (advice-add 'evil-org-indent-items :after
+              (lambda (&rest _) (deactivate-mark))))
 
 (use-package evil-surround
   :after evil
@@ -573,7 +596,7 @@
   (org-babel-python-command "python3")
   (org-confirm-babel-evaluate nil)
   (org-default-notes-file (concat org-directory "/capture.org"))
-  (org-ellipsis " ▾")
+  (org-ellipsis " ")
   (org-image-actual-width nil)
   (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
                        (sequence "|" "CANCELLED(c)")))
@@ -583,10 +606,32 @@
   ;;                  ("coding" . ?c)
   ;;                  ("blog" . ?b)))
   :config
-  (require 'org-habit)
+  (set-face-attribute 'org-ellipsis nil :background 'unspecified :box nil)
   (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
   (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
   (add-to-list 'org-modules 'habits)
+  (require 'org-faces)
+  ;; Hide emphasis markers on formatted text
+  (setq org-hide-emphasis-markers t)
+  ;; Resize Org headings
+  (dolist (face '((org-level-1 . 1.25)
+                  (org-level-2 . 1.2)
+                  (org-level-3 . 1.15)
+                  (org-level-4 . 1.1)
+                  (org-level-5 . 1.05)
+                  (org-level-6 . 1)
+                  (org-level-7 . 1)
+                  (org-level-8 . 1)))
+  (set-face-attribute (car face) nil :font snow/variable-width-font :weight 'medium :height (cdr face)))
+  ;; Make sure certain org faces use the fixed-pitch face when variable-pitch-mode is on
+  (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-formula nil :inherit 'fixed-pitch)
+  (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+  (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+  (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch)
   (setq org-capture-templates
         '(("a" "Private Appointments" entry (file+headline
                                              (lambda ()
@@ -650,12 +695,17 @@
                                         (lambda ()
                                           (concat org-directory "/meetings.org"))
                                         "Tech BiWeekly")
-           (file repeating-meeting-file))
-          ("wt" "Todo Work" entry (file+headline
+          (file repeating-meeting-file))
+          ("wt" "Tasks")
+          ("wtt" "Todo Work" entry (file+headline
                                    (lambda ()
                                      (concat org-directory "/work.org"))
                                    "Inbox")
-           "* TODO %?"))))
+           "* TODO %?")
+          ("wtf" "Learning Friday" entry (file
+                            (lambda ()
+                              (concat org-directory "/learning-friday.org")))
+            "* TODO %?"))))
 
 
 (defun org-summary-todo (n-done n-not-done)
@@ -751,26 +801,47 @@
   (require 'org-roam-dailies)
   (org-roam-db-autosync-mode))
 
+(use-package visual-fill-column
+    :custom
+    (visual-fill-column-width 80)
+    (visual-fill-column-center-text t))
+
+(use-package hide-mode-line)
+
 (defun snow/org-start-presentation ()
-  (interactive)
-  (org-tree-slide-mode 1)
-  (setq text-scale-mode-amount 1)
-  (text-scale-mode 1))
+    (interactive)
+    (org-tree-slide-mode 1)
+    (setq text-scale-mode-amount 2)
+    (text-scale-mode 1)
+    (visual-line-mode 1)
+    (visual-fill-column-mode 1)
+    (display-line-numbers-mode -1)
+    (org-display-inline-images)
+    (hide-mode-line-mode 1)
+    (evil-normalize-keymaps)
+    (evil-local-set-key 'normal (kbd "q") 'snow/org-end-presentation)
+    (evil-local-set-key 'normal (kbd "<right>") 'org-tree-slide-move-next-tree)
+    (evil-local-set-key 'normal (kbd "<left>") 'org-tree-slide-move-previous-tree))
 
 (defun snow/org-end-presentation ()
-  (interactive)
-  (text-scale-mode 0)
-  (org-tree-slide-mode 0))
+    (interactive)
+    (text-scale-mode 0)
+    (org-tree-slide-mode 0)
+    (visual-line-mode 0)
+    (visual-fill-column-mode 0)
+    (display-line-numbers-mode 1)
+    (hide-mode-line-mode 0))
 
 (use-package org-tree-slide
-  :defer t
-  :after org
-  :commands org-tree-slide-mode
-  :config
-  (evil-define-key 'normal org-tree-slide-mode-map
-    (kbd "q") 'snow/org-end-presentation
-    (kbd "<right>") 'org-tree-slide-move-next-tree
-    (kbd "<left>") 'org-tree-slide-move-previous-tree))
+    :defer t
+    :after '(org visual-fill-column evil)
+    :commands org-tree-slide-mode
+    :config
+    (with-eval-after-load 'org-tree-slide
+      (evil-collection-define-key 'normal 'org-tree-slide-mode-map
+        "q" 'snow/org-end-presentation
+        (kbd "<right>") 'org-tree-slide-move-next-tree
+        (kbd "<left>") 'org-tree-slide-move-previous-tree)))
 
 (setq ispell-program-name "aspell")
 
@@ -1301,6 +1372,11 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 
 (use-package vterm)
 
+(use-package eat
+  :load-path "~/.emacs.d/packages/emacs-eat"
+  :hook
+  (eshell-mode . eat-eshell-mode))
+
 (use-package auth-source-pass
   :ensure nil
   :config
@@ -1403,41 +1479,41 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   (openwith-mode t))
 
 (defun snow/dashboard-filter-agenda-today-or-earlier ()
-  "Exclude agenda items scheduled after today.
+    "Exclude agenda items scheduled after today.
 Return nil to include the entry, return point to exclude it."
-  (let ((scheduled-time (org-get-scheduled-time (point)))
-        (end-of-today (org-time-string-to-time
-                       (format-time-string "%Y-%m-%d 23:59:59" (current-time)))))
-    ;; Exclude (return point) if scheduled time is after today
-    (when (and scheduled-time
-               (time-less-p end-of-today scheduled-time))
-      (point))))
+    (let ((scheduled-time (org-get-scheduled-time (point)))
+          (end-of-today (org-time-string-to-time
+                         (format-time-string "%Y-%m-%d 23:59:59" (current-time)))))
+      ;; Exclude (return point) if scheduled time is after today
+      (when (and scheduled-time
+                 (time-less-p end-of-today scheduled-time))
+        (point))))
 
-(use-package dashboard
-  :after org
-  :custom
-  (dashboard-startup-banner (expand-file-name "~/workspace/snow/img/banner.png"))
-  (tab-bar-new-tab-choice "*dashboard*")
-  (dashboard-projects-backend 'project-el)
-  (dashboard-week-agenda nil)
-  (dashboard-match-agenda-entry "+SCHEDULED<=\"<today>\"")
-  (dashboard-items '((agenda . 5)
-                     (projects . 5)
-                     (recents  . 5)))
-  :config
-  (dashboard-setup-startup-hook))
+  (use-package dashboard
+    :after org
+    :custom
+    (dashboard-startup-banner (expand-file-name "~/workspace/snow/img/banner.png"))
+    (tab-bar-new-tab-choice "*dashboard*")
+    (dashboard-projects-backend 'project-el)
+    (dashboard-week-agenda nil)
+    (dashboard-match-agenda-entry "+SCHEDULED<=\"<today>\"")
+    (dashboard-items '((agenda . 5)
+                       (projects . 5)
+                       (recents  . 5)))
+    :config
+    (dashboard-setup-startup-hook))
 
-(use-package gnuplot)
-(use-package pass)
-(use-package proced
-  :config
-  (add-hook 'proced-mode-hook
-            (lambda ()
-              (proced-toggle-auto-update t))))
+  (use-package gnuplot)
+  (use-package pass)
+  (use-package proced
+    :config
+    (add-hook 'proced-mode-hook
+              (lambda ()
+                (proced-toggle-auto-update t))))
 
 (use-package aws
   :load-path "~/.emacs.d/packages/aws.el"
-  :commands (aws aws-login)  ;; This will use the autoloads we added
+  :commands (aws aws-login) 
   :custom
   (aws-login-method 'sso)
   (aws-output "yaml")

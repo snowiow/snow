@@ -1,3 +1,6 @@
+- name: Include version vars
+  include_vars: "{{ playbook_dir }}/versions.yaml"
+
 - name: make sure packages are installed
   package:
     name:
@@ -10,10 +13,17 @@
   become: yes
 
 
-- name: download and extract iosevka-term font
+- name: download and extract Iosevka Font
   become: yes
   ansible.builtin.unarchive:
-    src: https://github.com/be5invis/Iosevka/releases/download/v16.3.6/super-ttc-sgr-iosevka-term-16.3.6.zip
+    src: https://github.com/be5invis/Iosevka/releases/download/v{{ iosevka_font }}/SuperTTC-Iosevka-{{ iosevka_font }}.zip
+    dest: /usr/local/share/fonts/
+    remote_src: yes
+
+- name: download and extract Iosevka Aile Font
+  become: yes
+  ansible.builtin.unarchive:
+    src: https://github.com/be5invis/Iosevka/releases/download/v{{ iosevka_font }}/SuperTTC-IosevkaAile-{{ iosevka_font }}.zip
     dest: /usr/local/share/fonts/
     remote_src: yes
 
