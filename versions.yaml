@@ -1,6 +1,6 @@
 aws_vault: 7.2.0
 aws_sso: 2.0.3
-alacritty: 0.11.0
+alacritty: 0.16.1
 cue: 0.8.1
 emacs: 30.2
 kubectl: 1.25.0

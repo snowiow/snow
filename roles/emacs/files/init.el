@@ -17,14 +17,14 @@
 (use-package emacs
   :custom
   (xref-search-program 'ripgrep)
+  (tab-always-indent 'complete)
+  (text-mode-ispell-word-completion nil)
   :bind
   ("C-c m" . windmove-left)
   ("C-c i" . windmove-right)
   ("C-c e" . windmove-up)
-  ("C-c n" . windmove-down)
-  :config
-  ;; (server-start)
-  )
+  ("C-c n" . windmove-down))
+
 (use-package polymode)
 (use-package aio)
 
@@ -57,6 +57,7 @@
   (doom-themes-enable-italic t)
   :config
   (load-theme 'doom-one-light t)
+  ;; (load-theme 'doom-moonlight t)
   (load-theme 'doom-tomorrow-night t))
 
 (defun snow/switch-theme ()
@@ -83,19 +84,22 @@
 (defvar snow/variable-width-font "Iosevka Aile"
   "The font to use for variable-pitch (document) text.")
 
+(defvar snow/font-height 120
+  "The default height for all fonts")
+
 (if (eq system-type 'gnu/linux)
     (progn (set-face-attribute 'default nil
                         :family snow/fixed-width-font
-                        :height 120)
+                        :height snow/font-height)
            (set-face-attribute 'fixed-pitch nil
                         :family snow/fixed-width-font
-                        :height 120)
+                        :height snow/font-height)
            (set-face-attribute 'variable-pitch nil
                         :family snow/variable-width-font
-                        :height 120))
+                        :height snow/font-height))
   (set-face-attribute 'default nil
                       :family snow/fixed-width-font
-                      :height 140))
+                      :height snow/font-height))
 
 (setq mac-option-modifier 'super)
 (setq mac-right-option-modifier nil)
@@ -125,26 +129,41 @@
   :config
   (editorconfig-mode 1))
 
-(use-package company
-  :custom
-  (company-dabbrev-downcase nil)
-  (company-selection-wrap-around t)
-  (company-idle-delay 0.1)
-  (company-minimum-prefix-length 1)
-  :hook
-  (after-init . global-company-mode)
-  :bind
-  ("C-o" . company-complete)
-  (:map company-active-map
-              ("M-n" . nil)
-              ("M-p" . nil)
-              ("C-n" . company-select-next)
-              ("C-p" . company-select-previous)
-              ("C-p" . company-select-previous)
-              ("C-d" . company-show-doc-buffer)))
+;; (use-package company
+;;   :custom
+;;   (company-dabbrev-downcase nil)
+;;   (company-selection-wrap-around t)
+;;   (company-idle-delay 0.1)
+;;   (company-minimum-prefix-length 1)
+;;   :hook
+;;   (after-init . global-company-mode)
+;;   :bind
+;;   ("C-o" . company-complete)
+;;   (:map company-active-map
+;;               ("M-n" . nil)
+;;               ("M-p" . nil)
+;;               ("C-n" . company-select-next)
+;;               ("C-p" . company-select-previous)
+;;               ("C-p" . company-select-previous)
+;;               ("C-d" . company-show-doc-buffer)))
 
-(use-package company-box
-  :hook (company-mode . company-box-mode))
+;; (use-package company-box
+;;   :hook (company-mode . company-box-mode))
+
+(use-package corfu
+    :custom
+    (corfu-cycle t)
+    :bind
+    (:map corfu-map ("SPC" . corfu-insert-separator))
+    :init
+    (global-corfu-mode)
+    (corfu-history-mode)
+    (corfu-popupinfo-mode))
+
+;; (use-package nerd-icons-corfu
+;;   :after corfu
+;;   :config
+;;   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
 
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
@@ -1276,8 +1295,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
           ("<tab>" . 'copilot-accept-completion)
           ("TAB" . 'copilot-accept-completion)))
 
-(use-package shell-maker
- :load-path "~/.emacs.d/packages/chatgpt-shell")
+(use-package shell-maker)
 (use-package request)
 
 (use-package copilot-chat
@@ -1377,6 +1395,8 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :hook
   (eshell-mode . eat-eshell-mode))
 
+(use-package agent-shell)
+
 (use-package auth-source-pass
   :ensure nil
   :config
@@ -1438,12 +1458,34 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   (setq kubel-use-namespace-list 'on))
 (use-package kubel-evil)
 
-(use-package yasnippet
-  :bind
-  (:map yas-keymap
-        ("C-y" . yas-next-field-or-maybe-expand))
-  :config
-  (yas-global-mode 1))
+;; (use-package yasnippet
+;;   :bind
+;;   (("C-c y" . yas-insert-snippet)
+;;    :map yas-keymap
+;;    ("C-y" . yas-next-field-or-maybe-expand))
+;;   :config
+;;   (yas-global-mode 1))
+
+(use-package tempel
+:bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+       ("M-*" . tempel-insert))
+
+:init
+
+;; Setup completion at point
+(defun tempel-setup-capf ()
+(setq-local completion-at-point-functions
+            (cons #'tempel-expand completion-at-point-functions)))
+
+(add-hook 'conf-mode-hook 'tempel-setup-capf)
+(add-hook 'prog-mode-hook 'tempel-setup-capf)
+(add-hook 'text-mode-hook 'tempel-setup-capf)
+
+;; Optionally make the Tempel templates available to Abbrev,
+;; either locally or globally. `expand-abbrev' is bound to C-x '.
+;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+;; (global-tempel-abbrev-mode)
+)
 
 (use-package ripgrep)
 

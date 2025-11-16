@@ -9,6 +9,7 @@
           ("elpa" . "https://elpa.gnu.org/packages/")
           ("melpa" . "https://melpa.org/packages/")))
 #+END_SRC
+
 ** use-package setup
 #+BEGIN_SRC emacs-lisp
   (package-initialize)
@@ -29,14 +30,14 @@ This is a pseudo package specifying all emacs builtin settings
   (use-package emacs
     :custom
     (xref-search-program 'ripgrep)
+    (tab-always-indent 'complete)
+    (text-mode-ispell-word-completion nil)
     :bind
     ("C-c m" . windmove-left)
     ("C-c i" . windmove-right)
     ("C-c e" . windmove-up)
-    ("C-c n" . windmove-down)
-    :config
-    ;; (server-start)
-    )
+    ("C-c n" . windmove-down))
+
   (use-package polymode)
   (use-package aio)
 #+END_SRC
@@ -86,6 +87,7 @@ Disable all GUI Elements
     (doom-themes-enable-italic t)
     :config
     (load-theme 'doom-one-light t)
+    ;; (load-theme 'doom-moonlight t)
     (load-theme 'doom-tomorrow-night t))
 
   (defun snow/switch-theme ()
@@ -115,11 +117,14 @@ Disable all GUI Elements
 * Font Settings
 Save the Fonts I'm using into variables
 #+BEGIN_SRC emacs-lisp
-(defvar snow/fixed-width-font "Iosevka Term"
-  "The font to use for monospaced (fixed width) text.")
+  (defvar snow/fixed-width-font "Iosevka Term"
+    "The font to use for monospaced (fixed width) text.")
 
-(defvar snow/variable-width-font "Iosevka Aile"
-  "The font to use for variable-pitch (document) text.")
+  (defvar snow/variable-width-font "Iosevka Aile"
+    "The font to use for variable-pitch (document) text.")
+  
+  (defvar snow/font-height 120
+    "The default height for all fonts")
 #+END_SRC
 
 Due to differnt resolutions on Mac the font should be displayed bigger
@@ -127,16 +132,16 @@ Due to differnt resolutions on Mac the font should be displayed bigger
   (if (eq system-type 'gnu/linux)
       (progn (set-face-attribute 'default nil
                           :family snow/fixed-width-font
-                          :height 120)
+                          :height snow/font-height)
              (set-face-attribute 'fixed-pitch nil
                           :family snow/fixed-width-font
-                          :height 120)
+                          :height snow/font-height)
              (set-face-attribute 'variable-pitch nil
                           :family snow/variable-width-font
-                          :height 120))
+                          :height snow/font-height))
     (set-face-attribute 'default nil
                         :family snow/fixed-width-font
-                        :height 140))
+                        :height snow/font-height))
 #+END_SRC
 * Mac OSX Settings
 Set option to super and commant to meta
@@ -187,29 +192,49 @@ Use editorconfig
 
 ** Autocompletion
 #+BEGIN_SRC emacs-lisp
-  (use-package company
-    :custom
-    (company-dabbrev-downcase nil)
-    (company-selection-wrap-around t)
-    (company-idle-delay 0.1)
-    (company-minimum-prefix-length 1)
-    :hook
-    (after-init . global-company-mode)
-    :bind
-    ("C-o" . company-complete)
-    (:map company-active-map
-                ("M-n" . nil)
-                ("M-p" . nil)
-                ("C-n" . company-select-next)
-                ("C-p" . company-select-previous)
-                ("C-p" . company-select-previous)
-                ("C-d" . company-show-doc-buffer)))
+  ;; (use-package company
+  ;;   :custom
+  ;;   (company-dabbrev-downcase nil)
+  ;;   (company-selection-wrap-around t)
+  ;;   (company-idle-delay 0.1)
+  ;;   (company-minimum-prefix-length 1)
+  ;;   :hook
+  ;;   (after-init . global-company-mode)
+  ;;   :bind
+  ;;   ("C-o" . company-complete)
+  ;;   (:map company-active-map
+  ;;               ("M-n" . nil)
+  ;;               ("M-p" . nil)
+  ;;               ("C-n" . company-select-next)
+  ;;               ("C-p" . company-select-previous)
+  ;;               ("C-p" . company-select-previous)
+  ;;               ("C-d" . company-show-doc-buffer)))
 #+END_SRC
 
 #+BEGIN_SRC emacs-lisp
-  (use-package company-box
-    :hook (company-mode . company-box-mode))
+  ;; (use-package company-box
+  ;;   :hook (company-mode . company-box-mode))
 #+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  (use-package corfu
+      :custom
+      (corfu-cycle t)
+      :bind
+      (:map corfu-map ("SPC" . corfu-insert-separator))
+      :init
+      (global-corfu-mode)
+      (corfu-history-mode)
+      (corfu-popupinfo-mode))
+#+END_SRC
+
+#+BEGIN_SRC emacs-lisp
+  ;; (use-package nerd-icons-corfu
+  ;;   :after corfu
+  ;;   :config
+  ;;   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+#+END_SRC
+
 ** Global Tab settings
 #+BEGIN_SRC emacs-lisp
   (setq-default tab-width 4)
@@ -1478,8 +1503,7 @@ During Presentations we want to hide the model-line.
 ** Copilot Chat
 
 #+BEGIN_SRC emacs-lisp
-  (use-package shell-maker
-   :load-path "~/.emacs.d/packages/chatgpt-shell")
+  (use-package shell-maker)
   (use-package request)
   
   (use-package copilot-chat
@@ -1602,6 +1626,11 @@ This section installs the various terminals I use
     :hook
     (eshell-mode . eat-eshell-mode))
 #+END_SRC
+** Agent Shell
+
+#+BEGIN_SRC emacs-lisp
+  (use-package agent-shell)
+#+END_SRC
 * Auth
 #+BEGIN_SRC emacs-lisp
   (use-package auth-source-pass
@@ -1676,14 +1705,36 @@ This section installs the various terminals I use
 
 * Snippets
 #+BEGIN_SRC emacs-lisp
-  (use-package yasnippet
-    :bind
-    (:map yas-keymap
-          ("C-y" . yas-next-field-or-maybe-expand))
-    :config
-    (yas-global-mode 1))
+  ;; (use-package yasnippet
+  ;;   :bind
+  ;;   (("C-c y" . yas-insert-snippet)
+  ;;    :map yas-keymap
+  ;;    ("C-y" . yas-next-field-or-maybe-expand))
+  ;;   :config
+  ;;   (yas-global-mode 1))
+#+END_SRC
 
+#+BEGIN_SRC emacs-lisp
+      (use-package tempel
+      :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+             ("M-*" . tempel-insert))
 
+      :init
+
+      ;; Setup completion at point
+      (defun tempel-setup-capf ()
+      (setq-local completion-at-point-functions
+                  (cons #'tempel-expand completion-at-point-functions)))
+
+      (add-hook 'conf-mode-hook 'tempel-setup-capf)
+      (add-hook 'prog-mode-hook 'tempel-setup-capf)
+      (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+      ;; Optionally make the Tempel templates available to Abbrev,
+      ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+      ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+      ;; (global-tempel-abbrev-mode)
+      )
 #+END_SRC
 
 * Search

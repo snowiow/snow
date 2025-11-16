@@ -4,20 +4,23 @@
     cert_path: /etc/ssl/certs/ca-certificates.crt
   roles:
     - base
-    - locale
+    # - locale
     - git
-      #- gnupg
-    - dmenu
-    - dunst
+    #   #- gnupg
+    # - dmenu
+    # - dunst
     - bspwm
     - fish
+    - rust
+    - go
     - alacritty
-    - ctags
+    # - ctags
     - syncthing
-    - nvim
+    # - nvim
+    - helix
     - emacs
-    - ranger
-    - offlineimap
-    - qutebrowser
-    - mu
+    # - ranger
+    # - offlineimap
+    # - qutebrowser
+    # - mu
     - work

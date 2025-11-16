@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: snapshot
+# key: snapshot
+# --
+expect(template.toJSON()).toMatchSnapshot();

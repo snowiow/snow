@@ -12,21 +12,54 @@
     state: present
   become: yes
 
-
-- name: download and extract Iosevka Font
+- name: Create fonts directory
+  file:
+    path: /usr/local/share/fonts
+    state: directory
+    mode: '0755'
   become: yes
+
+- name: Check if Iosevka fonts are already installed
+  stat:
+    path: /usr/local/share/fonts/Iosevka.ttc
+  register: iosevka_installed
+
+- name: Download Iosevka Font
+  get_url:
+    url: "https://github.com/be5invis/Iosevka/releases/download/v{{ iosevka_font }}/SuperTTC-Iosevka-{{ iosevka_font }}.zip"
+    dest: "/tmp/iosevka-{{ iosevka_font }}.zip"
+    timeout: 300
+  when: not iosevka_installed.stat.exists
+
+- name: Extract Iosevka Font
   ansible.builtin.unarchive:
-    src: https://github.com/be5invis/Iosevka/releases/download/v{{ iosevka_font }}/SuperTTC-Iosevka-{{ iosevka_font }}.zip
+    src: "/tmp/iosevka-{{ iosevka_font }}.zip"
     dest: /usr/local/share/fonts/
     remote_src: yes
-
-- name: download and extract Iosevka Aile Font
   become: yes
+  when: not iosevka_installed.stat.exists
+
+- name: Check if Iosevka Aile is already installed
+  stat:
+    path: /usr/local/share/fonts/IosevkaAile.ttc
+  register: iosevka_aile_installed
+
+- name: Download Iosevka Aile Font
+  get_url:
+    url: "https://github.com/be5invis/Iosevka/releases/download/v{{ iosevka_font }}/SuperTTC-IosevkaAile-{{ iosevka_font }}.zip"
+    dest: "/tmp/iosevka-aile-{{ iosevka_font }}.zip"
+    timeout: 300
+  when: not iosevka_aile_installed.stat.exists
+
+- name: Extract Iosevka Aile Font
   ansible.builtin.unarchive:
-    src: https://github.com/be5invis/Iosevka/releases/download/v{{ iosevka_font }}/SuperTTC-IosevkaAile-{{ iosevka_font }}.zip
+    src: "/tmp/iosevka-aile-{{ iosevka_font }}.zip"
     dest: /usr/local/share/fonts/
     remote_src: yes
+  become: yes
+  when: not iosevka_aile_installed.stat.exists
 
 - name: Refresh Font Cache
   become: yes
   shell: fc-cache
+  when: not iosevka_installed.stat.exists

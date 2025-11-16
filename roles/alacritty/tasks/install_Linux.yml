@@ -1,32 +1,44 @@
 - name: Include version vars
   include_vars: "{{ playbook_dir }}/versions.yaml"
 
+- name: Check if Alacritty is already installed
+  stat:
+    path: /usr/local/bin/alacritty
+  register: alacritty_binary
+
+- name: Get installed Alacritty version
+  shell: /usr/local/bin/alacritty --version | grep -oP 'alacritty \K[\d.]+'
+  register: alacritty_installed_version
+  when: alacritty_binary.stat.exists
+  failed_when: false
+  changed_when: false
+
 - name: Download Alacritty Repo
   ansible.builtin.git:
     repo: git@github.com:alacritty/alacritty.git
     dest: ~/workspace/alacritty
     version: "v{{ alacritty }}"
-
-- name: Install rustup
-  shell: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+  when: not alacritty_binary.stat.exists or alacritty_installed_version.stdout != alacritty
 
 - name: Make sure Alacritty dependencies are installed
   package:
     name:
-      - cmake 
-      - pkg-config 
-      - libfreetype6-dev 
-      - libfontconfig1-dev 
-      - libxcb-xfixes0-dev 
-      - libxkbcommon-dev 
+      - cmake
+      - pkg-config
+      - libfreetype6-dev
+      - libfontconfig1-dev
+      - libxcb-xfixes0-dev
+      - libxkbcommon-dev
       - python3
     state: present
   become: yes
+  when: not alacritty_binary.stat.exists or alacritty_installed_version.stdout != alacritty
 
 - name: Build Alacritty
   shell:
     chdir: ~/workspace/alacritty
     cmd: cargo build --release
+  when: not alacritty_binary.stat.exists or alacritty_installed_version.stdout != alacritty
 
 - name: Copy Alacritty to bin
   ansible.builtin.copy:
@@ -34,6 +46,7 @@
     dest: /usr/local/bin
     mode: a+x
   become: yes
+  when: not alacritty_binary.stat.exists or alacritty_installed_version.stdout != alacritty
 
 - name: Copy Alacritty svg
   ansible.builtin.copy:

@@ -1,0 +1,9 @@
+- name: make sure fish is installed
+  package:
+    name:
+      - golang-go
+    state: present
+  become: yes
+
+- name: Install gopls
+  shell: go install golang.org/x/tools/gopls@latest

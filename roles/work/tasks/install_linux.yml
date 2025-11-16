@@ -2,14 +2,9 @@
   package:
     name:
       - awscli
-      - golang-go
-      - npm
     state: present
   become: yes
 
-- name: Install gopls
-  shell: go install golang.org/x/tools/gopls@latest
-  
 - name: Include version vars
   include_vars: "{{ playbook_dir }}/versions.yaml"
   
@@ -51,16 +46,6 @@
     mode: 755
   become: yes
 
-- name: Download aws-cfg-generator
-  shell: "curl -L -o bin/aws-cfg-generator https://github.com/moia-oss/aws-cfg-generator/releases/download/v{{ aws_cfg_generator }}/linux-amd64-aws-cfg-generator"
-    
-- name: Move aws-cfg-generator to bin
-  ansible.builtin.copy:
-    src: "{{ playbook_dir }}/bin/aws-cfg-generator"
-    dest: /usr/local/bin/aws-cfg-generator
-    mode: 755
-  become: yes
-  
 - name: create helm download directory
   file:
     path: "{{ playbook_dir }}/bin/helm"

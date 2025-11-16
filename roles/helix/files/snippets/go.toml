@@ -1,0 +1,5 @@
+[[snippets]]
+prefix = "func"
+scope = ["go"]
+body = "func $1($2) $3 {\n\t$0\n}"
+description = "function"

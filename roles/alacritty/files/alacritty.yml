@@ -36,8 +36,8 @@ window:
   # Blank space added around the window in pixels. This padding is scaled
   # by DPI and the specified value is always added at both opposing sides.
   padding:
-    x: 5
-    y: 5
+    x: 1
+    y: 1
 
   # Spread additional padding evenly around the terminal content.
   dynamic_padding: false
@@ -119,7 +119,7 @@ font:
     style: Italic
 
   # Point size
-  size: 10.0
+  size: 12.0
 
   # Offset is the extra space around each character. `offset.y` can be thought of
   # as modifying the line spacing, and `offset.x` as modifying the letter spacing.
@@ -134,40 +134,39 @@ font:
     x: 0
     y: 0
 
-# Colors (Tomorrow Night Bright)
-# Base16 Tomorrow Night - alacritty color config
-# Chris Kempson (http://chriskempson.com)
+# Colors (Helix Acid Theme)
+# Based on acid.toml from Helix editor
 colors:
   # Default colors
   primary:
-    background: '0x1d1f21'
-    foreground: '0xc5c8c6'
+    background: '0x161e26'
+    foreground: '0xe0e0e0'
 
   # Colors the cursor will use if `custom_cursor_colors` is true
   cursor:
-    text: '0x1d1f21'
-    cursor: '0xf19455'
+    text: '0x161e26'
+    cursor: '0xffa060'
 
   # Normal colors
   normal:
-    black:   '0x1d1f21'
-    red:     '0xcc6666'
-    green:   '0xb5bd68'
-    yellow:  '0xf0c674'
-    blue:    '0x81a2be'
-    magenta: '0xb294bb'
-    cyan:    '0x8abeb7'
-    white:   '0xc5c8c6'
+    black:   '0x161e26'
+    red:     '0xff7070'
+    green:   '0xb0ff80'
+    yellow:  '0xffd080'
+    blue:    '0x80d0ff'
+    magenta: '0xf0b0ff'
+    cyan:    '0x80d0ff'
+    white:   '0xe0e0e0'
 
   # Bright colors
   bright:
-    black:   '0x969896'
-    red:     '0xde935f'
-    green:   '0x282a2e'
-    yellow:  '0x373b41'
-    blue:    '0xb4b7b4'
-    magenta: '0xe0e0e0'
-    cyan:    '0xa3685a'
+    black:   '0x606870'
+    red:     '0xff7070'
+    green:   '0xb0ff80'
+    yellow:  '0xffd080'
+    blue:    '0x80d0ff'
+    magenta: '0xf0b0ff'
+    cyan:    '0x80d0ff'
     white:   '0xffffff'
 
 # If `true`, bold text is drawn using the bright color variants.

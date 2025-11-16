@@ -1,0 +1,41 @@
+- name: Clone Helix
+  git:
+    repo: https://github.com/helix-editor/helix
+    dest: ~/workspace/helix
+    version: master
+
+- name: Install Helix
+  shell:
+    chdir: ~/workspace/helix
+    creates: ~/.cargo/bin/hx
+    cmd: |
+      cargo install \
+         --profile opt \
+         --config 'build.rustflags="-C target-cpu=native"' \
+         --path helix-term \
+         --locked
+
+- name: create config dir
+  file:
+    path: ~/.config/helix
+    state: directory
+
+- name: symlink files
+  file:
+    src: "{{ ansible_env.PWD }}/roles/helix/files/{{ item }}"
+    path: "~/.config/helix/{{ item }}"
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - config.toml
+    - languages.toml
+    - snippets
+
+- name: Install simple-completion-language-server
+  shell:
+    creates: ~/.cargo/bin/simple-completion-language-server
+    cmd: |
+      cargo install \
+        --locked \
+        --git https://github.com/estin/simple-completion-language-server.git
