@@ -130,7 +130,7 @@
 (defvar snow/font-height 120
   "The default height for all fonts")
 
-(if (eq system-type 'gnu/linux)
+(when (eq system-type 'gnu/linux)
     (progn (set-face-attribute 'default nil
                         :family snow/fixed-width-font
                         :height snow/font-height)
@@ -139,10 +139,7 @@
                         :height snow/font-height)
            (set-face-attribute 'variable-pitch nil
                         :family snow/variable-width-font
-                        :height snow/font-height))
-  (set-face-attribute 'default nil
-                      :family snow/fixed-width-font
-                      :height snow/font-height))
+                        :height snow/font-height)))
 
 (setq mac-option-modifier 'super)
 (setq mac-right-option-modifier nil)

@@ -178,7 +178,7 @@ Save the Fonts I'm using into variables
 
 Due to differnt resolutions on Mac the font should be displayed bigger
 #+BEGIN_SRC emacs-lisp
-  (if (eq system-type 'gnu/linux)
+  (when (eq system-type 'gnu/linux)
       (progn (set-face-attribute 'default nil
                           :family snow/fixed-width-font
                           :height snow/font-height)
@@ -187,10 +187,7 @@ Due to differnt resolutions on Mac the font should be displayed bigger
                           :height snow/font-height)
              (set-face-attribute 'variable-pitch nil
                           :family snow/variable-width-font
-                          :height snow/font-height))
-    (set-face-attribute 'default nil
-                        :family snow/fixed-width-font
-                        :height snow/font-height))
+                          :height snow/font-height)))
 #+END_SRC
 * Mac OSX Settings
 Set option to super and commant to meta
