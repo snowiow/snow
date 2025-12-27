@@ -89,14 +89,24 @@ Don't ask to reread a tags file if it was written outside of Emacs
 Disable all GUI Elements
 #+BEGIN_SRC emacs-lisp
   (scroll-bar-mode -1)
-
-  (if (eq system-type 'android)
-      (tool-bar-mode 'bottom)
-    (tool-bar-mode -1))
-
   (menu-bar-mode -1)
   (setq ring-bell-function 'ignore)
 #+END_SRC
+** tool-bar-mode
+The tool-bar should only be visible in Android and there it should be at the bottom instead of the top
+#+begin_src emacs-lisp
+    (if (eq system-type 'android)
+        (progn
+          (tool-bar-mode t)
+          (setq tool-bar-position 'bottom))
+      (tool-bar-mode -1))
+#+end_src
+** modifier-bar-mode
+The modifier-bar-mode a specific bar which shows =Ctrl=, =Meta= etc as buttons 
+#+begin_src emacs-lisp
+  (when (eq system-type 'android)
+    (modifier-bar-mode))
+#+end_src
 ** Better Help Buffers
 #+BEGIN_SRC emacs-lisp
   (use-package helpful
@@ -190,7 +200,7 @@ Due to differnt resolutions on Mac the font should be displayed bigger
                           :height snow/font-height)))
 #+END_SRC
 * Mac OSX Settings
-Set option to super and commant to meta
+Set option to super and command to meta
 #+BEGIN_SRC emacs-lisp
     (setq mac-option-modifier 'super)
     (setq mac-right-option-modifier nil)
