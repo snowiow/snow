@@ -158,6 +158,8 @@ super + space ; m
 super + space ; r
       emacsclient -c -a 'emacs' -e '(org-roam-find-node)'
 super + space ; p
-      emacsclient -c -a 'emacs' -e '(pass)'
+      emacsclient -a 'emacs' -e '(pass)'
+super + space ; s
+      emacsclient -a 'emacs' -e '(snow/eshell-new-frame)'
 super + space ; t
-      emacsclient -c -a 'emacs' -e '(eshell)'
+      emacsclient -a 'emacs' -n -e '(snow/vterm-new-frame)'

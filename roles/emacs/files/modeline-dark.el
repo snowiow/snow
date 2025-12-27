@@ -8,8 +8,9 @@
                '(:eval (when vc-mode
 		                 (propertize (concat " " (substring vc-mode 5))
 			                         'face 'font-lock-negation-char-face)))
-               '(:eval (propertize
-                        (concat " " (all-the-icons-icon-for-buffer))))
+               '(:eval (ignore-errors
+                         (propertize
+                          (concat " " (all-the-icons-icon-for-buffer)))))
                (propertize " %b " 'face 'font-lock-negation-char-face)
                '(:eval (when (buffer-modified-p)
 		                 (propertize "+" 'face 'font-lock-variable-name-face)))
@@ -27,7 +28,7 @@
 		                " " 'display
 		                `((space :align-to (- (+ right right-fringe right-margin)
 				                              ,(+ 5
-                                                  (string-width mode-name)
+                                                  (string-width (format-mode-line mode-name))
                                                   (string-width (
                                                                  concat
                                                                  "["
@@ -45,15 +46,15 @@
                "]"))
 
 (set-face-attribute 'mode-line nil
-		            :background "#21252B"
-		            :foreground "white"
-		            :box '(:line-width 8 :color "#21252B")
+		            :background "#1e262e"
+		            :foreground "#e0e0e0"
+		            :box '(:line-width 8 :color "#1e262e")
 		            :overline nil
 		            :underline nil)
 
 (set-face-attribute 'mode-line-inactive nil
-		            :background "#21252B"
-		            :foreground "white"
-		            :box '(:line-width 8 :color "#21252B")
+		            :background "#161e26"
+		            :foreground "#606870"
+		            :box '(:line-width 8 :color "#161e26")
 		            :overline nil
 		            :underline nil)
