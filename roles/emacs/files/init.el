@@ -63,7 +63,11 @@
 (setq tags-revert-without-query 1)
 
 (scroll-bar-mode -1)
-(tool-bar-mode -1)
+
+(if (eq system-type 'android)
+    (tool-bar-mode 'bottom)
+  (tool-bar-mode -1))
+
 (menu-bar-mode -1)
 (setq ring-bell-function 'ignore)
 

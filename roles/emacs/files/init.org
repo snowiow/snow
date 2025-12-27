@@ -89,7 +89,11 @@ Don't ask to reread a tags file if it was written outside of Emacs
 Disable all GUI Elements
 #+BEGIN_SRC emacs-lisp
   (scroll-bar-mode -1)
-  (tool-bar-mode -1)
+
+  (if (eq system-type 'android)
+      (tool-bar-mode 'bottom)
+    (tool-bar-mode -1))
+
   (menu-bar-mode -1)
   (setq ring-bell-function 'ignore)
 #+END_SRC
