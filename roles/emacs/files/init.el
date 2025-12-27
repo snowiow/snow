@@ -69,11 +69,11 @@
 (if (eq system-type 'android)
     (progn
       (tool-bar-mode t)
-      (setq tool-bar-position 'bottom))
+      (set-frame-parameter nil 'tool-bar-position 'bottom))
   (tool-bar-mode -1))
 
 (when (eq system-type 'android)
-  (modifier-bar-mode))
+  (setq touch-screen-display-keyboard t))
 
 (use-package helpful
   :bind
@@ -1459,7 +1459,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 
 (defun snow/eshell-prompt ()
     (let (
-          (current-branch (magit-get-current-branch))
+          (current-branch (when magit-get-current-branch (magit-get-current-branch)))
           (aws-vault (getenv "AWS_VAULT"))
           (k8s-context (shell-command-to-string "kubectl config current-context")))
       (concat

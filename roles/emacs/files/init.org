@@ -98,14 +98,14 @@ The tool-bar should only be visible in Android and there it should be at the bot
     (if (eq system-type 'android)
         (progn
           (tool-bar-mode t)
-          (setq tool-bar-position 'bottom))
+          (set-frame-parameter nil 'tool-bar-position 'bottom))
       (tool-bar-mode -1))
 #+end_src
-** modifier-bar-mode
-The modifier-bar-mode a specific bar which shows =Ctrl=, =Meta= etc as buttons 
+
+** Touch Screen Keyboard
 #+begin_src emacs-lisp
   (when (eq system-type 'android)
-    (modifier-bar-mode))
+    (setq touch-screen-display-keyboard t))
 #+end_src
 ** Better Help Buffers
 #+BEGIN_SRC emacs-lisp
@@ -1709,7 +1709,7 @@ This snippet adds an advice around the =project-switch-project= function to auto
 #+BEGIN_SRC emacs-lisp
     (defun snow/eshell-prompt ()
       (let (
-            (current-branch (magit-get-current-branch))
+            (current-branch (when magit-get-current-branch (magit-get-current-branch)))
             (aws-vault (getenv "AWS_VAULT"))
             (k8s-context (shell-command-to-string "kubectl config current-context")))
         (concat
