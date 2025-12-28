@@ -1,3 +1,6 @@
+(defun not-android ()
+    (not (eq system-type 'android)))
+
 (require 'package)
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -9,6 +12,9 @@
 (setq use-package-always-ensure t)
 (use-package use-package-ensure-system-package
   :ensure t)
+
+(use-package request
+  :if (not-android))
 
 ;; (setq-default
 ;;     display-line-numbers-type 'relative)
@@ -63,8 +69,11 @@
 (setq tags-revert-without-query 1)
 
 (scroll-bar-mode -1)
-(menu-bar-mode -1)
 (setq ring-bell-function 'ignore)
+
+(if (eq system-type 'android)
+    (menu-bar-mode t)
+  (menu-bar-mode -1))
 
 (if (eq system-type 'android)
     (progn
@@ -774,7 +783,7 @@
    (typescript . t)))
 
 (use-package org-modern
-  :if (not (eq system-type 'android))
+  :if (not-android)
   :after org
   :hook (org-mode . org-modern-mode))
 
@@ -1179,11 +1188,6 @@
   :hook
   (go-ts-mode . eglot-ensure))
 
-(use-package go-tag)
-
-(use-package gotests
-  :load-path "~/.emacs.d/packages/GoTests-Emacs")
-
 (use-package json-ts-mode
   :ensure nil
   :mode "\\.json\\'"
@@ -1416,25 +1420,6 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
  (add-to-list 'eglot-server-programs
               '(terraform-mode . ("terraform-ls" "serve"))))
 
-(use-package copilot
-  :hook
-  (prog-mode . copilot-mode)
-  (yaml-ts-mode . copilot-mode)
-  :load-path "~/.emacs.d/packages/copilot.el"
-  :custom
-  (copilot-indent-offset-warning-disable t)
-  :bind (:map copilot-completion-map
-          ("<tab>" . 'copilot-accept-completion)
-          ("TAB" . 'copilot-accept-completion)))
-
-(use-package shell-maker)
-(use-package request)
-
-(use-package copilot-chat
-  :after (request shell-maker)
-  :custom
-  (copilot-chat-frontend 'org))
-
 (use-package project
   :ensure nil
   :bind (:map project-prefix-map
@@ -1509,6 +1494,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
     (esh-autosuggest-delay 0.5))
 
   (use-package eshell-syntax-highlighting
+    :if (not-android)
     :after esh-mode
     :custom  
     (eshell-syntax-highlighting-global-mode +1))
@@ -1527,6 +1513,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   (tramp-default-host "cloudpi"))
 
 (use-package vterm
+  :if (not-android)
   :config
   ;; Make sure Meow normal mode is active in vterm-copy-mode
   (add-hook 'vterm-copy-mode-hook
@@ -1547,9 +1534,8 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :hook
   (eshell-mode . eat-eshell-mode))
 
-(use-package agent-shell)
-
 (use-package auth-source-pass
+  :if (not-android)
   :ensure nil
   :config
   (auth-source-pass-enable)
@@ -1560,13 +1546,16 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :bind
   ("C-c g w" . browse-at-remote))
 
-(use-package forge)
+(use-package forge
+  :if (not-android))
 
 (use-package git-link
+  :if (not-android)
   :custom
   (git-link-open-in-browser t))
 
-(use-package github-review)
+(use-package github-review
+  :if (not-android))
 
 (use-package emacsql)
 (use-package magit
@@ -1584,6 +1573,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
               (local-set-key (kbd "C-c b") 'snow/branch-name-to-commit-msg))))
 
 (use-package mu4e
+  :if (not-android)
   :ensure nil
   :load-path "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.12.9"
   :custom
@@ -1614,7 +1604,6 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
         ("N" . kubel-set-namespace))
   :config
   (setq kubel-use-namespace-list 'on))
-(use-package kubel-evil)
 
 ;; (use-package yasnippet
 ;;   :bind
@@ -1645,29 +1634,31 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 ;; (global-tempel-abbrev-mode)
 )
 
-(use-package ripgrep)
+(use-package ripgrep
+  :if (not-android))
 
-(use-package rg)
-
-(rg-define-search snow/rg-org
-  :query ask
-  :format regexp
-  :files "*.org"
-  :case-fold-search smart
-  :dir org-directory
-  :confirm prefix)
-
-(rg-define-search snow/rg-project
-  :query ask
-  :format regexp
-  :files ""
-  :case-fold-search smart
-  :dir (if (project-current) (project-root (project-current))
-         default-directory)
-  :confirm prefix
-  :flags ("--hidden -g !.git"))
+(use-package rg
+  :if (not-android)
+  :config
+  (rg-define-search snow/rg-org
+    :query ask
+    :format regexp
+    :files "*.org"
+    :case-fold-search smart
+    :dir org-directory
+    :confirm prefix)
+  (rg-define-search snow/rg-project
+    :query ask
+    :format regexp
+    :files ""
+    :case-fold-search smart
+    :dir (if (project-current) (project-root (project-current))
+           default-directory)
+    :confirm prefix
+    :flags ("--hidden -g !.git")))
 
 (use-package openwith
+  :if (not-android)
   :config
   (add-to-list 'mm-inhibit-file-name-handlers 'openwith-file-handler) ;; needed to not randomly open the attachment when trying to send it
   (setq openwith-associations
@@ -1705,6 +1696,7 @@ Return nil to include the entry, return point to exclude it."
         (point))))
 
   (use-package dashboard
+    :if (not-android)
     :after org
     :custom
     (dashboard-startup-banner (expand-file-name "~/workspace/snow/img/banner.png"))
@@ -1718,8 +1710,12 @@ Return nil to include the entry, return point to exclude it."
     :config
     (dashboard-setup-startup-hook))
 
-  (use-package gnuplot)
-  (use-package pass)
+  (use-package gnuplot
+    :if (not-android))
+
+  (use-package pass
+    :if (not-android))
+
   (use-package proced
     :config
     (add-hook 'proced-mode-hook
@@ -1747,6 +1743,7 @@ Return nil to include the entry, return point to exclude it."
     (insert commit-msg)))
 
 (use-package org-roam-readwise
+  :if (not-android)
   :load-path "~/.emacs.d/packages/org-roam-readwise"
   :after org-roam
   :custom

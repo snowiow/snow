@@ -1,6 +1,12 @@
 #+title: Emacs Configuration
 #+PROPERTY: header-args:emacs-lisp :tangle "init.el" :mkdirp yes
 
+* Base Functions
+Definition of functions used throughout the config
+#+begin_src emacs-lisp
+  (defun not-android ()
+      (not (eq system-type 'android)))
+#+end_src
 * Package Management
 #+BEGIN_SRC emacs-lisp
   (require 'package)
@@ -18,6 +24,11 @@
   (use-package use-package-ensure-system-package
     :ensure t)
 #+END_SRC
+* Internal packages
+#+begin_src emacs-lisp
+      (use-package request
+        :if (not-android))
+#+end_src
 * Defaults
 #+BEGIN_SRC emacs-lisp
   ;; (setq-default
@@ -89,9 +100,15 @@ Don't ask to reread a tags file if it was written outside of Emacs
 Disable all GUI Elements
 #+BEGIN_SRC emacs-lisp
   (scroll-bar-mode -1)
-  (menu-bar-mode -1)
   (setq ring-bell-function 'ignore)
 #+END_SRC
+** menu-bar-mode
+The menu-bar should only be visible in Android and there it should be at the bottom instead of the top
+#+begin_src emacs-lisp
+  (if (eq system-type 'android)
+      (menu-bar-mode t)
+    (menu-bar-mode -1))
+#+end_src
 ** tool-bar-mode
 The tool-bar should only be visible in Android and there it should be at the bottom instead of the top
 #+begin_src emacs-lisp
@@ -913,7 +930,7 @@ Only show the typical german holidays
 Gives different org syntax modern ligatures. Doesn't work on Android natively and 
 #+BEGIN_SRC emacs-lisp
   (use-package org-modern
-    :if (not (eq system-type 'android))
+    :if (not-android)
     :after org
     :hook (org-mode . org-modern-mode))
 #+END_SRC
@@ -1366,11 +1383,6 @@ During Presentations we want to hide the model-line.
         :mode "\\.go\\'"
         :hook
         (go-ts-mode . eglot-ensure))
-
-      (use-package go-tag)
-
-      (use-package gotests
-        :load-path "~/.emacs.d/packages/GoTests-Emacs")
 #+END_SRC
 ** Json
 #+BEGIN_SRC emacs-lisp
@@ -1647,32 +1659,6 @@ During Presentations we want to hide the model-line.
      (add-to-list 'eglot-server-programs
                   '(terraform-mode . ("terraform-ls" "serve"))))
 #+end_src
-** Copilot
-
-#+BEGIN_SRC emacs-lisp
-  (use-package copilot
-    :hook
-    (prog-mode . copilot-mode)
-    (yaml-ts-mode . copilot-mode)
-    :load-path "~/.emacs.d/packages/copilot.el"
-    :custom
-    (copilot-indent-offset-warning-disable t)
-    :bind (:map copilot-completion-map
-            ("<tab>" . 'copilot-accept-completion)
-            ("TAB" . 'copilot-accept-completion)))
-#+END_SRC
-
-** Copilot Chat
-
-#+BEGIN_SRC emacs-lisp
-  (use-package shell-maker)
-  (use-package request)
-  
-  (use-package copilot-chat
-    :after (request shell-maker)
-    :custom
-    (copilot-chat-frontend 'org))
-#+END_SRC
 * Project Management
 
 ** project.el
@@ -1764,6 +1750,7 @@ This snippet adds an advice around the =project-switch-project= function to auto
       (esh-autosuggest-delay 0.5))
 
     (use-package eshell-syntax-highlighting
+      :if (not-android)
       :after esh-mode
       :custom  
       (eshell-syntax-highlighting-global-mode +1))
@@ -1788,6 +1775,7 @@ This snippet adds an advice around the =project-switch-project= function to auto
 This section installs the various terminals I use
 #+BEGIN_SRC emacs-lisp
   (use-package vterm
+    :if (not-android)
     :config
     ;; Make sure Meow normal mode is active in vterm-copy-mode
     (add-hook 'vterm-copy-mode-hook
@@ -1795,7 +1783,7 @@ This section installs the various terminals I use
                 (if vterm-copy-mode
                     (meow-normal-mode 1)
                   (meow-insert-mode 1)))))
-  
+
   (defun snow/vterm-new-frame ()
     "Open a new frame with a new vterm session."
     (interactive)
@@ -1808,14 +1796,10 @@ This section installs the various terminals I use
     :hook
     (eshell-mode . eat-eshell-mode))
 #+END_SRC
-** Agent Shell
-
-#+BEGIN_SRC emacs-lisp
-  (use-package agent-shell)
-#+END_SRC
 * Auth
 #+BEGIN_SRC emacs-lisp
   (use-package auth-source-pass
+    :if (not-android)
     :ensure nil
     :config
     (auth-source-pass-enable)
@@ -1825,36 +1809,40 @@ This section installs the various terminals I use
 #+END_SRC
 * Git
 #+BEGIN_SRC emacs-lisp
-  (use-package browse-at-remote
-    :bind
-    ("C-c g w" . browse-at-remote))
+    (use-package browse-at-remote
+      :bind
+      ("C-c g w" . browse-at-remote))
 
-  (use-package forge)
+    (use-package forge
+      :if (not-android))
 
-  (use-package git-link
-    :custom
-    (git-link-open-in-browser t))
+    (use-package git-link
+      :if (not-android)
+      :custom
+      (git-link-open-in-browser t))
 
-  (use-package github-review)
+    (use-package github-review
+      :if (not-android))
 
-  (use-package emacsql)
-  (use-package magit
-    :init
-    (setq magit-show-long-lines-warning nil)
-    :bind
-    ("C-c g g" . magit-status)
-    ("C-c g c" . magit-clone)
-    ("C-c g b" . magit-blame))
+    (use-package emacsql)
+    (use-package magit
+      :init
+      (setq magit-show-long-lines-warning nil)
+      :bind
+      ("C-c g g" . magit-status)
+      ("C-c g c" . magit-clone)
+      ("C-c g b" . magit-blame))
 
-  ;; Keybinding for commit message buffers
-  (with-eval-after-load 'git-commit
-    (add-hook 'git-commit-mode-hook
-              (lambda ()
-                (local-set-key (kbd "C-c b") 'snow/branch-name-to-commit-msg))))
+    ;; Keybinding for commit message buffers
+    (with-eval-after-load 'git-commit
+      (add-hook 'git-commit-mode-hook
+                (lambda ()
+                  (local-set-key (kbd "C-c b") 'snow/branch-name-to-commit-msg))))
 #+END_SRC
 * Mail
 #+BEGIN_SRC emacs-lisp
   (use-package mu4e
+    :if (not-android)
     :ensure nil
     :load-path "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.12.9"
     :custom
@@ -1888,7 +1876,6 @@ This section installs the various terminals I use
           ("N" . kubel-set-namespace))
     :config
     (setq kubel-use-namespace-list 'on))
-  (use-package kubel-evil)
 #+END_SRC
 
 * Snippets
@@ -1927,13 +1914,15 @@ This section installs the various terminals I use
 
 * Search
 #+BEGIN_SRC emacs-lisp
-  (use-package ripgrep)
+    (use-package ripgrep
+      :if (not-android))
 #+END_SRC
 
 ** rg
 #+begin_src emacs-lisp
-    (use-package rg)
-
+  (use-package rg
+    :if (not-android)
+    :config
     (rg-define-search snow/rg-org
       :query ask
       :format regexp
@@ -1941,7 +1930,6 @@ This section installs the various terminals I use
       :case-fold-search smart
       :dir org-directory
       :confirm prefix)
-
     (rg-define-search snow/rg-project
       :query ask
       :format regexp
@@ -1950,12 +1938,13 @@ This section installs the various terminals I use
       :dir (if (project-current) (project-root (project-current))
              default-directory)
       :confirm prefix
-      :flags ("--hidden -g !.git"))
+      :flags ("--hidden -g !.git")))
   #+end_src
 
 * Open external files
 #+BEGIN_SRC emacs-lisp
   (use-package openwith
+    :if (not-android)
     :config
     (add-to-list 'mm-inhibit-file-name-handlers 'openwith-file-handler) ;; needed to not randomly open the attachment when trying to send it
     (setq openwith-associations
@@ -1987,38 +1976,43 @@ and convert it to Org using the pandoc utility."
 
 * Other Applications
 #+BEGIN_SRC emacs-lisp
-  (defun snow/dashboard-filter-agenda-today-or-earlier ()
-    "Exclude agenda items scheduled after today.
-Return nil to include the entry, return point to exclude it."
-    (let ((scheduled-time (org-get-scheduled-time (point)))
-          (end-of-today (org-time-string-to-time
-                         (format-time-string "%Y-%m-%d 23:59:59" (current-time)))))
-      ;; Exclude (return point) if scheduled time is after today
-      (when (and scheduled-time
-                 (time-less-p end-of-today scheduled-time))
-        (point))))
+    (defun snow/dashboard-filter-agenda-today-or-earlier ()
+      "Exclude agenda items scheduled after today.
+  Return nil to include the entry, return point to exclude it."
+      (let ((scheduled-time (org-get-scheduled-time (point)))
+            (end-of-today (org-time-string-to-time
+                           (format-time-string "%Y-%m-%d 23:59:59" (current-time)))))
+        ;; Exclude (return point) if scheduled time is after today
+        (when (and scheduled-time
+                   (time-less-p end-of-today scheduled-time))
+          (point))))
 
-  (use-package dashboard
-    :after org
-    :custom
-    (dashboard-startup-banner (expand-file-name "~/workspace/snow/img/banner.png"))
-    (tab-bar-new-tab-choice "*dashboard*")
-    (dashboard-projects-backend 'project-el)
-    (dashboard-week-agenda nil)
-    (dashboard-match-agenda-entry "+SCHEDULED<=\"<today>\"")
-    (dashboard-items '((agenda . 5)
-                       (projects . 5)
-                       (recents  . 5)))
-    :config
-    (dashboard-setup-startup-hook))
+    (use-package dashboard
+      :if (not-android)
+      :after org
+      :custom
+      (dashboard-startup-banner (expand-file-name "~/workspace/snow/img/banner.png"))
+      (tab-bar-new-tab-choice "*dashboard*")
+      (dashboard-projects-backend 'project-el)
+      (dashboard-week-agenda nil)
+      (dashboard-match-agenda-entry "+SCHEDULED<=\"<today>\"")
+      (dashboard-items '((agenda . 5)
+                         (projects . 5)
+                         (recents  . 5)))
+      :config
+      (dashboard-setup-startup-hook))
 
-  (use-package gnuplot)
-  (use-package pass)
-  (use-package proced
-    :config
-    (add-hook 'proced-mode-hook
-              (lambda ()
-                (proced-toggle-auto-update t))))
+    (use-package gnuplot
+      :if (not-android))
+
+    (use-package pass
+      :if (not-android))
+
+    (use-package proced
+      :config
+      (add-hook 'proced-mode-hook
+                (lambda ()
+                  (proced-toggle-auto-update t))))
 #+END_SRC
 * Experimental Stuff
 #+BEGIN_SRC emacs-lisp
@@ -2043,6 +2037,7 @@ Return nil to include the entry, return point to exclude it."
       (insert commit-msg)))
 
   (use-package org-roam-readwise
+    :if (not-android)
     :load-path "~/.emacs.d/packages/org-roam-readwise"
     :after org-roam
     :custom
