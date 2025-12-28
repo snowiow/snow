@@ -641,7 +641,16 @@
  '(ediff-current-diff-B ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "#50a14f"))))
  '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
 
+(defvar snow/android-notes-path "/content/storage/com.android.externalstorage.documents/primary:Sync%2Fnotes/")
+(defvar snow/notes-path "~/Sync/notes/")
+
+;; Set org-directory early so other packages can use it
+(setq org-directory (if (eq system-type 'android)
+                        snow/android-notes-path
+                      snow/notes-path))
+
 (use-package org
+    :demand t
     :hook
     (org-after-todo-statistics . org-summary-todo)
     (org-mode . flyspell-mode)
@@ -651,8 +660,6 @@
     (:map org-mode-map
                 ("C-c S" . snow/org-start-presentation))
     :custom
-    ;; important first settings which is used by other configurations
-    (org-directory "~/Sync/notes")
     ;; AGENDA SETTINGS
     (org-agenda-files (file-expand-wildcards (concat org-directory "/roam/pages/agenda/*.org")))
     (org-agenda-skip-deadline-if-done t)
@@ -767,6 +774,7 @@
    (typescript . t)))
 
 (use-package org-modern
+  :if (not (eq system-type 'android))
   :after org
   :hook (org-mode . org-modern-mode))
 
@@ -789,11 +797,11 @@
   (:map org-mode-map
               ("C-c C-n C-i" . org-roam-node-insert))
   :custom
-  (org-roam-directory "~/Sync/notes/roam")
+  (org-roam-directory (concat org-directory "/roam"))
   (org-roam-dailies-directory "journals/")
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
-   '(("b" "book notes" plain (file "~/Sync/notes/roam/templates/booknote.org")
+   '(("b" "book notes" plain (file (concat org-roam-directory "/templates/booknote.org"))
       :target (file+head "pages/${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)
      ("d" "default" plain
@@ -812,12 +820,12 @@
   (org-roam-db-autosync-mode)
   (add-hook 'org-mode-hook #'snow/org-capf)
   ;; Load Custom Agendas
-  (let ((custom-agenda-commands (concat org-directory "/custom-agenda-commands.el")))
+  (let ((custom-agenda-commands (expand-file-name "custom-agenda-commands.el" org-directory)))
     (if (file-exists-p custom-agenda-commands)
         (load custom-agenda-commands)
       (message (format "%s not found." custom-agenda-commands))))
   ;; Load Capture Templates
-  (let ((capture-templates (concat org-directory "/capture-templates.el")))
+  (let ((capture-templates (expand-file-name "capture-templates.el" org-directory)))
     (if (file-exists-p capture-templates)
         (load capture-templates)
       (message (format "%s not found." capture-templates)))))
@@ -826,7 +834,7 @@
   :after '(org org-roam)
   :config
   ;; Load org-ql views
-  (let ((org-ql-views (concat org-directory "/org-ql-views.el")))
+  (let ((org-ql-views (expand-file-name "org-ql-views.el" org-directory)))
     (if (file-exists-p org-ql-views)
         (load org-ql-views)
       (message (format "%s not found." org-ql-views)))))
@@ -1459,7 +1467,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 
 (defun snow/eshell-prompt ()
     (let (
-          (current-branch (when magit-get-current-branch (magit-get-current-branch)))
+          (current-branch (when (fboundp 'magit-get-current-branch) (magit-get-current-branch)))
           (aws-vault (getenv "AWS_VAULT"))
           (k8s-context (shell-command-to-string "kubectl config current-context")))
       (concat
@@ -1491,7 +1499,6 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
     (eshell-pre-command . eshell-save-some-history)
     :custom
     (eshell-prompt-function 'snow/eshell-prompt)
-                                          ; needs to match the custum prompt
     (eshell-prompt-regexp "^$ "))
 
   (use-package esh-autosuggest
