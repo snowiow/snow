@@ -650,8 +650,8 @@
  '(ediff-current-diff-B ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "#50a14f"))))
  '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
 
-(defvar snow/android-notes-path "/content/storage/com.android.externalstorage.documents/primary:Sync%2Fnotes/")
-(defvar snow/notes-path "~/Sync/notes/")
+(defvar snow/android-notes-path "/content/storage/com.android.externalstorage.documents/primary:Sync%2Fnotes")
+(defvar snow/notes-path "~/Sync/notes")
 
 ;; Set org-directory early so other packages can use it
 (setq org-directory (if (eq system-type 'android)
