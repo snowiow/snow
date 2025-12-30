@@ -1,3 +1,6 @@
+(defun not-android ()
+    (not (eq system-type 'android)))
+
 (require 'package)
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -9,6 +12,9 @@
 (setq use-package-always-ensure t)
 (use-package use-package-ensure-system-package
   :ensure t)
+
+(use-package request
+  :if (not-android))
 
 ;; (setq-default
 ;;     display-line-numbers-type 'relative)
@@ -63,9 +69,20 @@
 (setq tags-revert-without-query 1)
 
 (scroll-bar-mode -1)
-(tool-bar-mode -1)
-(menu-bar-mode -1)
 (setq ring-bell-function 'ignore)
+
+(if (eq system-type 'android)
+    (menu-bar-mode t)
+  (menu-bar-mode -1))
+
+(if (eq system-type 'android)
+    (progn
+      (tool-bar-mode t)
+      (set-frame-parameter nil 'tool-bar-position 'bottom))
+  (tool-bar-mode -1))
+
+(when (eq system-type 'android)
+  (setq touch-screen-display-keyboard t))
 
 (use-package helpful
   :bind
@@ -126,7 +143,7 @@
 (defvar snow/font-height 120
   "The default height for all fonts")
 
-(if (eq system-type 'gnu/linux)
+(when (eq system-type 'gnu/linux)
     (progn (set-face-attribute 'default nil
                         :family snow/fixed-width-font
                         :height snow/font-height)
@@ -135,10 +152,7 @@
                         :height snow/font-height)
            (set-face-attribute 'variable-pitch nil
                         :family snow/variable-width-font
-                        :height snow/font-height))
-  (set-face-attribute 'default nil
-                      :family snow/fixed-width-font
-                      :height snow/font-height))
+                        :height snow/font-height)))
 
 (setq mac-option-modifier 'super)
 (setq mac-right-option-modifier nil)
@@ -636,7 +650,16 @@
  '(ediff-current-diff-B ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "#50a14f"))))
  '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
 
+(defvar snow/android-notes-path "/content/storage/com.android.externalstorage.documents/primary:Sync%2Fnotes")
+(defvar snow/notes-path "~/Sync/notes")
+
+;; Set org-directory early so other packages can use it
+(setq org-directory (if (eq system-type 'android)
+                        snow/android-notes-path
+                      snow/notes-path))
+
 (use-package org
+    :demand t
     :hook
     (org-after-todo-statistics . org-summary-todo)
     (org-mode . flyspell-mode)
@@ -646,8 +669,6 @@
     (:map org-mode-map
                 ("C-c S" . snow/org-start-presentation))
     :custom
-    ;; important first settings which is used by other configurations
-    (org-directory "~/Sync/notes")
     ;; AGENDA SETTINGS
     (org-agenda-files (file-expand-wildcards (concat org-directory "/roam/pages/agenda/*.org")))
     (org-agenda-skip-deadline-if-done t)
@@ -762,6 +783,7 @@
    (typescript . t)))
 
 (use-package org-modern
+  :if (not-android)
   :after org
   :hook (org-mode . org-modern-mode))
 
@@ -784,11 +806,11 @@
   (:map org-mode-map
               ("C-c C-n C-i" . org-roam-node-insert))
   :custom
-  (org-roam-directory "~/Sync/notes/roam")
+  (org-roam-directory (concat org-directory "/roam"))
   (org-roam-dailies-directory "journals/")
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
-   '(("b" "book notes" plain (file "~/Sync/notes/roam/templates/booknote.org")
+   '(("b" "book notes" plain (file (concat org-roam-directory "/templates/booknote.org"))
       :target (file+head "pages/${slug}.org" "#+title: ${title}\n")
       :unnarrowed t)
      ("d" "default" plain
@@ -807,12 +829,12 @@
   (org-roam-db-autosync-mode)
   (add-hook 'org-mode-hook #'snow/org-capf)
   ;; Load Custom Agendas
-  (let ((custom-agenda-commands (concat org-directory "/custom-agenda-commands.el")))
+  (let ((custom-agenda-commands (expand-file-name "custom-agenda-commands.el" org-directory)))
     (if (file-exists-p custom-agenda-commands)
         (load custom-agenda-commands)
       (message (format "%s not found." custom-agenda-commands))))
   ;; Load Capture Templates
-  (let ((capture-templates (concat org-directory "/capture-templates.el")))
+  (let ((capture-templates (expand-file-name "capture-templates.el" org-directory)))
     (if (file-exists-p capture-templates)
         (load capture-templates)
       (message (format "%s not found." capture-templates)))))
@@ -821,7 +843,7 @@
   :after '(org org-roam)
   :config
   ;; Load org-ql views
-  (let ((org-ql-views (concat org-directory "/org-ql-views.el")))
+  (let ((org-ql-views (expand-file-name "org-ql-views.el" org-directory)))
     (if (file-exists-p org-ql-views)
         (load org-ql-views)
       (message (format "%s not found." org-ql-views)))))
@@ -1166,11 +1188,6 @@
   :hook
   (go-ts-mode . eglot-ensure))
 
-(use-package go-tag)
-
-(use-package gotests
-  :load-path "~/.emacs.d/packages/GoTests-Emacs")
-
 (use-package json-ts-mode
   :ensure nil
   :mode "\\.json\\'"
@@ -1403,25 +1420,6 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
  (add-to-list 'eglot-server-programs
               '(terraform-mode . ("terraform-ls" "serve"))))
 
-(use-package copilot
-  :hook
-  (prog-mode . copilot-mode)
-  (yaml-ts-mode . copilot-mode)
-  :load-path "~/.emacs.d/packages/copilot.el"
-  :custom
-  (copilot-indent-offset-warning-disable t)
-  :bind (:map copilot-completion-map
-          ("<tab>" . 'copilot-accept-completion)
-          ("TAB" . 'copilot-accept-completion)))
-
-(use-package shell-maker)
-(use-package request)
-
-(use-package copilot-chat
-  :after (request shell-maker)
-  :custom
-  (copilot-chat-frontend 'org))
-
 (use-package project
   :ensure nil
   :bind (:map project-prefix-map
@@ -1454,7 +1452,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 
 (defun snow/eshell-prompt ()
     (let (
-          (current-branch (magit-get-current-branch))
+          (current-branch (when (fboundp 'magit-get-current-branch) (magit-get-current-branch)))
           (aws-vault (getenv "AWS_VAULT"))
           (k8s-context (shell-command-to-string "kubectl config current-context")))
       (concat
@@ -1486,7 +1484,6 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
     (eshell-pre-command . eshell-save-some-history)
     :custom
     (eshell-prompt-function 'snow/eshell-prompt)
-                                          ; needs to match the custum prompt
     (eshell-prompt-regexp "^$ "))
 
   (use-package esh-autosuggest
@@ -1497,6 +1494,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
     (esh-autosuggest-delay 0.5))
 
   (use-package eshell-syntax-highlighting
+    :if (not-android)
     :after esh-mode
     :custom  
     (eshell-syntax-highlighting-global-mode +1))
@@ -1515,6 +1513,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   (tramp-default-host "cloudpi"))
 
 (use-package vterm
+  :if (not-android)
   :config
   ;; Make sure Meow normal mode is active in vterm-copy-mode
   (add-hook 'vterm-copy-mode-hook
@@ -1535,9 +1534,8 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :hook
   (eshell-mode . eat-eshell-mode))
 
-(use-package agent-shell)
-
 (use-package auth-source-pass
+  :if (not-android)
   :ensure nil
   :config
   (auth-source-pass-enable)
@@ -1548,13 +1546,16 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :bind
   ("C-c g w" . browse-at-remote))
 
-(use-package forge)
+(use-package forge
+  :if (not-android))
 
 (use-package git-link
+  :if (not-android)
   :custom
   (git-link-open-in-browser t))
 
-(use-package github-review)
+(use-package github-review
+  :if (not-android))
 
 (use-package emacsql)
 (use-package magit
@@ -1572,6 +1573,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
               (local-set-key (kbd "C-c b") 'snow/branch-name-to-commit-msg))))
 
 (use-package mu4e
+  :if (not-android)
   :ensure nil
   :load-path "/usr/share/emacs/site-lisp/elpa-src/mu4e-1.12.9"
   :custom
@@ -1602,7 +1604,6 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
         ("N" . kubel-set-namespace))
   :config
   (setq kubel-use-namespace-list 'on))
-(use-package kubel-evil)
 
 ;; (use-package yasnippet
 ;;   :bind
@@ -1633,29 +1634,31 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 ;; (global-tempel-abbrev-mode)
 )
 
-(use-package ripgrep)
+(use-package ripgrep
+  :if (not-android))
 
-(use-package rg)
-
-(rg-define-search snow/rg-org
-  :query ask
-  :format regexp
-  :files "*.org"
-  :case-fold-search smart
-  :dir org-directory
-  :confirm prefix)
-
-(rg-define-search snow/rg-project
-  :query ask
-  :format regexp
-  :files ""
-  :case-fold-search smart
-  :dir (if (project-current) (project-root (project-current))
-         default-directory)
-  :confirm prefix
-  :flags ("--hidden -g !.git"))
+(use-package rg
+  :if (not-android)
+  :config
+  (rg-define-search snow/rg-org
+    :query ask
+    :format regexp
+    :files "*.org"
+    :case-fold-search smart
+    :dir org-directory
+    :confirm prefix)
+  (rg-define-search snow/rg-project
+    :query ask
+    :format regexp
+    :files ""
+    :case-fold-search smart
+    :dir (if (project-current) (project-root (project-current))
+           default-directory)
+    :confirm prefix
+    :flags ("--hidden -g !.git")))
 
 (use-package openwith
+  :if (not-android)
   :config
   (add-to-list 'mm-inhibit-file-name-handlers 'openwith-file-handler) ;; needed to not randomly open the attachment when trying to send it
   (setq openwith-associations
@@ -1693,6 +1696,7 @@ Return nil to include the entry, return point to exclude it."
         (point))))
 
   (use-package dashboard
+    :if (not-android)
     :after org
     :custom
     (dashboard-startup-banner (expand-file-name "~/workspace/snow/img/banner.png"))
@@ -1706,8 +1710,12 @@ Return nil to include the entry, return point to exclude it."
     :config
     (dashboard-setup-startup-hook))
 
-  (use-package gnuplot)
-  (use-package pass)
+  (use-package gnuplot
+    :if (not-android))
+
+  (use-package pass
+    :if (not-android))
+
   (use-package proced
     :config
     (add-hook 'proced-mode-hook
@@ -1735,6 +1743,7 @@ Return nil to include the entry, return point to exclude it."
     (insert commit-msg)))
 
 (use-package org-roam-readwise
+  :if (not-android)
   :load-path "~/.emacs.d/packages/org-roam-readwise"
   :after org-roam
   :custom

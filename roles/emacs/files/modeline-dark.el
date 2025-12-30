@@ -1,7 +1,7 @@
 (setq-default mode-line-format
               (list
-               '(:eval (meow-indicator))
-               '(:eval (when evil-mode-line-tag
+               '(:eval (when (fboundp 'meow-indicator) (meow-indicator)))
+               '(:eval (when (boundp 'evil-mode-line-tag)
                          (propertize
                           (concat " " (substring evil-mode-line-tag 2 3) "  ")
                           'face 'font-lock-keyword-face)))
