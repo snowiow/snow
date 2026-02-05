@@ -11,4 +11,4 @@
     follow: false
     force: yes
   loop:
-    - alacritty.yml
+    - alacritty.toml
