@@ -143,16 +143,42 @@
 (defvar snow/font-height 120
   "The default height for all fonts")
 
-(when (eq system-type 'gnu/linux)
+(defvar snow/font-height 120
+  "The default height for all fonts")
+
+(if (eq system-type 'gnu/linux)
     (progn (set-face-attribute 'default nil
-                        :family snow/fixed-width-font
-                        :height snow/font-height)
+                               :family snow/fixed-width-font
+                               :height snow/font-height)
            (set-face-attribute 'fixed-pitch nil
-                        :family snow/fixed-width-font
-                        :height snow/font-height)
+                               :family snow/fixed-width-font
+                               :height snow/font-height)
            (set-face-attribute 'variable-pitch nil
-                        :family snow/variable-width-font
-                        :height snow/font-height)))
+                               :family snow/variable-width-font
+                               :height snow/font-height))
+  (set-face-attribute 'default nil
+                      :family snow/fixed-width-font
+                      :height snow/font-height))
+(defun snow/set-font-size (font-height)
+  (when (eq system-type 'gnu/linux)
+    (progn (set-face-attribute 'default nil
+                               :family snow/fixed-width-font
+                               :height font-height)
+           (set-face-attribute 'fixed-pitch nil
+                               :family snow/fixed-width-font
+                               :height font-height)
+           (set-face-attribute 'variable-pitch nil
+                               :family snow/variable-width-font
+                               :height font-height))))
+(defun snow/set-normal-font-size ()
+  (interactive)
+  (snow/set-font-size 120))
+
+(defun snow/set-office-font-size ()
+  (interactive)
+  (snow/set-font-size 160))
+
+(snow/set-normal-font-size)
 
 (setq mac-option-modifier 'super)
 (setq mac-right-option-modifier nil)
@@ -599,6 +625,20 @@
 
 (use-package string-inflection)
 
+(use-package change-inner
+    :bind
+    (("M-i" . change-inner)
+     ("M-o" . change-outer)))
+
+(defun snow/mark-current-line ()
+    "Mark the current line."
+    (interactive)
+    (beginning-of-line)
+    (set-mark (point))
+    (end-of-line))
+
+(global-set-key (kbd "C-c l") 'snow/mark-current-line)
+
 (use-package popper
   :after (shackle project)
   :bind (("C-'"   . popper-toggle-latest)
@@ -663,6 +703,8 @@
     :hook
     (org-after-todo-statistics . org-summary-todo)
     (org-mode . flyspell-mode)
+    (org-mode . visual-line-mode)
+    (org-mode . visual-fill-column-mode)
     :bind
     ("C-c o a" . org-agenda)
     ("C-c o c" . org-capture)
@@ -850,8 +892,8 @@
 
 (use-package visual-fill-column
     :custom
-    (visual-fill-column-width 80)
-    (visual-fill-column-center-text t))
+    (visual-fill-column-width 120)
+    (visual-fill-column-center-text nil))
 
 (use-package hide-mode-line)
 
@@ -863,6 +905,7 @@
     (visual-line-mode 1)
     (visual-fill-column-mode 1)
     (display-line-numbers-mode -1)
+    (visual-fill-column-center-text t)
     (org-display-inline-images)
     (hide-mode-line-mode 1)
     ;; Set up keybindings for presentation mode
@@ -879,7 +922,7 @@
     (text-scale-mode 0)
     (org-tree-slide-mode 0)
     (visual-line-mode 0)
-    (visual-fill-column-mode 0)
+    (visual-fill-column-center-text nil)
     (display-line-numbers-mode 1)
     (hide-mode-line-mode 0))
 
@@ -1190,6 +1233,8 @@
 
 (use-package json-ts-mode
   :ensure nil
+  :bind (:map json-ts-mode-map
+              ("C-c C-l f" . json-pretty-print-buffer))
   :mode "\\.json\\'"
   :hook
   (json-ts-mode . eglot-ensure))
@@ -1202,6 +1247,7 @@
   :mode "\\.md\\'"
   :config
   (setq markdown-command "multimarkdown")
+  (setq markdown-command "pandoc -f markdown -t html")
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-ts-mode))
   :hook
   (markdown-ts-mode . flyspell-mode))
@@ -1656,6 +1702,12 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
            default-directory)
     :confirm prefix
     :flags ("--hidden -g !.git")))
+
+(use-package claude-code-ide
+  :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+  :bind ("C-c a" . claude-code-ide-menu)
+  :config
+  (claude-code-ide-emacs-tools-setup))
 
 (use-package openwith
   :if (not-android)

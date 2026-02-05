@@ -32,6 +32,8 @@
       - libncurses-dev
       - libgnutls28-dev
       - libsqlite3-dev
+      - libtree-sitter-dev
+      - libtree-sitter0
     state: present
   become: yes
   when: emacs_binary.rc != 0 or emacs_installed_version.stdout != emacs
@@ -47,7 +49,7 @@
   shell:
     cmd: |
       ./autogen.sh
-      ./configure --with-xml2
+      ./configure --with-xml2 --with-tree-sitter
     chdir: ~/workspace/emacs
   when: emacs_binary.rc != 0 or emacs_installed_version.stdout != emacs
 

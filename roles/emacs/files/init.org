@@ -203,18 +203,44 @@ Save the Fonts I'm using into variables
     "The default height for all fonts")
 #+END_SRC
 
-Due to differnt resolutions on Mac the font should be displayed bigger
+Due to different resolutions on Mac the font should be displayed bigger
 #+BEGIN_SRC emacs-lisp
-  (when (eq system-type 'gnu/linux)
+  (defvar snow/font-height 120
+    "The default height for all fonts")
+
+  (if (eq system-type 'gnu/linux)
       (progn (set-face-attribute 'default nil
-                          :family snow/fixed-width-font
-                          :height snow/font-height)
+                                 :family snow/fixed-width-font
+                                 :height snow/font-height)
              (set-face-attribute 'fixed-pitch nil
-                          :family snow/fixed-width-font
-                          :height snow/font-height)
+                                 :family snow/fixed-width-font
+                                 :height snow/font-height)
              (set-face-attribute 'variable-pitch nil
-                          :family snow/variable-width-font
-                          :height snow/font-height)))
+                                 :family snow/variable-width-font
+                                 :height snow/font-height))
+    (set-face-attribute 'default nil
+                        :family snow/fixed-width-font
+                        :height snow/font-height))
+  (defun snow/set-font-size (font-height)
+    (when (eq system-type 'gnu/linux)
+      (progn (set-face-attribute 'default nil
+                                 :family snow/fixed-width-font
+                                 :height font-height)
+             (set-face-attribute 'fixed-pitch nil
+                                 :family snow/fixed-width-font
+                                 :height font-height)
+             (set-face-attribute 'variable-pitch nil
+                                 :family snow/variable-width-font
+                                 :height font-height))))
+  (defun snow/set-normal-font-size ()
+    (interactive)
+    (snow/set-font-size 120))
+
+  (defun snow/set-office-font-size ()
+    (interactive)
+    (snow/set-font-size 160))
+
+  (snow/set-normal-font-size)
 #+END_SRC
 * Mac OSX Settings
 Set option to super and command to meta
@@ -711,6 +737,25 @@ Have something similar to vim-surround.
 #+BEGIN_SRC emacs-lisp
   (use-package string-inflection)
 #+END_SRC
+** change-inner
+#+begin_src emacs-lisp
+  (use-package change-inner
+      :bind
+      (("M-i" . change-inner)
+       ("M-o" . change-outer)))
+#+end_src
+
+** Marks
+#+begin_src emacs-lisp
+  (defun snow/mark-current-line ()
+      "Mark the current line."
+      (interactive)
+      (beginning-of-line)
+      (set-mark (point))
+      (end-of-line))
+
+  (global-set-key (kbd "C-c l") 'snow/mark-current-line)
+ #+end_src 
 * Buffer Management 
 #+BEGIN_SRC emacs-lisp
   (use-package popper
@@ -796,6 +841,8 @@ Now configure org-mode
       :hook
       (org-after-todo-statistics . org-summary-todo)
       (org-mode . flyspell-mode)
+      (org-mode . visual-line-mode)
+      (org-mode . visual-fill-column-mode)
       :bind
       ("C-c o a" . org-agenda)
       ("C-c o c" . org-capture)
@@ -1004,8 +1051,8 @@ This package can centralize text to make presentations look better
 #+BEGIN_SRC emacs-lisp
 (use-package visual-fill-column
     :custom
-    (visual-fill-column-width 80)
-    (visual-fill-column-center-text t))
+    (visual-fill-column-width 120)
+    (visual-fill-column-center-text nil))
 #+END_SRC
 
 During Presentations we want to hide the model-line.
@@ -1022,6 +1069,7 @@ During Presentations we want to hide the model-line.
       (visual-line-mode 1)
       (visual-fill-column-mode 1)
       (display-line-numbers-mode -1)
+      (visual-fill-column-center-text t)
       (org-display-inline-images)
       (hide-mode-line-mode 1)
       ;; Set up keybindings for presentation mode
@@ -1038,7 +1086,7 @@ During Presentations we want to hide the model-line.
       (text-scale-mode 0)
       (org-tree-slide-mode 0)
       (visual-line-mode 0)
-      (visual-fill-column-mode 0)
+      (visual-fill-column-center-text nil)
       (display-line-numbers-mode 1)
       (hide-mode-line-mode 0))
 
@@ -1388,6 +1436,8 @@ During Presentations we want to hide the model-line.
 #+BEGIN_SRC emacs-lisp
   (use-package json-ts-mode
     :ensure nil
+    :bind (:map json-ts-mode-map
+                ("C-c C-l f" . json-pretty-print-buffer))
     :mode "\\.json\\'"
     :hook
     (json-ts-mode . eglot-ensure))
@@ -1407,6 +1457,7 @@ During Presentations we want to hide the model-line.
     :mode "\\.md\\'"
     :config
     (setq markdown-command "multimarkdown")
+    (setq markdown-command "pandoc -f markdown -t html")
     (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-ts-mode))
     :hook
     (markdown-ts-mode . flyspell-mode))
@@ -1940,7 +1991,14 @@ This section installs the various terminals I use
       :confirm prefix
       :flags ("--hidden -g !.git")))
   #+end_src
-
+* AI
+#+begin_src emacs-lisp
+  (use-package claude-code-ide
+    :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
+    :bind ("C-c a" . claude-code-ide-menu)
+    :config
+    (claude-code-ide-emacs-tools-setup))
+#+end_src
 * Open external files
 #+BEGIN_SRC emacs-lisp
   (use-package openwith
