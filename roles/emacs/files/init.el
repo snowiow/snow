@@ -1300,11 +1300,18 @@
   (typescript-ts-mode . eglot-ensure)
   (tsx-ts-mode . eglot-ensure))
 
+(defun snow/yaml-capf ()
+  (setq-local completion-at-point-functions
+              (list (cape-capf-super
+                     #'cape-dabbrev
+                     #'cape-keyword))))
+
 (use-package yaml-ts-mode
   :ensure nil
   :mode (("\\.yml\\'" . yaml-ts-mode)
          ("\\.yaml\\'" . yaml-ts-mode))
   :hook
+  (yaml-ts-mode . snow/yaml-capf)
   (yaml-ts-mode . highlight-indent-guides-mode)
   (yaml-ts-mode . eglot-ensure))
 

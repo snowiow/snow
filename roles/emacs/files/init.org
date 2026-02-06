@@ -1525,11 +1525,18 @@ During Presentations we want to hide the model-line.
 #+END_SRC
 ** Yaml
 #+BEGIN_SRC emacs-lisp
+    (defun snow/yaml-capf ()
+      (setq-local completion-at-point-functions
+                  (list (cape-capf-super
+                         #'cape-dabbrev
+                         #'cape-keyword))))
+
     (use-package yaml-ts-mode
       :ensure nil
       :mode (("\\.yml\\'" . yaml-ts-mode)
              ("\\.yaml\\'" . yaml-ts-mode))
       :hook
+      (yaml-ts-mode . snow/yaml-capf)
       (yaml-ts-mode . highlight-indent-guides-mode)
       (yaml-ts-mode . eglot-ensure))
 #+END_SRC
