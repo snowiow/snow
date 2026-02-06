@@ -1,13 +1,6 @@
 - name: Include version vars
   include_vars: "{{ playbook_dir }}/versions.yaml"
 
-- name: Get installed Emacs version
-  shell: emacs --version | head -n1 | grep -oP 'GNU Emacs \K[\d.]+'
-  register: emacs_installed_version
-  when: emacs_binary.rc == 0
-  failed_when: false
-  changed_when: false
-
 - name: install emacs dependencies on linux
   package:
     name:

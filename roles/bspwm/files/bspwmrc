@@ -2,41 +2,43 @@
 
 sxhkd &
 
+LAPTOP=$(xrandr | grep -oP 'eDP\S* connected' | cut -d' ' -f1)
+
 if xrandr -q | grep 'HDMI1 connected' && xrandr -q | grep 'DP2 connected'; then
-    bspc monitor eDP1 -d 1
+    bspc monitor "$LAPTOP" -d 1
     bspc monitor HDMI1 -d 2 3 4 5 6 7 8 9
     bspc monitor DP2 -d 0
 elif xrandr -q | grep 'HDMI1 connected'; then
-    xrandr --output eDP1 --mode 1920x1080 --output HDMI1 --primary --mode 1920x1080 --right-of eDP1
-    bspc monitor eDP1 -d 1
+    xrandr --output "$LAPTOP" --mode 1920x1080 --output HDMI1 --primary --mode 1920x1080 --right-of "$LAPTOP"
+    bspc monitor "$LAPTOP" -d 1
     bspc monitor HDMI1 -d 2 3 4 5 6 7 8 9 0
 elif [ "$(hostname)" = "marcel" ]; then
     if xrandr -q | grep 'HDMI-1 connected' && xrandr -q | grep 'DP-2 connected'; then
-        xrandr --output eDP-1 --mode 1920x1200 --output HDMI-1 --primary --mode 1920x1080 --right-of eDP-1 --output DP-2 --mode 1920x1080 --right-of HDMI-1
-        bspc monitor eDP-1 -d 1
+        xrandr --output "$LAPTOP" --mode 1920x1200 --output HDMI-1 --primary --mode 1920x1080 --right-of "$LAPTOP" --output DP-2 --mode 1920x1080 --right-of HDMI-1
+        bspc monitor "$LAPTOP" -d 1
         bspc monitor HDMI-1 -d 2 3 4 5 6 7 8 9
         bspc monitor DP-2 -d 0
     elif xrandr -q | grep 'HDMI-1 connected'; then
-        xrandr --output eDP-1 --mode 1920x1200 --output HDMI-1 --primary --mode 1920x1080 --right-of eDP-1
-        bspc monitor eDP-1 -d 1
+        xrandr --output "$LAPTOP" --mode 1920x1200 --output HDMI-1 --primary --mode 1920x1080 --right-of "$LAPTOP"
+        bspc monitor "$LAPTOP" -d 1
         bspc monitor HDMI-1 -d 2 3 4 5 6 7 8 9 0
     elif xrandr -q | grep 'DP-3 connected'; then
-        xrandr --output eDP-1 --mode 1920x1200 --output DP-3 --primary --mode 2560x1440 -right-of eDP-1
-        bspc monitor eDP-1 -d 1
+        xrandr --output "$LAPTOP" --mode 1920x1200 --output DP-3 --primary --mode 2560x1440 -right-of "$LAPTOP"
+        bspc monitor "$LAPTOP" -d 1
         bspc monitor DP-3 -d 2 3 4 5 6 7 8 9 0
     elif xrandr -q | grep 'DP-2 connected'; then
-        xrandr --output eDP-1 --mode 1920x1200 --output DP-3 --primary --mode 2560x1440 -right-of eDP-1
-        bspc monitor eDP-1 -d 1
+        xrandr --output "$LAPTOP" --mode 1920x1200 --output DP-3 --primary --mode 2560x1440 -right-of "$LAPTOP"
+        bspc monitor "$LAPTOP" -d 1
         bspc monitor DP-2 -d 2 3 4 5 6 7 8 9 0
     elif xrandr -q | grep 'DP-4 connected'; then
-        xrandr --output eDP-1 --mode 1920x1200 --output DP-4 --primary --mode 2560x1440 -right-of eDP-1
-        bspc monitor eDP-1 -d 1
+        xrandr --output "$LAPTOP" --mode 1920x1200 --output DP-4 --primary --mode 2560x1440 -right-of "$LAPTOP"
+        bspc monitor "$LAPTOP" -d 1
         bspc monitor DP-4 -d 2 3 4 5 6 7 8 9 0
     else
-        bspc monitor eDP-1 -d 1 2 3 4 5 6 7 8 9 0
+        bspc monitor "$LAPTOP" -d 1 2 3 4 5 6 7 8 9 0
     fi
 else
-    bspc monitor eDP1 -d 1 2 3 4 5 6 7 8 9 0
+    bspc monitor "$LAPTOP" -d 1 2 3 4 5 6 7 8 9 0
 fi
 
 ########################## Border Settings ####################################
