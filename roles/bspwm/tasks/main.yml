@@ -37,14 +37,6 @@
     path: ~/.config/bspwm
     state: directory
     
-- name: symlink xsessionrc
-  file:
-    src: "{{ ansible_env.PWD }}/roles/bspwm/files/xsessionrc"
-    path: ~/.xsessionrc
-    state: link
-    follow: false
-    force: yes
-
 - name: symlink dotfile
   file:
     src: "{{ ansible_env.PWD }}/roles/bspwm/files/bspwmrc"

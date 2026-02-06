@@ -20,3 +20,11 @@
     chdir: "/home/{{ ansible_user_id }}/workspace/dmenu"
     target: install
   become: yes
+
+- name: symlink run-recent
+  file:
+    src: "{{ ansible_env.PWD }}/roles/dmenu/files/run-recent"
+    path: ~/.local/bin/run-recent
+    state: link
+    follow: false
+    force: yes

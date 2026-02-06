@@ -7,7 +7,7 @@
     # - locale
     - git
     #   #- gnupg
-    # - dmenu
+    - dmenu
     # - dunst
     - bspwm
     - fish

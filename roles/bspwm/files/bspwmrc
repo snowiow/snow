@@ -56,4 +56,7 @@ bspc rule -a Emacs state=tiled
 bspc rule -a libreoffice state=tiled
 
 ############################ Autostart ########################################
+feh --bg-scale ~/Sync/wallpaper/gnu_smoking.png &
+setxkbmap -layout eu &
+dunst &
 ~/.local/bin/bar
