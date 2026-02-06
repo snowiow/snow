@@ -1,12 +1,6 @@
 - name: Include version vars
   include_vars: "{{ playbook_dir }}/versions.yaml"
 
-- name: Check if Emacs is already installed
-  shell: command -v emacs
-  register: emacs_binary
-  failed_when: false
-  changed_when: false
-
 - name: Get installed Emacs version
   shell: emacs --version | head -n1 | grep -oP 'GNU Emacs \K[\d.]+'
   register: emacs_installed_version
@@ -36,14 +30,12 @@
       - libtree-sitter0
     state: present
   become: yes
-  when: emacs_binary.rc != 0 or emacs_installed_version.stdout != emacs
 
 - name: Clone Emacs
   git:
     repo: https://git.savannah.gnu.org/git/emacs.git
     dest: ~/workspace/emacs
     version: "emacs-{{ emacs }}"
-  when: emacs_binary.rc != 0 or emacs_installed_version.stdout != emacs
 
 - name: Configure Emacs
   shell:
@@ -51,17 +43,13 @@
       ./autogen.sh
       ./configure --with-xml2 --with-tree-sitter
     chdir: ~/workspace/emacs
-  when: emacs_binary.rc != 0 or emacs_installed_version.stdout != emacs
 
 - name: Build Emacs
   make:
     chdir: ~/workspace/emacs
-  when: emacs_binary.rc != 0 or emacs_installed_version.stdout != emacs
 
 - name: Install Emacs
   make:
     chdir: "/home/{{ ansible_user_id }}/workspace/emacs"
     target: install
   become: yes
-  when: emacs_binary.rc != 0 or emacs_installed_version.stdout != emacs
-
