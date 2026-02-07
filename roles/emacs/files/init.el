@@ -113,8 +113,10 @@
 ;;      :config
  ;;     (setq catppuccin-flavor 'mocha)
  ;;     (load-theme 'catppuccin :no-confirm))
-   (add-to-list 'custom-theme-load-path "~/.emacs.d/themes")
-   (load-theme 'acid t)
+   (use-package acid-theme
+     :vc (:url "https://github.com/snowiow/emacs-acid-theme")
+     :config
+     (load-theme 'acid t))
 
     (defun snow/switch-theme ()
       "switches between dark and light theme"

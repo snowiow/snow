@@ -40,6 +40,8 @@
 - name: Build Emacs
   make:
     chdir: ~/workspace/emacs
+    params:
+      "--jobs": "{{ ansible_processor_vcpus }}"
 
 - name: Install Emacs
   make:
