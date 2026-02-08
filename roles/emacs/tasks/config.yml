@@ -21,3 +21,21 @@
     - modeline-light.el
     - snippets
     - eshell/alias
+
+- name: create systemd user directory
+  file:
+    path: ~/.config/systemd/user
+    state: directory
+
+- name: copy emacs service
+  copy:
+    src: "{{ ansible_env.PWD }}/roles/emacs/files/emacs.service"
+    dest: ~/.config/systemd/user/emacs.service
+
+- name: enable emacs daemon
+  systemd:
+    name: emacs.service
+    state: started
+    enabled: yes
+    scope: user
+    daemon_reload: yes
