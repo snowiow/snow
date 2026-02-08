@@ -6,4 +6,5 @@ emacs: 30.2
 kubectl: 1.25.0
 helm: 3.10.2
 iosevka_font: 33.3.4
+hyprpaper: 0.7.6
 terraform: 1.9.4

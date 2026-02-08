@@ -1,0 +1,236 @@
+- name: Include version vars
+  include_vars: "{{ playbook_dir }}/versions.yaml"
+
+- name: make sure hyprland and tools are installed
+  become: yes
+  package:
+    name:
+      - hyprland
+      - sway-notification-center
+      - slurp
+      - grim
+      - wofi
+      - brightnessctl
+    state: present
+
+- name: install hypr ecosystem build dependencies
+  become: yes
+  package:
+    name:
+      - cmake
+      - libpugixml-dev
+      - libpixman-1-dev
+      - libdrm-dev
+      - libcairo2-dev
+      - libpango1.0-dev
+      - libjpeg-dev
+      - libwebp-dev
+      - libmagic-dev
+      - libpng-dev
+      - librsvg2-dev
+      - libegl-dev
+      - libgles-dev
+      - libsdbus-c++-dev
+      - libwayland-dev
+      - wayland-protocols
+      - libxkbcommon-dev
+      - libpam0g-dev
+      - libgbm-dev
+      - libffi-dev
+      - libiniparser-dev
+      - libseat-dev
+      - libinput-dev
+      - libudev-dev
+      - libdisplay-info-dev
+      - hwdata
+    state: present
+
+- name: clone hyprland-protocols
+  git:
+    repo: https://github.com/hyprwm/hyprland-protocols.git
+    dest: ~/workspace/hyprland-protocols
+    accept_hostkey: yes
+
+- name: build hyprland-protocols
+  shell:
+    cmd: |
+      cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr -S . -B ./build
+      cmake --build ./build --config Release --target all -j{{ ansible_processor_vcpus }}
+    chdir: ~/workspace/hyprland-protocols
+
+- name: install hyprland-protocols
+  shell:
+    cmd: cmake --install build
+    chdir: "/home/{{ ansible_user_id }}/workspace/hyprland-protocols"
+  become: yes
+
+- name: clone hyprutils
+  git:
+    repo: https://github.com/hyprwm/hyprutils.git
+    dest: ~/workspace/hyprutils
+    accept_hostkey: yes
+
+- name: build hyprutils
+  shell:
+    cmd: |
+      cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr -S . -B ./build
+      cmake --build ./build --config Release --target all -j{{ ansible_processor_vcpus }}
+    chdir: ~/workspace/hyprutils
+
+- name: install hyprutils
+  shell:
+    cmd: cmake --install build
+    chdir: "/home/{{ ansible_user_id }}/workspace/hyprutils"
+  become: yes
+
+- name: clone hyprwayland-scanner
+  git:
+    repo: https://github.com/hyprwm/hyprwayland-scanner.git
+    dest: ~/workspace/hyprwayland-scanner
+    accept_hostkey: yes
+
+- name: build hyprwayland-scanner
+  shell:
+    cmd: |
+      cmake -DCMAKE_INSTALL_PREFIX=/usr -B build
+      cmake --build build -j{{ ansible_processor_vcpus }}
+    chdir: ~/workspace/hyprwayland-scanner
+
+- name: install hyprwayland-scanner
+  shell:
+    cmd: cmake --install build
+    chdir: "/home/{{ ansible_user_id }}/workspace/hyprwayland-scanner"
+  become: yes
+
+- name: clone hyprlang
+  git:
+    repo: https://github.com/hyprwm/hyprlang.git
+    dest: ~/workspace/hyprlang
+    accept_hostkey: yes
+
+- name: build hyprlang
+  shell:
+    cmd: |
+      cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr -S . -B ./build
+      cmake --build ./build --config Release --target hyprlang -j{{ ansible_processor_vcpus }}
+    chdir: ~/workspace/hyprlang
+
+- name: install hyprlang
+  shell:
+    cmd: cmake --install build
+    chdir: "/home/{{ ansible_user_id }}/workspace/hyprlang"
+  become: yes
+
+- name: clone hyprgraphics
+  git:
+    repo: https://github.com/hyprwm/hyprgraphics.git
+    dest: ~/workspace/hyprgraphics
+    accept_hostkey: yes
+
+- name: build hyprgraphics
+  shell:
+    cmd: |
+      cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr -S . -B ./build
+      cmake --build ./build --config Release --target all -j{{ ansible_processor_vcpus }}
+    chdir: ~/workspace/hyprgraphics
+
+- name: install hyprgraphics
+  shell:
+    cmd: cmake --install build
+    chdir: "/home/{{ ansible_user_id }}/workspace/hyprgraphics"
+  become: yes
+
+- name: clone hyprlock
+  git:
+    repo: https://github.com/hyprwm/hyprlock.git
+    dest: ~/workspace/hyprlock
+    accept_hostkey: yes
+
+- name: build hyprlock
+  shell:
+    cmd: |
+      cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr -S . -B ./build
+      cmake --build ./build --config Release --target hyprlock -j{{ ansible_processor_vcpus }}
+    chdir: ~/workspace/hyprlock
+
+- name: install hyprlock
+  shell:
+    cmd: cmake --install build
+    chdir: "/home/{{ ansible_user_id }}/workspace/hyprlock"
+  become: yes
+
+- name: clone hypridle
+  git:
+    repo: https://github.com/hyprwm/hypridle.git
+    dest: ~/workspace/hypridle
+    accept_hostkey: yes
+
+- name: build hypridle
+  shell:
+    cmd: |
+      cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr -S . -B ./build
+      cmake --build ./build --config Release --target all -j{{ ansible_processor_vcpus }}
+    chdir: ~/workspace/hypridle
+
+- name: install hypridle
+  shell:
+    cmd: cmake --install build
+    chdir: "/home/{{ ansible_user_id }}/workspace/hypridle"
+  become: yes
+
+- name: clone hyprpaper
+  git:
+    repo: https://github.com/hyprwm/hyprpaper.git
+    dest: ~/workspace/hyprpaper
+    version: "v{{ hyprpaper }}"
+    accept_hostkey: yes
+
+- name: build hyprpaper
+  shell:
+    cmd: |
+      cmake --no-warn-unused-cli -DCMAKE_BUILD_TYPE:STRING=Release -DCMAKE_INSTALL_PREFIX:PATH=/usr -S . -B ./build
+      cmake --build ./build --config Release --target all -j{{ ansible_processor_vcpus }}
+    chdir: ~/workspace/hyprpaper
+
+- name: install hyprpaper
+  shell:
+    cmd: cmake --install build
+    chdir: "/home/{{ ansible_user_id }}/workspace/hyprpaper"
+  become: yes
+
+- name: clone hyprshot
+  git:
+    repo: https://github.com/Gustash/hyprshot.git
+    dest: ~/workspace/hyprshot
+    accept_hostkey: yes
+
+- name: make hyprshot executable
+  file:
+    path: ~/workspace/hyprshot/hyprshot
+    mode: '0755'
+
+- name: symlink hyprshot
+  file:
+    src: "{{ ansible_env.HOME }}/workspace/hyprshot/hyprshot"
+    path: ~/.local/bin/hyprshot
+    state: link
+    follow: false
+    force: yes
+
+- name: make sure hypr config directory is present
+  file:
+    path: ~/.config/hypr
+    state: directory
+
+- name: symlink hyprland config
+  file:
+    src: "{{ ansible_env.PWD }}/roles/hyprland/files/{{ item }}"
+    path: ~/.config/hypr/{{ item }}
+    state: link
+    follow: false
+    force: yes
+  loop:
+    - hyprland.conf
+    - hyprlock.conf
+    - hypridle.conf
+    - hyprpaper.conf
