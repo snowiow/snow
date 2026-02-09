@@ -11,6 +11,7 @@
       - grim
       - wofi
       - brightnessctl
+      - xdg-desktop-portal-hyprland
     state: present
 
 - name: install hypr ecosystem build dependencies

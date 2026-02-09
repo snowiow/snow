@@ -5,6 +5,7 @@ Documentation=info:emacs man:emacs(1) https://gnu.org/software/emacs/
 [Service]
 Type=forking
 ExecStart=/usr/local/bin/emacs --daemon
+PassEnvironment=WAYLAND_DISPLAY XDG_RUNTIME_DIR XDG_DATA_DIRS
 SuccessExitStatus=15
 Restart=on-failure
 TimeoutStartSec=120s

@@ -1544,17 +1544,14 @@ During Presentations we want to hide the model-line.
 #+END_SRC
 * Navigation
 #+BEGIN_SRC emacs-lisp
-      (use-package icomplete
-        :ensure nil
+      (use-package vertico
         :init
-        (icomplete-vertical-mode t)
-        :bind (:map icomplete-vertical-mode-minibuffer-map
-                    ("<return>" . 'icomplete-force-complete-and-exit)
-                    ("C-d"   . 'icomplete-fido-exit)
-                    ("<tab>" . 'icomplete-force-complete))
+        (vertico-mode t)
         :config
-        (define-key minibuffer-local-completion-map " " 'self-insert-command)
-        (setq icomplete-show-matches-on-no-input t))
+        (setq vertico-count 10
+              vertico-resize nil
+              vertico-cycle t)
+        (define-key minibuffer-local-completion-map " " 'self-insert-command))
 
       (use-package orderless
         :init
@@ -2007,6 +2004,46 @@ This section installs the various terminals I use
     :bind ("C-c a" . claude-code-ide-menu)
     :config
     (claude-code-ide-emacs-tools-setup))
+#+end_src
+* Application Launcher
+Install xdg launcher from manually cloned git repo, because for some reason the ~:vc~ version doesn't load the most current version
+#+begin_src emacs-lisp
+(use-package xdg-launcher
+      :load-path "~/.emacs.d/packages/xdg-launcher")
+#+end_src
+
+#+begin_src emacs-lisp
+  (defun snow/app-launcher ()
+    "Start xdg-launcher in a floating Emacs frame for app launching.
+  Frame is created by emacsclient -c for proper Wayland focus."
+    (interactive)
+    (switch-to-buffer (get-buffer-create " *app-launcher*"))
+    (setq-local mode-line-format nil)
+    (setq-local header-line-format nil)
+    (setq-local cursor-type nil)
+    (let ((window-min-height 1)
+          (vertico-count 10)
+          (vertico-resize nil))
+      (unwind-protect
+          (xdg-launcher-run-app)
+        (delete-frame))))
+#+end_src
+* Wayland clipboard
+#+begin_src emacs-lisp
+  (defun snow/setup-wayland-clipboard (&optional frame)
+    (when (and (display-graphic-p frame)
+               (getenv "WAYLAND_DISPLAY"))
+      (setq interprogram-cut-function
+            (lambda (text)
+              (start-process "wl-copy" nil "wl-copy" "--" text)))
+      (setq interprogram-paste-function
+            (lambda ()
+              (let ((clipboard (string-trim (shell-command-to-string "wl-paste -n 2>/dev/null"))))
+                (unless (string-empty-p clipboard)
+                  clipboard))))))
+  (if (daemonp)
+      (add-hook 'after-make-frame-functions #'snow/setup-wayland-clipboard)
+    (snow/setup-wayland-clipboard))
 #+end_src
 * Open external files
 #+BEGIN_SRC emacs-lisp
