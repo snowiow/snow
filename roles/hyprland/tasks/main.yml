@@ -11,6 +11,7 @@
       - grim
       - wofi
       - brightnessctl
+      - waybar 
       - xdg-desktop-portal-hyprland
     state: present
 
@@ -223,9 +224,22 @@
     path: ~/.config/hypr
     state: directory
 
+- name: symlink waybar config
+  file:
+    src: "{{ ansible_env.PWD  }}/roles/hyprland/files/waybar/{{ item }}"
+    path: "~/.config/waybar/{{ item }}"
+    state: link
+    follow: false
+    force: yes
+  loop:
+  - config
+  - style.css
+  - power_menu.xml  
+  - scripts 
+    
 - name: symlink hyprland config
   file:
-    src: "{{ ansible_env.PWD }}/roles/hyprland/files/{{ item }}"
+    src: "{{ ansible_env.PWD }}/roles/hyprland/files/hypr/{{ item }}"
     path: ~/.config/hypr/{{ item }}
     state: link
     follow: false

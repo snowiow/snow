@@ -1,0 +1,156 @@
+{
+    "layer": "top",
+    "position": "top",
+    "mod": "dock",
+    "exclusive": true,
+    "passthrough": false,
+    "gtk-layer-shell": true,
+    "height": 36,
+    "margin-right": 5,
+    "margin-left": 5, 
+
+    "modules-left": [
+        "clock",
+    ],
+
+    "modules-center": [
+        "hyprland/workspaces",
+    ],
+
+    "modules-right": [
+        "tray",
+        "custom/updates",
+        "battery",
+        "pulseaudio",
+        "backlight",
+        "cpu",
+        "memory",
+        "disk",
+        "temperature",
+        "network",
+        "custom/power"
+    ],
+
+    "hyprland/workspaces": {
+        "on-click": "activate",
+        "disable-scroll": true,
+        "all-outputs": true,
+        "show-special": true,
+    },
+
+    "tray": {
+        "icon-size": 12,
+        "spacing": 10
+    },
+      "custom/updates": {
+      "exec": "$HOME/.config/waybar/scripts/checkupdates", // <--- path to script
+      "on-click": "$HOME/.config/scripts/checkupdates", // refresh on click
+      "interval": 14400, // refresh every 4 hours
+      "return-type": "json",
+      "format": "{icon} {}",
+      "format-icons": {
+        "has-updates": "", // icon when updates needed
+        "updated": "" // icon when all packages updated
+      }
+    },
+    "cpu": {
+        "interval": 30,
+        "format": " {usage}%",
+        "max-length": 10,
+    },
+
+    "memory": {
+        "interval": 30,
+        "format": " {}%",
+        "max-length": 10,
+        "tooltip": true,
+        "tooltip-format": "Memory - {used:0.1f}GB used",
+    },
+    
+    "disk": {
+        "interval": 600,
+        "format": " {percentage_used}%",
+        "path": "/",
+        "tooltip": true,
+        "tooltip-format": "HDD - {used} used out of {total} on {path} ({percentage_used}%)",
+        "states": {
+            "warning": 85,
+            "critical": 90,
+        },
+    },
+
+    "temperature": {
+        "thermal-zone": 1,
+        "format": "{temperatureC}°C",
+        "critical-threshold": 70,
+    },
+
+    "battery": {
+        "format": "{icon} {capacity}%",
+        "format-charging": " {capacity}%",
+        "format-plugged": " {capacity}%",
+        "format-alt-click": "click-right",
+        "format-alt": "{icon} {capacity}%",
+        "states": {
+            "warning": 30,
+            "critical": 15
+        },
+        "format-icons": ["", "", "", "", ""],
+    },
+
+    "pulseaudio": {
+        "format": "{icon} {volume}%",
+        "format-bluetooth": "{icon} {volume}%",
+        "format-muted": "",
+        "on-click": "flatpak run com.saivert.pwvucontrol",
+        "format-icons": {
+          "alsa_output.pci-0000_00_1f.3.analog-stereo": "",
+          "alsa_output.pci-0000_00_1f.3.analog-stereo-muted": "",
+          "headphone": "",
+          "hands-free": "",
+          "headset": "",
+          "phone": "",
+          "phone-muted": "",
+          "portable": "",
+          "car": "",
+          "default": ["", ""]
+      },
+    },
+    "backlight": {
+        "device": "intel_backlight",
+        "format": "{icon} {percent}%",
+        "on-scroll-up": "brightnessctl set 5%+",
+        "on-scroll-down": "brightnessctl set 5%-",
+        "format-icons": ["󰃞"],
+    },
+
+    "network": {
+        "format": "{ifname}",
+        "format-ethernet": "󰈀 LAN",
+        "format-disconnected": " ", //An empty format will hide the module.
+        "format-wifi": " {essid} ({signalStrength}%)",
+        "max-length": 50
+    },
+
+    "clock": {
+        "format": " {:%Y-%m-%d %H:%M}",
+        "tooltip-format": "{tz_list}",
+        "timezones": [
+          "Europe/Berlin",
+          "UTC",
+         "America/Los_Angeles",
+      ]
+    },
+    "custom/power": {
+        "format" : "⏻ ",
+		"tooltip": false,
+		"menu": "on-click",
+		"menu-file": "$HOME/.config/waybar/power_menu.xml", // Menu file in resources folder
+		"menu-actions": {
+			"shutdown": "shutdown",
+			"reboot": "reboot",
+			"suspend": "systemctl suspend",
+			"hibernate": "systemctl hibernate"
+		}
+    },
+}

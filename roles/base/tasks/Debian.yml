@@ -59,7 +59,27 @@
   become: yes
   when: not iosevka_aile_installed.stat.exists
 
+- name: Check if Iosevka Nerd Font is already installed
+  stat:
+    path: /usr/local/share/fonts/IosevkaNerdFont-Regular.ttf
+  register: iosevka_nerd_installed
+
+- name: Download Iosevka Nerd Font
+  get_url:
+    url: "https://github.com/ryanoasis/nerd-fonts/releases/download/v{{ nerd_fonts }}/Iosevka.zip"
+    dest: "/tmp/iosevka-nerd-{{ nerd_fonts }}.zip"
+    timeout: 300
+  when: not iosevka_nerd_installed.stat.exists
+
+- name: Extract Iosevka Nerd Font
+  ansible.builtin.unarchive:
+    src: "/tmp/iosevka-nerd-{{ nerd_fonts }}.zip"
+    dest: /usr/local/share/fonts/
+    remote_src: yes
+  become: yes
+  when: not iosevka_nerd_installed.stat.exists
+
 - name: Refresh Font Cache
   become: yes
   shell: fc-cache
-  when: not iosevka_installed.stat.exists
+  when: not iosevka_installed.stat.exists or not iosevka_nerd_installed.stat.exists

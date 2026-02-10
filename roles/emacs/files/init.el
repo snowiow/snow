@@ -1317,17 +1317,14 @@
   (yaml-ts-mode . highlight-indent-guides-mode)
   (yaml-ts-mode . eglot-ensure))
 
-(use-package icomplete
-  :ensure nil
+(use-package vertico
   :init
-  (icomplete-vertical-mode t)
-  :bind (:map icomplete-vertical-mode-minibuffer-map
-              ("<return>" . 'icomplete-force-complete-and-exit)
-              ("C-d"   . 'icomplete-fido-exit)
-              ("<tab>" . 'icomplete-force-complete))
+  (vertico-mode t)
   :config
-  (define-key minibuffer-local-completion-map " " 'self-insert-command)
-  (setq icomplete-show-matches-on-no-input t))
+  (setq vertico-count 10
+        vertico-resize nil
+        vertico-cycle t)
+  (define-key minibuffer-local-completion-map " " 'self-insert-command))
 
 (use-package orderless
   :init
@@ -1717,6 +1714,39 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :bind ("C-c a" . claude-code-ide-menu)
   :config
   (claude-code-ide-emacs-tools-setup))
+
+(use-package xdg-launcher
+      :load-path "~/.emacs.d/packages/xdg-launcher")
+
+(defun snow/app-launcher ()
+  "Start xdg-launcher in a floating Emacs frame for app launching.
+Frame is created by emacsclient -c for proper Wayland focus."
+  (interactive)
+  (switch-to-buffer (get-buffer-create " *app-launcher*"))
+  (setq-local mode-line-format nil)
+  (setq-local header-line-format nil)
+  (setq-local cursor-type nil)
+  (let ((window-min-height 1)
+        (vertico-count 10)
+        (vertico-resize nil))
+    (unwind-protect
+        (xdg-launcher-run-app)
+      (delete-frame))))
+
+(defun snow/setup-wayland-clipboard (&optional frame)
+  (when (and (display-graphic-p frame)
+             (getenv "WAYLAND_DISPLAY"))
+    (setq interprogram-cut-function
+          (lambda (text)
+            (start-process "wl-copy" nil "wl-copy" "--" text)))
+    (setq interprogram-paste-function
+          (lambda ()
+            (let ((clipboard (string-trim (shell-command-to-string "wl-paste -n 2>/dev/null"))))
+              (unless (string-empty-p clipboard)
+                clipboard))))))
+(if (daemonp)
+    (add-hook 'after-make-frame-functions #'snow/setup-wayland-clipboard)
+  (snow/setup-wayland-clipboard))
 
 (use-package openwith
   :if (not-android)
