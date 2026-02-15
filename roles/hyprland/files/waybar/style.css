@@ -1,56 +1,28 @@
-/* Colors (gruvbox) */
-/*
-@define-color black	#282828;
-@define-color red	#cc241d;
-@define-color green	#98971a;
-@define-color yellow	#d79921;
-@define-color blue	#458588;
-@define-color purple	#b16286;
-@define-color aqua	#689d6a;
-@define-color gray	#a89984;
-@define-color brgray	#928374;
-@define-color brred	#fb4934;
-@define-color brgreen	#b8bb26;
-@define-color bryellow	#fabd2f;
-@define-color brblue	#83a598;
-@define-color brpurple	#d3869b;
-@define-color braqua	#8ec07c;
-@define-color white	#ebdbb2;
-@define-color bg2	#504945;
-*/
-
-/* Colors (dracula) */
-@define-color foreground	#f8f8f2;
-@define-color background	rgba(40, 42, 54, 0.5);
-@define-color orange	#ffb86c;
-@define-color gray	#44475a;
-@define-color black #21222c;
-@define-color red	#ff5555;
-@define-color green	#50fa7b;
-@define-color yellow	#f1fa8c;
-@define-color cyan	#8be9fd;
-@define-color blue	#6272a4;
-@define-color purple	#bd93f9;
-@define-color pink	#ff79c6;
-@define-color white #ffffff;
-@define-color brred #ff6e6e;
-@define-color brgreen #69ff94;
-@define-color bryellow #ffffa5;
-@define-color brcyan #a4ffff;
-@define-color brblue #6272a4;
-@define-color brpurple #d6acff;
-@define-color brpink #ff92df;
-
-@define-color arch_blue #89b4fa;
+/* Colors (acid) */
+@define-color foreground	#e0e0e0;
+@define-color background	rgba(22, 30, 38, 0.85);
+@define-color highlight	#1e262e;
+@define-color black	#161e26;
+@define-color gray	#303840;
+@define-color lightgray	#606870;
+@define-color red	#ff7070;
+@define-color orange	#ffa060;
+@define-color yellow	#ffd080;
+@define-color green	#b0ff80;
+@define-color cyan	#80d0ff;
+@define-color purple	#b090ff;
+@define-color magenta	#f0b0ff;
+@define-color accent	#8080c0;
+@define-color white	#e0e0e0;
 
 @define-color workspace_background	@background;
 @define-color workspace_button	@foreground;
 @define-color workspace_active	@black;
-@define-color workspace_active_background	@green;
+@define-color workspace_active_background	@cyan;
 @define-color workspace_urgent	@white;
-@define-color workspace_urgent_background	@brred;
+@define-color workspace_urgent_background	@red;
 @define-color workspace_hover	@black;
-@define-color workspace_hover_background	@pink;
+@define-color workspace_hover_background	@magenta;
 @define-color critical	@red;
 @define-color warning	@yellow;
 
@@ -81,6 +53,7 @@ window#waybar {
     opacity: 1;
     transition: none;
     padding: 5px 5px;
+    margin: 2px 0px 2px 0px;
     border-radius: 5px;
 }
 
@@ -124,11 +97,11 @@ tooltip {
     border-radius: 10px;
     border-width: 2px;
     border-style: solid;
-    border-color: @purple;
+    border-color: @accent;
 }
 
 tooltip label{
-    color: @grey;
+    color: @foreground;
 }
 
 #cpu,
@@ -186,21 +159,58 @@ tooltip label{
 }
 
 #clock {
+    color: @cyan;
     border-radius: 5px 5px 5px 5px;
+}
+
+#cpu {
+    color: @orange;
+}
+
+#memory {
+    color: @purple;
+}
+
+#disk {
+    color: @magenta;
+}
+
+#temperature {
+    color: @yellow;
+}
+
+#network {
+    color: @green;
+}
+
+#pulseaudio {
+    color: @cyan;
+}
+
+#pulseaudio.microphone {
+    color: @accent;
+}
+
+#backlight {
+    color: @yellow;
+}
+
+#custom-updates {
+    color: @magenta;
+    border-radius: 5px 0px 0px 5px;
+}
+
+#custom-power {
+    color: @red;
+    border-radius: 0px 5px 5px 0px;
+}
+
+#language {
+    color: @accent;
 }
 
 #tray {
     background: @background;
     border-radius: 5px;
     margin: 5px 50px 5px 10px;
-}
-#custom-updates {
-    border-radius: 5px 0px 0px 5px;    
-}
-
-#pulseaudio {
-}
-
-#custom-power {
-    border-radius: 0px 5px 5px 0px;
 }

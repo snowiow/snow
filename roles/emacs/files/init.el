@@ -105,9 +105,7 @@
       (doom-themes-enable-bold t)
       (doom-themes-enable-italic t)
       :config
-      (load-theme 'doom-one-light t)
-      ;; (load-theme 'doom-moonlight t)
-      (load-theme 'doom-tomorrow-night t))
+      (load-theme 'doom-one-light t))
 
 ;;    (use-package catppuccin-theme
 ;;      :config
@@ -121,12 +119,14 @@
     (defun snow/switch-theme ()
       "switches between dark and light theme"
       (interactive)
-      (if (eq (car custom-enabled-themes) 'doom-tomorrow-night)
+      (if (eq (car custom-enabled-themes) 'acid)
           (progn
-            (disable-theme 'doom-tomorrow-night)
+            (disable-theme 'acid)
+            (enable-theme 'doom-one-light)
             (load "~/.emacs.d/modeline-light.el"))
         (progn
-          (enable-theme 'doom-tomorrow-night)
+          (disable-theme 'doom-one-light)
+          (enable-theme 'acid)
           (load "~/.emacs.d/modeline-dark.el"))))
 
 (use-package which-key

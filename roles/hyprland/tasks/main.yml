@@ -249,3 +249,4 @@
     - hyprlock.conf
     - hypridle.conf
     - hyprpaper.conf
+    - monitor-setup.sh
