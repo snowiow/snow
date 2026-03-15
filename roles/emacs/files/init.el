@@ -16,37 +16,7 @@
 (use-package request
   :if (not-android))
 
-;; (setq-default
-;;     display-line-numbers-type 'relative)
 (global-display-line-numbers-mode)
-
-(defvar snow/current-keyboard-layout 'colemak
-  "Current keyboard layout: 'colemak or 'qwerty")
-
-(defun snow/toggle-keyboard-layout ()
-  "Toggle between Colemak and QWERTY keyboard layouts."
-  (interactive)
-  (setq snow/current-keyboard-layout
-        (if (eq snow/current-keyboard-layout 'colemak)
-            'qwerty
-          'colemak))
-
-  ;; Apply Meow bindings
-  (snow/apply-meow-layout snow/current-keyboard-layout)
-
-  ;; Apply dired bindings
-  (snow/setup-dired-bindings)
-
-  ;; Refresh all dired buffers
-  (dolist (buffer (buffer-list))
-    (with-current-buffer buffer
-      (when (eq major-mode 'dired-mode)
-        (revert-buffer))))
-
-  (message "Keyboard layout switched to %s"
-           (if (eq snow/current-keyboard-layout 'colemak)
-               "Colemak"
-             "QWERTY")))
 
 (use-package emacs
   :custom
@@ -55,10 +25,6 @@
   (text-mode-ispell-word-completion nil)
   (tab-width 2)
   :bind
-  ("C-c m" . windmove-left)
-  ("C-c i" . windmove-right)
-  ("C-c e" . windmove-up)
-  ("C-c n" . windmove-down)
   ("C-x C-b" . ibuffer)
   :config
   (windmove-default-keybindings))
@@ -101,33 +67,29 @@
 (setq tab-bar-show nil)
 
 (use-package doom-themes
-      :custom
-      (doom-themes-enable-bold t)
-      (doom-themes-enable-italic t)
-      :config
-      (load-theme 'doom-one-light t))
+   :custom
+   (doom-themes-enable-bold t)
+   (doom-themes-enable-italic t)
+   :config
+   (load-theme 'doom-one-light t))
 
-;;    (use-package catppuccin-theme
-;;      :config
- ;;     (setq catppuccin-flavor 'mocha)
- ;;     (load-theme 'catppuccin :no-confirm))
-   (use-package acid-theme
-     :vc (:url "https://github.com/snowiow/emacs-acid-theme")
-     :config
-     (load-theme 'acid t))
+(use-package acid-theme
+  :load-path "~/.emacs.d/packages/emacs-acid-theme"
+  :config
+  (load-theme 'acid t))
 
-    (defun snow/switch-theme ()
-      "switches between dark and light theme"
-      (interactive)
-      (if (eq (car custom-enabled-themes) 'acid)
-          (progn
-            (disable-theme 'acid)
-            (enable-theme 'doom-one-light)
-            (load "~/.emacs.d/modeline-light.el"))
-        (progn
-          (disable-theme 'doom-one-light)
-          (enable-theme 'acid)
-          (load "~/.emacs.d/modeline-dark.el"))))
+ (defun snow/switch-theme ()
+   "switches between dark and light theme"
+   (interactive)
+   (if (eq (car custom-enabled-themes) 'acid)
+       (progn
+         (disable-theme 'acid)
+         (enable-theme 'doom-one-light)
+         (load "~/.emacs.d/modeline-light.el"))
+     (progn
+       (disable-theme 'doom-one-light)
+       (enable-theme 'acid)
+       (load "~/.emacs.d/modeline-dark.el"))))
 
 (use-package which-key
   :init (which-key-mode)
@@ -161,26 +123,6 @@
   (set-face-attribute 'default nil
                       :family snow/fixed-width-font
                       :height snow/font-height))
-(defun snow/set-font-size (font-height)
-  (when (eq system-type 'gnu/linux)
-    (progn (set-face-attribute 'default nil
-                               :family snow/fixed-width-font
-                               :height font-height)
-           (set-face-attribute 'fixed-pitch nil
-                               :family snow/fixed-width-font
-                               :height font-height)
-           (set-face-attribute 'variable-pitch nil
-                               :family snow/variable-width-font
-                               :height font-height))))
-(defun snow/set-normal-font-size ()
-  (interactive)
-  (snow/set-font-size 120))
-
-(defun snow/set-office-font-size ()
-  (interactive)
-  (snow/set-font-size 160))
-
-(snow/set-normal-font-size)
 
 (setq mac-option-modifier 'super)
 (setq mac-right-option-modifier nil)
@@ -209,27 +151,6 @@
   :ensure t
   :config
   (editorconfig-mode 1))
-
-;; (use-package company
-;;   :custom
-;;   (company-dabbrev-downcase nil)
-;;   (company-selection-wrap-around t)
-;;   (company-idle-delay 0.1)
-;;   (company-minimum-prefix-length 1)
-;;   :hook
-;;   (after-init . global-company-mode)
-;;   :bind
-;;   ("C-o" . company-complete)
-;;   (:map company-active-map
-;;               ("M-n" . nil)
-;;               ("M-p" . nil)
-;;               ("C-n" . company-select-next)
-;;               ("C-p" . company-select-previous)
-;;               ("C-p" . company-select-previous)
-;;               ("C-d" . company-show-doc-buffer)))
-
-;; (use-package company-box
-;;   :hook (company-mode . company-box-mode))
 
 (use-package corfu
   :custom
@@ -267,11 +188,6 @@
   :config
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster))
 
-;; (use-package nerd-icons-corfu
-;;   :after corfu
-;;   :config
-;;   (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
-
 (setq-default tab-width 4)
 (setq-default indent-tabs-mode nil)
 (setq-default tab-stop-list (number-sequence 2 120 2))
@@ -287,343 +203,6 @@
 (use-package highlight-indent-guides
   :custom
   (highlight-indent-guides-method 'character))
-
-;; (use-package undo-tree
-;;   :custom
-;;   (undo-tree-auto-save-history nil)
-;;   :config
-;;   (global-undo-tree-mode))
-
-;; (defun snow/evil-yank-highlight-advice (orig-fn beg end &rest args)
-;;   "Highlight yanked region."
-;;   (apply orig-fn beg end args)
-;;   (let ((overlay (make-overlay beg end)))
-;;     (overlay-put overlay 'face 'highlight)
-;;     (run-with-timer 0.5 nil
-;;                     (lambda (ov) (delete-overlay ov))
-;;                     overlay)))
-
-;; (use-package evil
-;;   :after undo-tree
-;;   :custom
-;;   (evil-want-C-u-scroll t)
-;;   (evil-want-keybinding nil)
-;;   (evil-want-Y-yank-to-eol t)
-;;   (evil-search-module 'evil-search)
-;;   (evil-undo-system 'undo-tree)
-;;   :config
-;;   (advice-add 'evil-yank :around 'snow/evil-yank-highlight-advice)
-;;   (evil-mode)
-;;   ;; Use Emacs state for calendar mode to preserve default keybindings
-;;   (evil-set-initial-state 'calendar-mode 'emacs))
-
-;; (use-package evil-collection
-;;   :after evil
-;;   :config
-;;   (evil-collection-init '(calc
-;;                           ;; calendar
-;;                           dashboard
-;;                           dired
-;;                           ediff
-;;                           eshell
-;;                           forge
-;;                           helpful
-;;                           info
-;;                           magit
-;;                           mu4e
-;;                           package-menu
-;;                           pass
-;;                           proced
-;;                           rg
-;;                           ripgrep
-;;                           term
-;;                           xref)))
-
-;; (use-package evil-commentary
-;;   :after evil
-;;   :config
-;;   (evil-commentary-mode))
-
-;; (use-package evil-numbers
-;;   :after evil)
-
-;; (use-package evil-org
-;;   :after org
-;;   :hook
-;;   (org-mode . evil-org-mode)
-;;   :config
-;;   (add-hook 'evil-org-mode-hook
-;;             (lambda ()
-;;               (evil-org-set-key-theme '(textobjects insert navigation additional shift todo))))
-;;   (require 'evil-org-agenda)
-;;   (evil-org-agenda-set-keys)
-;;   ;; Fix: Deactivate mark after evil-org indent operations to prevent entering visual mode
-;;   (advice-add 'evil-org-indent-items :after
-;;               (lambda (&rest _) (deactivate-mark))))
-
-;; (use-package evil-surround
-;;   :after evil
-;;   :custom
-;;   (global-evil-surround-mode 1))
-
-;; (use-package general
-;;   :after consult 
-;;   :config
-;;   (general-evil-setup t)
-;;   (general-define-key
-;;    "C-+" 'text-scale-increase
-;;    "C--" 'text-scale-decrease
-;;    ;; "C-k" 'previous-line
-;;    )
-
-;;   ;; general normal mappings
-;;   (general-nmap
-;;     "C-c +" 'evil-numbers/inc-at-pt
-;;     "C-c -" 'evil-numbers/dec-at-pt)
-
-;;   ;; org-mode mappings
-;;   (general-define-key
-;;    :keymaps 'org-mode-map
-;;    :states 'normal
-;;    "RET"  'org-open-at-point)
-
-;;   ;; org-agenda-mode mappings
-;;   (general-define-key
-;;    :keymaps 'org-agenda-mode-map
-;;    "<"  'org-agenda-earlier
-;;    ">"  'org-agenda-later)
-
-;;   ;; emacs-lisp-mode mappings
-;;   (general-define-key
-;;    :states 'visual
-;;    :keymaps 'emacs-lisp-mode-map
-;;    "e" 'eval-region)
-
-;;   ;; evil-insert-state mappings
-;;   (general-define-key
-;;    :keymaps 'evil-insert-state-map
-;;    "C-o" 'company-complete
-;;    "C-y" 'yas-expand)
-
-
-;;   ;; leader key mappings
-;;   (general-create-definer snow/leader-keys
-;;     :states '(normal motion)
-;;     :keymaps 'override
-;;     :prefix "SPC")
-
-;;   (snow/leader-keys
-;;     ;; general
-;;     ;; applications
-;;     "a" '(:ignore t :which-key "applications")
-;;     "aa" '(:ignore t :which-key "aws")
-;;     "aaa" 'aws
-;;     "ac"  'calc
-;;     "aal" 'aws-login
-;;     "aan"  'aws-organizations-get-account-name
-;;     "aai" 'aws-organizations-get-account-id
-;;     "ak" 'kubel
-;;     "am" 'mu4e
-;;     "ap" 'pass
-
-;;     "b" 'consult-buffer
-;;     "c" '(:ignore t :which-key "copilot")
-;;     "cc" 'copilot-chat-display
-;;     "cd" 'copilot-chat-doc
-;;     "ce" 'copilot-chat-explain
-;;     "cf" 'copilot-chat-fix
-;;     "cr" 'copilot-chat-review
-;;     "co" 'copilot-chat-optimize
-;;     "ct" 'copilot-chat-test
-;;     "e" 'dired-jump
-
-;;     ;; find
-;;     "f"  '(:ignore t :which-key "find")
-;;     "fd" 'dired
-;;     "ff" 'find-file
-;;     "fi" 'consult-imenu
-;;     "fr" 'rg
-;;     "fs" 'consult-line
-
-;;     ;; git
-;;     "g"  '(:ignore t :which-key "Git")
-;;     "gg" 'magit
-;;     "gb" 'magit-blame
-;;     "gc" 'magit-clone
-;;     "gd" 'magit-diff
-;;     "gl" 'git-link
-;;     "gw" 'browse-at-remote
-
-;;     ;; help
-;;     "h" '(:ignore t :which-key "Help")
-;;     "ha" 'consult-apropos
-;;     "hf" 'describe-function
-;;     "hk" 'describe-key
-;;     "hi" 'info
-;;     "hp" 'describe-package
-;;     "hs" 'describe-symbol
-;;     "hv" 'describe-variable
-
-;;     ;; language-server-protocol
-;;     "l" '(:ignore t :which-key "Eglot")
-;;     ;; "ld" 'lsp-find-definition
-;;     ;; "lf" 'lsp-format-buffer
-;;     ;; "li" 'lsp-organize-imports
-;;     ;; "ln" 'lsp-rename
-;;     ;; "lr" 'lsp-find-references
-;;     ;; "ls" 'lsp-describe-session
-;;     "lc" 'copilot-complete
-;;     "ld" 'xref-find-definitions
-;;     "lf" 'eglot-format-buffer
-;;     "li" 'eglot-code-action-organize-imports
-;;     "ln" 'eglot-rename
-;;     "lr" 'xref-find-references
-;;     "lt" 'consult-imenu
-
-;;     ;; project mode
-;;     "p"    project-prefix-map
-
-;;     ;; org mode
-;;     "o"    '(:ignore t :which-key "Org Mode")
-;;     "oa"   'org-agenda
-;;     "oc"   'org-capture
-;;     "or"   '(:ignore t :which-key "Roam")
-;;     "ord"  'org-roam-dailies-map
-;;     "orf"  'org-roam-node-find
-;;     "ort"  'org-roam-buffer-toggle
-;;     "os"   'snow/rg-org
-
-;;     ;;tab-bar-mode
-;;     "t" '(:ignore t :which-key "Tabs")
-;;     "tc" 'tab-close
-;;     "tn" 'tab-new
-;;     "tr" 'tab-bar-rename-tab
-;;     "tt" 'tab-bar-select-tab-by-name
-
-;;     "wm" 'windmove-left
-;;     "wn" 'windmove-down
-;;     "we" 'windmove-up
-;;     "wi" 'windmove-right
-;;     "ws" 'split-window-below
-;;     "wv" 'split-window-right
-;;     "wo" 'delete-other-windows
-;;     "wq" 'delete-window
-;;     "w=" 'balance-windows
-
-;;     "y" 'yas-insert-snippet
-
-;;     "/"  'rg-menu
-;;     ":"  'execute-extended-command
-;;     )
-
-;;   ;; local-leader key mappings
-;;   (general-create-definer snow/local-leader-keys
-;;     :prefix ",")
-
-;;   ;; dart-mode
-;;   (snow/local-leader-keys
-;;     :states 'normal
-;;     :keymaps 'dart-mode-map
-;;     "h" 'flutter-run-or-hot-reload
-;;     "r" 'flutter-hot-restart
-;;     )
-
-;;   ;; json-mode
-;;   (snow/local-leader-keys
-;;     :states 'normal
-;;     :keymaps 'json-mode-map
-;;     "f" 'json-pretty-print-buffer
-;;     )
-;;   ;; jsonnet-mode
-;;   (snow/local-leader-keys
-;;     :states 'normal
-;;     :keymaps 'jsonnet-mode-map
-;;     "f" 'jsonnet-reformat-buffer
-;;     )
-;;   ;; emacs-lisp-mode
-;;   (snow/local-leader-keys
-;;     :states 'normal
-;;     :keymaps 'emacs-lisp-mode-map
-;;     "e" '(:ignore t :which-key "eval")
-;;     "eb" 'eval-buffer
-;;     "ee" 'eval-last-sexp
-;;     "ef" 'eval-defun
-;;     "l" 'package-lint-current-buffer
-;;     )
-
-;;   ;; ledger-mode
-;;   (snow/local-leader-keys
-;;     :states 'normal
-;;     :keymaps 'ledger-mode-map
-;;     "r" 'ledger-reconcile
-;;     "a" 'ledger-add-transaction
-;;     "c" 'ledger-occur
-;;     "p" 'ledger-report
-;;     )
-
-;;   ;; lisp-interaction-mode
-;;   (snow/local-leader-keys
-;;     :states 'normal
-;;     :keymaps 'lisp-interaction-mode-map
-;;     "e" 'eval-print-last-sexp)
-  
-;;   ;; mu4e-view-mode
-;;   (snow/local-leader-keys
-;;       :states 'normal
-;;       :keymaps 'mu4e-view-mode-map
-;;       "h" 'mu4e-view-toggle-html
-;;       "a" 'mu4e-view-save-attachment)
-  
-;;   ;; mu4e-compose-mode
-;;   (snow/local-leader-keys
-;;     :states 'normal
-;;     :keymaps 'mu4e-compose-mode-map
-;;     "a" 'mml-attach-file
-;;     "cc" 'message-goto-cc
-;;     "bcc" 'message-goto-bcc)
-
-;;   ;; org-mode
-;;   (snow/local-leader-keys
-;;     :states 'normal
-;;     :keymaps 'org-mode-map
-;;     "RET" 'org-open-at-point
-;;     "g"   '(:ignore t :which-key "go to")
-;;     "gg"  'consult-org-heading
-;;     "gp"  'org-previous-visible-heading
-;;     "i"   'org-toggle-inline-images
-;;     "l"   'org-insert-link
-;;     "o"   'org-agenda-open-link
-;;     "p"   'org-plot/gnuplot
-;;     "r"   '(:ignore t :which-key "Org Roam")
-;;     "ra"  'org-roam-alias-add
-;;     "ri"  'org-roam-node-insert
-;;     "t"   'org-set-tags-command
-;;     ","   'org-ctrl-c-ctrl-c
-;;     "0"   'snow/org-start-presentation
-;;     "$"   'org-archive-subtree
-;;     )
-
-;;   ;; org-agenda
-;;   (snow/local-leader-keys
-;;     :states 'motion
-;;     :keymaps 'org-agenda-mode-map
-;;     "f" 'org-agenda-filter)
-
-;;   ;; text-mode
-;;   (snow/local-leader-keys
-;;     :states 'normal
-;;     :keymaps 'text-mode-map
-;;     "b" 'snow/branch-name-to-commit-msg  
-;;     )
-;;   ;; vterm-mode
-;;   (snow/local-leader-keys
-;;     :states 'normal
-;;     :keymaps 'vterm-mode-map
-;;     "p" 'vterm-yank
-;;     :config
-;;     (setq vterm-shell "/opt/homebrew/bin/fish")
-;;     )
-;;   )
 
 (use-package string-inflection)
 
@@ -728,11 +307,6 @@
     (org-image-actual-width nil)
     (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
                          (sequence "|" "CANCELLED(c)")))
-    ;; (org-tag-alist '(
-    ;;                  ("work" . ?w)
-    ;;                  ("home" . ?p)
-    ;;                  ("coding" . ?c)
-    ;;                  ("blog" . ?b)))
     ;; Open org links in the same buffer instead of splitting
     (org-link-frame-setup '((file . find-file)))
     :config
@@ -914,10 +488,6 @@
     (define-key org-tree-slide-mode-map (kbd "<right>") 'org-tree-slide-move-next-tree)
     (define-key org-tree-slide-mode-map (kbd "<left>") 'org-tree-slide-move-previous-tree)
     (define-key org-tree-slide-mode-map (kbd "Q") 'snow/org-end-presentation))
-    ;; (evil-normalize-keymaps)
-    ;; (evil-local-set-key 'normal (kbd "q") 'snow/org-end-presentation)
-    ;; (evil-local-set-key 'normal (kbd "<right>") 'org-tree-slide-move-next-tree)
-    ;; (evil-local-set-key 'normal (kbd "<left>") 'org-tree-slide-move-previous-tree))
 
 (defun snow/org-end-presentation ()
     (interactive)
@@ -955,219 +525,6 @@
   ("n" text-scale-increase "+")
   ("e" text-scale-decrease "-")
   ("q" nil "finished" :exit t))
-
-(defun meow-setup ()
-  "Initial Meow setup with shared leader key bindings."
-  (setq meow-cheatsheet-layout meow-cheatsheet-layout-colemak)
-  ;; Shared leader key bindings (same for both layouts)
-  (meow-leader-define-key
-   '("?" . meow-cheatsheet)
-   '("1" . meow-digit-argument)
-   '("2" . meow-digit-argument)
-   '("3" . meow-digit-argument)
-   '("4" . meow-digit-argument)
-   '("5" . meow-digit-argument)
-   '("6" . meow-digit-argument)
-   '("7" . meow-digit-argument)
-   '("8" . meow-digit-argument)
-   '("9" . meow-digit-argument)
-   '("0" . meow-digit-argument)
-   ;; major modes
-   '("a a a" . aws)
-   '("a a l" . aws-login)
-   '("a a i" . aws-organizations-get-account-id)
-   '("a a n" . aws-organizations-get-account-name)
-   '("a c" . calc)
-   '("a k" . kubel)
-   '("a m" . mu4e)
-   '("a p" . pass)
-   ;; Help
-   '("h a" . consult-apropos)
-   '("h f" . helpful-callable)
-   '("h k" . helpful-key)
-   '("h i" . info)
-   '("h p" . describe-package)
-   '("h s" . helpful-symbol)
-   '("h v" . helpful-variable)
-   '("h ." . helpful-at-point)
-   ;; LSP
-   '("l d" . xref-find-definitions)
-   '("l f" . eglot-format-buffer)
-   '("l i" . eglot-code-action-organize-imports)
-   '("l n" . eglot-rename)
-   '("l r" . xref-find-references)
-   '("l t" . consult-imenu)
-   ;; org mode
-   '("o a"     . org-agenda)
-   '("o c"     . org-capture)
-   '("o r d t" . org-roam-dailies-capture-today)
-   '("o r d T" . org-roam-dailies-goto-today)
-   '("o r d y" . org-roam-dailies-capture-yesterday)
-   '("o r d Y" . org-roam-dailies-goto-yesterday)
-   '("o r d d" . org-roam-dailies-capture-date)
-   '("o r d D" . org-roam-dailies-goto-date)
-   '("o r f"   . org-roam-node-find)
-   '("o r t"   . org-roam-buffer-toggle)
-   '("o s"     . snow/rg-org)
-   ;; project mode
-   (cons "p" project-prefix-map)
-   ;; tab management
-   '("t c" . tab-close)
-   '("t n" . tab-new)
-   '("t r" . tab-bar-rename-tab)
-   '("t t" . tab-bar-select-tab-by-name)
-   ;; window movement
-   '("w s" . split-window-below)
-   '("w v" . split-window-right)
-   '("w o" . delete-other-windows)
-   '("w q" . delete-window)
-   '("w =" . balance-windows))
-  ;; Shared normal mode bindings
-  (meow-normal-define-key
-   '("0" . meow-expand-0)
-   '("1" . meow-expand-1)
-   '("2" . meow-expand-2)
-   '("3" . meow-expand-3)
-   '("4" . meow-expand-4)
-   '("5" . meow-expand-5)
-   '("6" . meow-expand-6)
-   '("7" . meow-expand-7)
-   '("8" . meow-expand-8)
-   '("9" . meow-expand-9)
-   '("-" . negative-argument)
-   '(";" . meow-reverse)
-   '("," . meow-inner-of-thing)
-   '("." . meow-bounds-of-thing)
-   '("[" . meow-beginning-of-thing)
-   '("]" . meow-end-of-thing)
-   '("/" . meow-visit)
-   '("a" . meow-insert)
-   '("A" . meow-open-above)
-   '("b" . meow-back-word)
-   '("B" . meow-back-symbol)
-   '("c" . meow-change)
-   '("C" . meow-comment)
-   '("d" . meow-kill)
-   '("D" . meow-page-down)
-   '("f" . meow-find)
-   '("F" . meow-page-up)
-   '("g" . meow-cancel-selection)
-   '("G" . meow-grab)
-   '("j" . meow-pop-to-mark)
-   '("J" . meow-unpop-to-mark)
-   '("C-j" . meow-join)
-   '("L" . meow-goto-line)
-   '("o" . meow-block)
-   '("O" . meow-to-block)
-   '("p" . meow-yank)
-   '("P" . meow-clipboard-yank)
-   '("q" . meow-quit)
-   '("r" . meow-replace)
-   '("s" . meow-append)
-   '("S" . meow-open-below)
-   '("t" . meow-till)
-   '("u" . meow-undo)
-   '("U" . meow-undo-in-selection)
-   '("C-r" . undo-redo)
-   '("w" . meow-next-word)
-   '("W" . meow-next-symbol)
-   '("x" . meow-line)
-   '("X" . meow-backward-delete)
-   '("y" . meow-save)
-   '("Y" . meow-clipboard-save)
-   '("z" . meow-pop-selection)
-   '("'" . repeat)
-   '("=" . meow-indent)
-   '(">" . indent-rigidly-right-to-tab-stop)
-   '("<" . indent-rigidly-left-to-tab-stop)
-   ;; '("!" . meow-find-ref)
-   '("C-o" . meow-pop-to-global-mark)
-   '("@" . kmacro-start-macro-or-insert-counter)
-   '("!" . kmacro-end-or-call-macro)
-   '("<escape>" . ignore))
-
-  ;; Apply initial layout-specific bindings
-  (snow/apply-meow-layout snow/current-keyboard-layout))
-
-(defun snow/setup-colemak-meow-bindings ()
-  "Set up Colemak-specific Meow navigation bindings."
-  (setq meow-cheatsheet-layout meow-cheatsheet-layout-colemak)
-  (meow-leader-define-key
-   '("w m" . windmove-left)
-   '("w n" . windmove-down)
-   '("w e" . windmove-up)
-   '("w i" . windmove-right))
-  (meow-motion-overwrite-define-key
-   '("e" . meow-prev)
-   '("n" . meow-next)
-   '("<escape>" . ignore))
-  (meow-normal-define-key
-   '("e" . meow-prev)
-   '("E" . meow-prev-expand)
-   '("n" . meow-next)
-   '("N" . meow-next-expand)
-   '("m" . meow-left)
-   '("M" . meow-left-expand)
-   '("i" . meow-right)
-   '("I" . meow-right-expand)
-   '("l" . meow-line)
-   ;; Colemak-specific rebindings for displaced keys
-   '("h" . meow-mark-word)    ;; 'h' displaced by left movement
-   '("H" . meow-mark-symbol)
-   '("v" . meow-search)))
-
-(defun snow/setup-qwerty-meow-bindings ()
-  "Set up QWERTY-specific Meow navigation bindings."
-  (setq meow-cheatsheet-layout meow-cheatsheet-layout-qwerty)
-    (meow-leader-define-key
-     '("w h" . windmove-left)
-     '("w j" . windmove-down)
-     '("w k" . windmove-up)
-     '("w l" . windmove-right))
-  (meow-motion-overwrite-define-key
-   '("j" . meow-next)
-   '("k" . meow-prev)
-   '("<escape>" . ignore))
-  (meow-normal-define-key
-   ;; QWERTY navigation: h/j/k/l (Vim-style)
-   '("h" . meow-left)
-   '("H" . meow-left-expand)
-   '("j" . meow-next)
-   '("J" . meow-next-expand)
-   '("k" . meow-prev)
-   '("K" . meow-prev-expand)
-   '("l" . meow-right)
-   '("L" . meow-right-expand)
-   ;; QWERTY-specific rebindings for displaced keys
-   '("m" . meow-join)
-   '("n" . meow-search)
-   '("V" . meow-goto-line)
-   '("e" . meow-mark-word)
-   '("E" . meow-mark-symbol)))
-
-(defun snow/apply-meow-layout (layout)
-  "Apply LAYOUT-specific Meow bindings (colemak or qwerty)."
-  (if (eq layout 'colemak)
-      (snow/setup-colemak-meow-bindings)
-    (snow/setup-qwerty-meow-bindings)))
-
-;; (use-package meow
-;;   :custom
-;;   (meow-expand-exclude-mode-list nil)
-;;   (meow-motion-remap-prefix "C-M-")
-;;   :config
-;;   (meow-setup)
-;;   (meow-global-mode 1)
-;;   ;; Remove default h -> help-command binding in leader keymap
-;;   (meow-thing-register 'apostrophe
-;;                        '(regexp "'" "'")
-;;                        '(regexp "'" "'"))
-;;   (add-to-list 'meow-char-thing-table '(?' . apostrophe))
-;;   (setq meow-keypad-start-keys '((?c . ?c) (?x . ?x)))
-;;   (setq meow-use-cursor-position-hack t))
-;; (use-package meow-tree-sitter
-;;   :config
-;;   (meow-tree-sitter-register-defaults))
 
 (use-package erc
   :custom
@@ -1218,11 +575,6 @@
   :config
   (flutter-l10n-flycheck-setup))
 
-;; (use-package lsp-dart
-;;   :after lsp
-;;   :hook
-;;   (dart-mode . lsp))
-
 (use-package dockerfile-mode)
 
 (use-package package-lint)
@@ -1231,7 +583,9 @@
   :ensure nil
   :mode "\\.go\\'"
   :hook
-  (go-ts-mode . eglot-ensure))
+  (go-ts-mode . eglot-ensure)
+  :config
+  (setq go-ts-mode-indent-offset 4))
 
 (use-package json-ts-mode
   :ensure nil
@@ -1290,10 +644,8 @@
         (typescript "https://github.com/tree-sitter/tree-sitter-typescript" "master" "typescript/src")
         (yaml "https://github.com/ikatyang/tree-sitter-yaml")))
 
-;; Use built-in typescript-ts-mode (requires tree-sitter grammars)
-;; Install grammars with: M-x treesit-install-language-grammar RET typescript RET
 (use-package typescript-ts-mode
-  :ensure nil  ;; built-in to Emacs 29+
+  :ensure nil
   :mode (("\\.ts\\'" . typescript-ts-mode)
          ("\\.tsx\\'" . tsx-ts-mode))
   :custom
@@ -1364,44 +716,9 @@
          (local-tmp-file (file-local-copy filename)))
     (find-file local-tmp-file)))
 
-(defun snow/setup-dired-bindings ()
-  "Set up dired bindings based on current keyboard layout."
-  (require 'dired)
-  (if (eq snow/current-keyboard-layout 'colemak)
-      (progn
-        ;; Unbind QWERTY keys
-        (define-key dired-mode-map (kbd "h") nil)
-        (define-key dired-mode-map (kbd "j") nil)
-        (define-key dired-mode-map (kbd "k") nil)
-        (define-key dired-mode-map (kbd "l") nil)
-        ;; Bind Colemak keys
-        (define-key dired-mode-map (kbd "m") 'dired-up-directory)
-        (define-key dired-mode-map (kbd "i") 'dired-find-file))
-    (progn
-      ;; Unbind Colemak keys
-      (define-key dired-mode-map (kbd "m") nil)
-      (define-key dired-mode-map (kbd "i") nil)
-      ;; Bind QWERTY keys with explicit navigation
-      (define-key dired-mode-map (kbd "h") 'dired-up-directory)
-      (define-key dired-mode-map (kbd "j") 'dired-next-line)
-      (define-key dired-mode-map (kbd "k") 'dired-previous-line)
-      (define-key dired-mode-map (kbd "l") 'dired-find-file))))
-
 (use-package dired
-  ;; :after (evil evil-collection)
   :ensure nil
-  :commands (dired dired-jump)
-  :config
-  (define-key dired-mode-map (kbd "J") 'dired-goto-file)
-  (snow/setup-dired-bindings))
-;; :config
-;; (evil-collection-define-key 'normal 'dired-mode-map
-;;   "m" 'dired-up-directory
-;;   "n" 'evil-next-line
-;;   "e" 'evil-previous-line
-;;   "i" 'dired-find-file
-;;   "L" 'dired-display-file
-;;   "M" 'snow/dired-open-locally))
+  :commands (dired dired-jump))
 
 (use-package flycheck
   :init
@@ -1448,24 +765,6 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
     (add-hook 'cfn-json-mode-hook 'flycheck-mode)
     (add-hook 'cfn-yaml-mode-hook 'flycheck-mode)))
 
-;; Set up a mode for JSON based templates
-
-;; (setq gc-cons-threshold 100000000)
-;; (setq read-process-output-max (* 1024 1024)) ;; 1mb
-
-;; (use-package lsp-mode
-;;   :commands lsp
-;;   :hook
-;;   (go-mode . lsp)
-;;   (python-mode . lsp)
-;;   (javascript-mode . lsp)
-;;   ;; (terraform-mode . lsp) ;; currently not working properly
-;;   (typescript-mode . lsp)
-;;   :init
-;;   (setq lsp-headerline-breadcrumb-enable t)
-;;   :config
-;;   (setq lsp-file-watch-threshold 5000))
-
 (use-package eglot
  :ensure nil
  :config
@@ -1509,19 +808,19 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
           (k8s-context (shell-command-to-string "kubectl config current-context")))
       (concat
        "\n"
-       (propertize (user-login-name) 'face `(:foreground "#c196d6"))
-       (propertize "@" 'face `(:foreground "white"))
-       (propertize (system-name) 'face `(:foreground "#f0c574"))
+       (propertize (user-login-name) 'face 'font-lock-type-face)
+       (propertize "@" 'face 'default)
+       (propertize (system-name) 'face 'font-lock-function-name-face)
        (when current-branch
-         (propertize (concat "  " current-branch) 'face `(:foreground "#c196d6")))
+         (propertize (concat "  " current-branch) 'face 'font-lock-keyword-face))
        (when (boundp 'kubel-context)
-         (propertize (concat " k8s: " k8s-context) 'face `(:foreground "#c86464")))
+         (propertize (concat " k8s: " k8s-context) 'face 'font-lock-warning-face))
        (when aws-vault
-         (propertize (concat "  " aws-vault) 'face `(:foreground "#b2b966")))
+         (propertize (concat "  " aws-vault) 'face 'font-lock-string-face))
        "\n"
-       (propertize (eshell/pwd) 'face `(:foreground "#819fbb"))
+       (propertize (eshell/pwd) 'face 'font-lock-constant-face)
        "\n"
-       (propertize "$ " 'face `(:foreground "white")))))
+       (propertize "$ " 'face 'eshell-prompt))))
 
   (defun snow/eshell-config ()
     (eshell-hist-initialize)
@@ -1540,8 +839,6 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 
   (use-package esh-autosuggest
     :hook (eshell-mode . esh-autosuggest-mode)
-    ;; :bind (:map esh-autosuggest-active-map
-    ;;             ("C-l" . 'company-complete-selection))
     :custom
     (esh-autosuggest-delay 0.5))
 
@@ -1565,14 +862,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   (tramp-default-host "cloudpi"))
 
 (use-package vterm
-  :if (not-android)
-  :config
-  ;; Make sure Meow normal mode is active in vterm-copy-mode
-  (add-hook 'vterm-copy-mode-hook
-            (lambda ()
-              (if vterm-copy-mode
-                  (meow-normal-mode 1)
-                (meow-insert-mode 1)))))
+  :if (not-android))
 
 (defun snow/vterm-new-frame ()
   "Open a new frame with a new vterm session."
@@ -1657,14 +947,6 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :config
   (setq kubel-use-namespace-list 'on))
 
-;; (use-package yasnippet
-;;   :bind
-;;   (("C-c y" . yas-insert-snippet)
-;;    :map yas-keymap
-;;    ("C-y" . yas-next-field-or-maybe-expand))
-;;   :config
-;;   (yas-global-mode 1))
-
 (use-package tempel
 :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
        ("M-*" . tempel-insert))
@@ -1674,17 +956,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 ;; Setup completion at point
 (defun tempel-setup-capf ()
 (setq-local completion-at-point-functions
-            (cons #'tempel-expand completion-at-point-functions)))
-
-;; (add-hook 'conf-mode-hook 'tempel-setup-capf)
-;; (add-hook 'prog-mode-hook 'tempel-setup-capf)
-;; (add-hook 'text-mode-hook 'tempel-setup-capf)
-
-;; Optionally make the Tempel templates available to Abbrev,
-;; either locally or globally. `expand-abbrev' is bound to C-x '.
-;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
-;; (global-tempel-abbrev-mode)
-)
+            (cons #'tempel-expand completion-at-point-functions))))
 
 (use-package ripgrep
   :if (not-android))

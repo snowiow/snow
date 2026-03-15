@@ -1,17 +1,24 @@
-- name: make sure fish is installed
-  package:
-    name:
-      - awscli
-    state: present
-  become: yes
-
 - name: Include version vars
   include_vars: "{{ playbook_dir }}/versions.yaml"
-  
+
 - name: create bin directory if not exists
   file:
     path: "{{ playbook_dir }}/bin"
     state: directory
+
+- name: Download awscli
+  shell:
+    "curl -L -o bin/awscli.zip https://awscli.amazonaws.com/awscli-exe-linux-x86_64-{{ awscli }}.zip"
+
+- name: Extract awscli
+  ansible.builtin.unarchive:
+    src: "{{ playbook_dir }}/bin/awscli.zip"
+    dest: "{{ playbook_dir }}/bin"
+
+- name: Install awscli
+  shell:
+    "{{ playbook_dir }}/bin/aws/install --update"
+  become: yes
     
 - name: Download aws-vault
   shell:
@@ -82,3 +89,31 @@
     dest: /usr/local/bin/cue
     mode: 755
   become: yes
+
+- name: Install Claude Code
+  shell:
+    "curl -fsSL https://claude.ai/install.sh | bash -s -- {{ claude_code }}"
+  args:
+    creates: "{{ ansible_env.HOME }}/.local/share/claude/versions/{{ claude_code }}"
+  environment:
+    HOME: "{{ ansible_env.HOME }}"
+
+- name: Create .claude directory if not exists
+  file:
+    path: "{{ ansible_env.HOME }}/.claude"
+    state: directory
+    mode: 0755
+
+- name: Symlink Claude settings
+  file:
+    src: "{{ playbook_dir }}/roles/work/files/claude_settings.json"
+    dest: "{{ ansible_env.HOME }}/.claude/settings.json"
+    state: link
+    force: yes
+
+- name: Symlink Claude MCP configuration
+  file:
+    src: "{{ playbook_dir }}/roles/work/files/claude_mcp_config.json"
+    dest: "{{ ansible_env.HOME }}/.claude.json"
+    state: link
+    force: yes

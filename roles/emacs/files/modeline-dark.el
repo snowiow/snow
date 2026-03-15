@@ -7,11 +7,11 @@
                           'face 'font-lock-keyword-face)))
                '(:eval (when vc-mode
 		                 (propertize (concat " " (substring vc-mode 5))
-			                         'face 'font-lock-negation-char-face)))
+			                         'face 'font-lock-type-face)))
                '(:eval (ignore-errors
                          (propertize
                           (concat " " (all-the-icons-icon-for-buffer)))))
-               (propertize " %b " 'face 'font-lock-negation-char-face)
+               (propertize " %b " 'face 'font-lock-type-face)
                '(:eval (when (buffer-modified-p)
 		                 (propertize "+" 'face 'font-lock-variable-name-face)))
                " ("
