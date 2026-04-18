@@ -626,3 +626,8 @@ lines = 0
 [window.padding]
 x = 1
 y = 1
+
+[[keyboard.bindings]]
+key = "Return"
+mods = "Shift"
+chars = "\u001B\r"

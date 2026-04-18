@@ -1,11 +1,11 @@
-awscli: 2.33.23
+awscli: 2.34.15
 aws_vault: 7.2.0
 aws_sso: 2.0.3
 alacritty: 0.16.1
 claude_code: 2.1.76
 cue: 0.8.1
 emacs: 30.2
-kubectl: 1.25.0
+kubectl: 1.35.3
 helm: 3.10.2
 iosevka_font: 33.3.4
 nerd_fonts: 3.3.0

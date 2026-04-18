@@ -120,9 +120,10 @@
            (set-face-attribute 'variable-pitch nil
                                :family snow/variable-width-font
                                :height snow/font-height))
-  (set-face-attribute 'default nil
-                      :family snow/fixed-width-font
-                      :height snow/font-height))
+  (when (not-android)
+    (set-face-attribute 'default nil
+                        :family snow/fixed-width-font
+                        :height snow/font-height)))
 
 (setq mac-option-modifier 'super)
 (setq mac-right-option-modifier nil)
@@ -284,13 +285,14 @@
     :hook
     (org-after-todo-statistics . org-summary-todo)
     (org-mode . flyspell-mode)
-    (org-mode . visual-line-mode)
-    (org-mode . visual-fill-column-mode)
     :bind
     ("C-c o a" . org-agenda)
     ("C-c o c" . org-capture)
+    ("C-c o s" . snow/rg-org)
     (:map org-mode-map
                 ("C-c S" . snow/org-start-presentation))
+    (:map flyspell-mode-map
+          ("M-TAB" . nil))
     :custom
     ;; AGENDA SETTINGS
     (org-agenda-files (file-expand-wildcards (concat org-directory "/roam/pages/agenda/*.org")))
@@ -407,12 +409,12 @@
 
 (defun snow/org-capf ()
   (setq-local completion-at-point-functions
-              (list (apply #'cape-capf-super
-                           (append
-                            (when (fboundp 'org-roam-completion-at-point)
-                              (list #'org-roam-completion-at-point))
-                            (list #'tempel-expand
-                                  #'cape-dabbrev))))))
+              (list (cape-capf-super
+                     #'org-roam-complete-everywhere
+                     #'org-roam-complete-link-at-point
+                     #'tempel-expand
+                     #'cape-file
+                     #'cape-dabbrev))))
 
 (use-package org-roam
   :after org
@@ -420,6 +422,7 @@
   :init
   (setq org-roam-v2-ack t)
   :bind
+  ("C-c o r d" . org-roam-dailies-map)
   ("C-c o r f" . org-roam-node-find)
   (:map org-mode-map
               ("C-c C-n C-i" . org-roam-node-insert))
@@ -775,7 +778,10 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :ensure nil
   :bind (:map project-prefix-map
               ("R" . 'snow/rg-project)
-              ("m" . 'magit-status)))
+              ("m" . 'magit-status))
+  :config
+  (when (eq system-type 'android)
+    (project-remember-projects-under snow/android-notes-path)))
 
 (cl-defmethod project-root ((project (head local)))
   (cdr project))
@@ -980,6 +986,12 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
            default-directory)
     :confirm prefix
     :flags ("--hidden -g !.git")))
+
+(use-package agent-shell
+    :ensure t
+    :ensure-system-package
+    ;; Add agent installation configs here
+    ((claude-agent-acp . "npm install -g @zed-industries/claude-agent-acp")))
 
 (use-package claude-code-ide
   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)

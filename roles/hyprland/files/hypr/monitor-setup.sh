@@ -30,6 +30,17 @@ if has_monitor "HDMI-A-1" && has_monitor "DP-1"; then
         "8,monitor:HDMI-A-1" \
         "9,monitor:DP-1" \
         "10,monitor:DP-1"
+elif has_monitor "DP-1"; then
+    "1,monitor:eDP-1" \
+    "2,monitor:DP-1" \
+    "3,monitor:DP-1" \
+    "4,monitor:DP-1" \
+    "5,monitor:DP-1" \
+    "6,monitor:DP-1" \
+    "7,monitor:DP-1" \
+    "8,monitor:DP-1" \
+    "9,monitor:DP-1" \
+    "10,monitor:DP-1"
 elif has_monitor "DP-2"; then
     # Work: eDP-1 + DP-1
     apply_workspaces \

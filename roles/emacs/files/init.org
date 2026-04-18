@@ -175,9 +175,10 @@ Due to different resolutions on Mac the font should be displayed bigger
              (set-face-attribute 'variable-pitch nil
                                  :family snow/variable-width-font
                                  :height snow/font-height))
-    (set-face-attribute 'default nil
-                        :family snow/fixed-width-font
-                        :height snow/font-height))
+    (when (not-android)
+      (set-face-attribute 'default nil
+                          :family snow/fixed-width-font
+                          :height snow/font-height)))
 #+END_SRC
 * Mac OSX Settings
 Set option to super and command to meta
@@ -404,11 +405,10 @@ Now configure org-mode
       :hook
       (org-after-todo-statistics . org-summary-todo)
       (org-mode . flyspell-mode)
-      (org-mode . visual-line-mode)
-      (org-mode . visual-fill-column-mode)
       :bind
       ("C-c o a" . org-agenda)
       ("C-c o c" . org-capture)
+      ("C-c o s" . snow/rg-org)
       (:map org-mode-map
                   ("C-c S" . snow/org-start-presentation))
       (:map flyspell-mode-map
@@ -546,6 +546,8 @@ Gives different org syntax modern ligatures. Doesn't work on Android natively an
   (defun snow/org-capf ()
     (setq-local completion-at-point-functions
                 (list (cape-capf-super
+                       #'org-roam-complete-everywhere
+                       #'org-roam-complete-link-at-point
                        #'tempel-expand
                        #'cape-file
                        #'cape-dabbrev))))
@@ -556,6 +558,7 @@ Gives different org syntax modern ligatures. Doesn't work on Android natively an
     :init
     (setq org-roam-v2-ack t)
     :bind
+    ("C-c o r d" . org-roam-dailies-map)
     ("C-c o r f" . org-roam-node-find)
     (:map org-mode-map
                 ("C-c C-n C-i" . org-roam-node-insert))
@@ -988,7 +991,10 @@ During Presentations we want to hide the model-line.
       :ensure nil
       :bind (:map project-prefix-map
                   ("R" . 'snow/rg-project)
-                  ("m" . 'magit-status)))
+                  ("m" . 'magit-status))
+      :config
+      (when (eq system-type 'android)
+        (project-remember-projects-under snow/android-notes-path)))
 #+END_SRC
 
 Create a way to add local projects to the project.el project list. Normally only directories in version control are recognized as projects by project.el.
@@ -1232,6 +1238,15 @@ This section installs the various terminals I use
       :flags ("--hidden -g !.git")))
   #+end_src
 * AI
+* Agent shell
+#+begin_src emacs-lisp
+  (use-package agent-shell
+      :ensure t
+      :ensure-system-package
+      ;; Add agent installation configs here
+      ((claude-agent-acp . "npm install -g @zed-industries/claude-agent-acp")))
+#+end_src
+* Claude Code IDE
 #+begin_src emacs-lisp
   (use-package claude-code-ide
     :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
