@@ -783,7 +783,10 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
               ("m" . 'magit-status))
   :config
   (when (eq system-type 'android)
-    (project-remember-projects-under snow/android-notes-path)))
+    (add-to-list 'project-find-functions
+                 (lambda (dir)
+                   (when (string-prefix-p (url-unhex-string snow/android-notes-path) dir)
+                     (cons 'transient (url-unhex-string snow/android-notes-path)))))))
 
 (cl-defmethod project-root ((project (head local)))
   (cdr project))

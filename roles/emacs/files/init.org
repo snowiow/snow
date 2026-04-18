@@ -996,7 +996,10 @@ During Presentations we want to hide the model-line.
                   ("m" . 'magit-status))
       :config
       (when (eq system-type 'android)
-        (project-remember-projects-under snow/android-notes-path)))
+        (add-to-list 'project-find-functions
+                     (lambda (dir)
+                       (when (string-prefix-p (url-unhex-string snow/android-notes-path) dir)
+                         (cons 'transient (url-unhex-string snow/android-notes-path)))))))
 #+END_SRC
 
 Create a way to add local projects to the project.el project list. Normally only directories in version control are recognized as projects by project.el.
