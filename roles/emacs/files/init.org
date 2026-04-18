@@ -145,7 +145,8 @@ The tool-bar should only be visible in Android and there it should be at the bot
 #+END_SRC
 ** Modeline
 #+BEGIN_SRC emacs-lisp
-  (load "~/.emacs.d/modeline-dark.el")
+  (when (not-android)
+    (load "~/.emacs.d/modeline-dark.el"))
 #+END_SRC
 
 * Font Settings

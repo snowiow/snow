@@ -97,7 +97,8 @@
   :custom
   (which-key-idle-delay 0.3))
 
-(load "~/.emacs.d/modeline-dark.el")
+(when (not-android)
+  (load "~/.emacs.d/modeline-dark.el"))
 
 (defvar snow/fixed-width-font "Iosevka Term"
   "The font to use for monospaced (fixed width) text.")
