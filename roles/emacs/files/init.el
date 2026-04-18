@@ -61,6 +61,7 @@
 
 (use-package all-the-icons)
 (use-package all-the-icons-dired
+  :if (not-android)
   :hook
   (dired-mode . all-the-icons-dired-mode))
 

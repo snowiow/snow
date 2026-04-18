@@ -99,6 +99,7 @@ The tool-bar should only be visible in Android and there it should be at the bot
 #+BEGIN_SRC emacs-lisp
   (use-package all-the-icons)
   (use-package all-the-icons-dired
+    :if (not-android)
     :hook
     (dired-mode . all-the-icons-dired-mode))
 #+END_SRC
