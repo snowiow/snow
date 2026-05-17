@@ -1,6 +1,129 @@
 (defun not-android ()
     (not (eq system-type 'android)))
 
+(defvar-local snow/rest-timer--state nil
+  "Current rest timer state for this buffer.")
+
+(defvar-local snow/rest-timer--refresh-timer nil
+  "Emacs timer used to refresh the visible rest timer.")
+
+(defvar-local snow/rest-timer--saved-header-line nil
+  "Header line value before `snow/rest-timer-start' changed it.")
+
+(defvar-local snow/rest-timer--saved-header-line-p nil
+  "Non-nil when `snow/rest-timer--saved-header-line' has been captured.")
+
+(defvar snow/rest-timer--timers (make-hash-table :test 'eq)
+  "Map buffers to their active rest timer refresh timers.")
+
+(defvar snow/rest-timer-over-hook '(beep)
+  "Functions run once when a targeted rest timer finishes.")
+
+(defun snow/rest-timer--parse-duration (duration)
+  "Return DURATION as seconds.
+DURATION may be a number of seconds or a string such as \"90\", \"90s\",
+\"2m\", \"2min\", \"1h\", or \"1hour\"."
+  (cond
+   ((numberp duration) duration)
+   ((and (stringp duration)
+         (string-match "\\`[[:space:]]*\\([0-9]+\\)[[:space:]]*\\([[:alpha:]]*\\)[[:space:]]*\\'"
+                       duration))
+    (let ((amount (string-to-number (match-string 1 duration)))
+          (unit (downcase (match-string 2 duration))))
+      (* amount
+         (pcase unit
+           ((or "" "s" "sec" "second" "seconds") 1)
+           ((or "m" "min" "minute" "minutes") 60)
+           ((or "h" "hr" "hour" "hours") 3600)
+           (_ (user-error "Unknown duration unit: %s" unit))))))
+   (t
+    (user-error "Invalid duration: %S" duration))))
+
+(defun snow/rest-timer--format ()
+  "Return the header-line text for the active rest timer."
+  (pcase-let ((`(,start ,target ,notified) snow/rest-timer--state))
+    (let ((elapsed (- (floor (float-time)) start)))
+      (if target
+          (let* ((bar-width 20)
+                 (ratio (/ (float elapsed) target))
+                 (filled (min bar-width (floor (* bar-width (min ratio 1.0)))))
+                 (empty (- bar-width filled))
+                 (text (format "REST [%s%s] %ds/%ds"
+                               (make-string filled ?#)
+                               (make-string empty ?\s)
+                               elapsed
+                               target)))
+            (if notified
+                (propertize text 'face 'error)
+              text))
+        (format "REST %d:%02d" (/ elapsed 60) (mod elapsed 60))))))
+
+(defun snow/rest-timer--tick (buffer)
+  "Refresh BUFFER's rest timer display."
+  (if (not (buffer-live-p buffer))
+      (let ((timer (gethash buffer snow/rest-timer--timers)))
+        (when (timerp timer)
+          (cancel-timer timer))
+        (remhash buffer snow/rest-timer--timers))
+    (with-current-buffer buffer
+      (when snow/rest-timer--state
+        (pcase-let ((`(,start ,target ,notified) snow/rest-timer--state))
+          (when (and target
+                     (not notified)
+                     (> (floor (float-time)) (+ start target)))
+            (setq snow/rest-timer--state (list start target t))
+            (run-hooks 'snow/rest-timer-over-hook)))
+        (setq-local header-line-format (snow/rest-timer--format))
+        (force-mode-line-update)))))
+
+(defun snow/rest-timer-start (&optional duration)
+  "Start a rest timer in the current buffer.
+DURATION is a number of seconds or a duration string.  Interactively, prompt
+for a duration string."
+  (interactive (list (read-string "Rest duration: " "60s")))
+  (let ((seconds (and duration (snow/rest-timer--parse-duration duration))))
+    (unless snow/rest-timer--saved-header-line-p
+      (setq-local snow/rest-timer--saved-header-line header-line-format)
+      (setq-local snow/rest-timer--saved-header-line-p t))
+    (when (timerp snow/rest-timer--refresh-timer)
+      (cancel-timer snow/rest-timer--refresh-timer))
+    (setq-local snow/rest-timer--state
+                (list (floor (float-time)) seconds nil))
+    (let ((buffer (current-buffer)))
+      (setq-local snow/rest-timer--refresh-timer
+                  (run-at-time nil 0.5 #'snow/rest-timer--tick buffer))
+      (puthash buffer snow/rest-timer--refresh-timer snow/rest-timer--timers))))
+
+(defun snow/rest-timer-stop ()
+  "Stop the current buffer's rest timer and restore its header line."
+  (interactive)
+  (when (timerp snow/rest-timer--refresh-timer)
+    (cancel-timer snow/rest-timer--refresh-timer))
+  (setq-local snow/rest-timer--refresh-timer nil)
+  (setq-local snow/rest-timer--state nil)
+  (setq-local header-line-format snow/rest-timer--saved-header-line)
+  (setq-local snow/rest-timer--saved-header-line nil)
+  (setq-local snow/rest-timer--saved-header-line-p nil)
+  (remhash (current-buffer) snow/rest-timer--timers)
+  (force-mode-line-update))
+
+(defun snow/rest-timer-add-seconds (seconds)
+  "Add SECONDS to the current buffer's rest timer target."
+  (interactive "nAdd seconds: ")
+  (if snow/rest-timer--state
+      (pcase-let ((`(,start ,target ,notified) snow/rest-timer--state))
+        (setq-local snow/rest-timer--state
+                    (list start (+ (or target 0) seconds) notified)))
+    (snow/rest-timer-start seconds)))
+
+(defun snow/rest-timer-toggle (&optional duration)
+  "Stop an active rest timer, or start one with DURATION.
+Interactively, use a 60 second rest timer."
+  (interactive)
+  (if snow/rest-timer--state
+      (snow/rest-timer-stop)
+    (snow/rest-timer-start (or duration 60))))
+
 (require 'package)
 (setq package-archives
       '(("gnu" . "http://elpa.gnu.org/packages/")
@@ -287,14 +410,16 @@
     :hook
     (org-after-todo-statistics . org-summary-todo)
     (org-mode . flyspell-mode)
+    (org-mode . (lambda () (setq-local flycheck-disabled-checkers
+                                       (cons 'org-lint flycheck-disabled-checkers))))
+    (org-capture-mode . (lambda () (flycheck-mode -1)))
     :bind
     ("C-c o a" . org-agenda)
     ("C-c o c" . org-capture)
     ("C-c o s" . snow/rg-org)
     (:map org-mode-map
-                ("C-c S" . snow/org-start-presentation))
-    (:map flyspell-mode-map
-          ("M-TAB" . nil))
+                ("C-c S" . snow/org-start-presentation)
+                ("M-TAB" . completion-at-point))
     :custom
     ;; AGENDA SETTINGS
     (org-agenda-files (file-expand-wildcards (concat org-directory "/roam/pages/agenda/*.org")))
@@ -451,6 +576,8 @@
   (require 'org-roam-dailies)
   (org-roam-db-autosync-mode)
   (add-hook 'org-mode-hook #'snow/org-capf)
+  (with-eval-after-load 'flyspell
+    (define-key flyspell-mode-map (kbd "M-TAB") nil))
   ;; Load Custom Agendas
   (let ((custom-agenda-commands (expand-file-name "custom-agenda-commands.el" org-directory)))
     (if (file-exists-p custom-agenda-commands)
@@ -461,6 +588,56 @@
     (if (file-exists-p capture-templates)
         (load capture-templates)
       (message (format "%s not found." capture-templates)))))
+
+(use-package linkmarks
+  :vc (:url "https://github.com/dustinlacewell/linkmarks" :rev :newest)
+  :custom
+  (linkmarks-file (concat org-directory "/bookmarks.org"))
+  :config
+  ;; linkmarks--in-file uses old org-element plist API; override to use
+  ;; org-element-property which handles the modern :standard-properties vector
+  (defun linkmarks--in-file ()
+    (linkmarks--setup)
+    (with-temp-buffer
+      (insert-file-contents linkmarks-file t)
+      (org-mode)
+      (goto-char (point-min))
+      (outline-show-all)
+      (cl-loop
+       for target in (org-refile-get-targets)
+       for element = (progn
+                       (goto-char (nth 3 target))
+                       (forward-line)
+                       (org-element-context))
+       for type = (org-element-type element)
+       for begin = (org-element-property :begin element)
+       for end = (org-element-property :end element)
+       for content = (and begin end (buffer-substring begin end))
+       if (equal 'link type)
+       collect (list (car target) content))))
+  (defun snow/linkmarks-capture ()
+    (interactive)
+    (let ((org-capture-templates
+           `(("t" "Bookmark" entry (file ,linkmarks-file)
+              "* %^{Title}\n[[%^{URL}]]\n  added: %U" :kill-buffer t))))
+      (linkmarks--setup)
+      (org-capture nil "t")))
+  :bind
+  ("C-c o b" . linkmarks-select)
+  ("C-c o B" . snow/linkmarks-capture))
+
+(use-package org-roam-ui
+  :if (not-android)
+  :after org-roam
+  :custom
+  (org-roam-ui-sync-theme t)
+  (org-roam-ui-follow t)
+  (org-roam-ui-update-on-save t)
+  (org-roam-ui-open-on-start t)
+  :config
+  (advice-add 'org-roam-ui--get-nodes :filter-return
+              (lambda (nodes)
+                (seq-filter (lambda (node) (= (nth 3 node) 0)) nodes))))
 
 (use-package org-ql
   :after '(org org-roam)
@@ -815,7 +992,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 (defun snow/eshell-prompt ()
     (let (
           (current-branch (when (fboundp 'magit-get-current-branch) (magit-get-current-branch)))
-          (aws-vault (getenv "AWS_VAULT"))
+          (aws-profile (getenv "AWS_PROFILE"))
           (k8s-context (shell-command-to-string "kubectl config current-context")))
       (concat
        "\n"
@@ -824,10 +1001,10 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
        (propertize (system-name) 'face 'font-lock-function-name-face)
        (when current-branch
          (propertize (concat "  " current-branch) 'face 'font-lock-keyword-face))
+       (when aws-profile
+         (propertize (concat " aws: " aws-profile) 'face 'font-lock-string-face))
        (when (boundp 'kubel-context)
          (propertize (concat " k8s: " k8s-context) 'face 'font-lock-warning-face))
-       (when aws-vault
-         (propertize (concat "  " aws-vault) 'face 'font-lock-string-face))
        "\n"
        (propertize (eshell/pwd) 'face 'font-lock-constant-face)
        "\n"
@@ -860,7 +1037,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
     (eshell-syntax-highlighting-global-mode +1))
 
 (defun snow/eshell-new-frame ()
-    "Open a new frame with a new vterm session."
+    "Open a new frame with a new eshell session."
     (interactive)
     (let ((new-frame (make-frame)))
       (select-frame new-frame)
@@ -878,12 +1055,15 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 (defun snow/vterm-new-frame ()
   "Open a new frame with a new vterm session."
   (interactive)
-  (let ((new-frame (make-frame)))
+  (let ((new-frame (make-frame))
+        (default-directory "~"))
     (select-frame new-frame)
     (vterm (generate-new-buffer-name "*vterm*"))))
 
 (use-package eat
-  :load-path "~/.emacs.d/packages/emacs-eat"
+  :if (not-android)
+  :vc (:url "https://codeberg.org/akib/emacs-eat"
+       :rev :newest)
   :hook
   (eshell-mode . eat-eshell-mode))
 
@@ -996,11 +1176,16 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
     :ensure t
     :ensure-system-package
     ;; Add agent installation configs here
-    ((claude-agent-acp . "npm install -g @zed-industries/claude-agent-acp")))
+    ((claude-agent-acp . "npm install -g @zed-industries/claude-agent-acp"))
+    :bind
+    ("C-c a s s" . agent-shell)
+    ("C-c a s n" . agent-shell-new-shell)
+    ("C-c a s c" . agent-shell-anthropic-start-claude-code)
+    ("C-c a s g" . agent-shell-github-start-copilot))
 
 (use-package claude-code-ide
   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
-  :bind ("C-c a" . claude-code-ide-menu)
+  :bind ("C-c a c" . claude-code-ide-menu)
   :config
   (claude-code-ide-emacs-tools-setup))
 
@@ -1104,15 +1289,22 @@ Return nil to include the entry, return point to exclude it."
 
 (use-package aws
   :load-path "~/.emacs.d/packages/aws.el"
-  :commands (aws aws-login) 
+  :commands (aws aws-login aws-set-profile) 
   :custom
   (aws-login-method 'sso)
   (aws-output "yaml")
-  (aws-organizations-account "Moia-Master:pe-infra-engineer-m"))
+  (aws-organizations-account "Moia-Master:pe-infra-engineer-m")
+  :bind
+  (("C-c w a" . aws)
+   ("C-c w p" . aws-set-profile))
+  :config
+  (advice-add 'aws-set-profile :after
+              (lambda (&rest _)
+                (dolist (buf (buffer-list))
+                  (with-current-buffer buf
+                    (when (eq major-mode 'eshell-mode)
+                      (eshell-reset)))))))
 
-(use-package aws-evil
-  :after aws
-  :load-path "~/.emacs.d/packages/aws.el")
 
 (defun snow/branch-name-to-commit-msg ()
  (interactive)
