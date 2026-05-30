@@ -126,15 +126,12 @@ Interactively, use a 60 second rest timer."
 
 (require 'package)
 (setq package-archives
-      '(("gnu" . "http://elpa.gnu.org/packages/")
-        ("elpa" . "https://elpa.gnu.org/packages/")
+      '(("gnu" . "https://elpa.gnu.org/packages/")
         ("melpa" . "https://melpa.org/packages/")))
 
 (package-initialize)
 (require 'use-package)
 (setq use-package-always-ensure t)
-(use-package use-package-ensure-system-package
-  :ensure t)
 
 (use-package request
   :if (not-android))
@@ -691,6 +688,7 @@ Interactively, use a 60 second rest timer."
 (setq ispell-program-name "aspell")
 
 (global-set-key (kbd "<escape>") 'keyboard-escape-quit)
+(global-set-key (kbd "M-Z") 'zap-up-to-char)
 
 (use-package hydra)
 
@@ -957,6 +955,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :ensure nil
   :bind (:map project-prefix-map
               ("R" . 'snow/rg-project)
+              ("a" . 'snow/pi-vterm)
               ("m" . 'magit-status))
   :config
   (when (eq system-type 'android)
@@ -1174,14 +1173,30 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
 
 (use-package agent-shell
     :ensure t
-    :ensure-system-package
-    ;; Add agent installation configs here
-    ((claude-agent-acp . "npm install -g @zed-industries/claude-agent-acp"))
     :bind
     ("C-c a s s" . agent-shell)
     ("C-c a s n" . agent-shell-new-shell)
     ("C-c a s c" . agent-shell-anthropic-start-claude-code)
     ("C-c a s g" . agent-shell-github-start-copilot))
+
+(defun snow/pi-vterm ()
+  "Open Pi in a new vterm, rooted at the current project when possible.
+Include the `project.el' root directory in the vterm buffer name."
+  (interactive)
+  (require 'vterm)
+  (let* ((project (project-current nil))
+         (project-root (when project (project-root project)))
+         (default-directory (or project-root default-directory))
+         (buffer-name (if project-root
+                          (format "*pi:%s*"
+                                  (file-name-nondirectory
+                                   (directory-file-name project-root)))
+                        "*pi*")))
+    (vterm (generate-new-buffer-name buffer-name))
+    (vterm-send-string "pi")
+    (vterm-send-return)))
+
+(global-set-key (kbd "C-c a p") #'snow/pi-vterm)
 
 (use-package claude-code-ide
   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)

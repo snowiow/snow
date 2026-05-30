@@ -1,0 +1,34 @@
+- name: Check if pi is installed
+  command: which pi
+  register: pi_installed
+  changed_when: false
+  failed_when: false
+
+- name: Install pi coding agent
+  command: npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+  when: pi_installed.rc != 0
+
+- name: Create pi agent directory
+  file:
+    path: ~/.pi/agent
+    state: directory
+    mode: '0700'
+
+- name: Copy pi agent configuration
+  copy:
+    src: agent/
+    dest: ~/.pi/agent/
+    mode: preserve
+    directory_mode: '0755'
+
+- name: Install pi package dependencies
+  command: npm install --omit=dev
+  args:
+    chdir: ~/.pi/agent/npm
+    creates: ~/.pi/agent/npm/node_modules
+
+- name: Install Slack extension dependencies
+  command: npm install --omit=dev
+  args:
+    chdir: ~/.pi/agent/extensions/slack
+    creates: ~/.pi/agent/extensions/slack/node_modules

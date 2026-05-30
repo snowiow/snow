@@ -13,5 +13,6 @@
     follow: false
     force: yes
   loop:
+    - aws-gen-profiles.py
     - bank-to-ledger
     - dkb-to-ledger
