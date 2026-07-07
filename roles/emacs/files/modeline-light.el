@@ -1,10 +1,10 @@
 (setq-default mode-line-format
               (list
                '(:eval (when (fboundp 'meow-indicator) (meow-indicator)))
-               '(:eval (when evil-mode-line-tag
+               '(:eval (when (boundp 'evil-mode-line-tag)
                          (propertize
-		                  (concat " " (substring evil-mode-line-tag 2 3) "  ")
-			              'face 'font-lock-keyword-face)))
+                          (concat " " (substring evil-mode-line-tag 2 3) "  ")
+                          'face 'font-lock-keyword-face)))
                '(:eval (when vc-mode
 		                 (propertize (concat " " (substring vc-mode 5))
 			                         'face 'font-lock-negation-char-face)))
@@ -23,13 +23,15 @@
                "/"
                (propertize "%I" 'face 'font-lock-constant-face)
                "]"
-	           ;; (propertize
                " " 'display
                '(:eval (propertize
 		                " " 'display
 		                `((space :align-to (- (+ right right-fringe right-margin)
 				                              ,(+ 5
                                                   (string-width (format-mode-line mode-name))
+                                                  (string-width (or (and (fboundp 'snow/org-roam-context-modeline)
+                                                                        (concat "[" (snow/org-roam-context-modeline) "] "))
+                                                                    ""))
                                                   (string-width (
                                                                  concat
                                                                  "["
@@ -39,6 +41,11 @@
                                                                  "]"))))))))
 
                (propertize " %m " 'face 'font-lock-string-face)
+               "["
+               '(:eval (when (fboundp 'snow/org-roam-context-modeline)
+                         (propertize (snow/org-roam-context-modeline)
+                                     'face 'font-lock-constant-face)))
+               "] "
                "["
                '(:eval (propertize (number-to-string (tab-bar--current-tab-index))
                                    'face 'font-lock-constant-face))

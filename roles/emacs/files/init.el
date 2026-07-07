@@ -1,6 +1,15 @@
 (defun not-android ()
     (not (eq system-type 'android)))
 
+(defun snow/org-roam-context-modeline ()
+  "Return the current org-roam notes context for the mode line."
+  (when (boundp 'snow/org-notes-context)
+    (format "Roam: %s"
+            (pcase snow/org-notes-context
+              ('private "P")
+              ('work "W")
+              (_ "?")))))
+
 (defvar-local snow/rest-timer--state nil
   "Current rest timer state for this buffer.")
 
@@ -147,7 +156,8 @@ Interactively, use a 60 second rest timer."
   :bind
   ("C-x C-b" . ibuffer)
   :config
-  (windmove-default-keybindings))
+  (windmove-default-keybindings)
+  (winner-mode 1))
 
 (use-package polymode)
 (use-package aio)
@@ -327,21 +337,17 @@ Interactively, use a 60 second rest timer."
   :custom
   (highlight-indent-guides-method 'character))
 
-(use-package string-inflection)
-
 (use-package change-inner
     :bind
     (("M-i" . change-inner)
      ("M-o" . change-outer)))
 
-(defun snow/mark-current-line ()
-    "Mark the current line."
+(defun snow/yank-current-line ()
+    "yank the current line."
     (interactive)
-    (beginning-of-line)
-    (set-mark (point))
-    (end-of-line))
+    (kill-ring-save (line-beginning-position) (line-beginning-position 2)))
 
-(global-set-key (kbd "C-c l") 'snow/mark-current-line)
+(global-set-key (kbd "C-c l") 'snow/yank-current-line)
 
 (use-package popper
   :after (shackle project)
@@ -395,80 +401,131 @@ Interactively, use a 60 second rest timer."
  '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
 
 (defvar snow/android-notes-path "/content/storage/com.android.externalstorage.documents/primary:Sync%2Fnotes")
-(defvar snow/notes-path "~/Sync/notes")
+(defvar snow/android-work-notes-path "/content/storage/com.android.externalstorage.documents/primary:Sync%2Fwork-notes")
+(defvar snow/private-notes-path "~/Sync/notes")
+(defvar snow/work-notes-path "~/Sync/work-notes")
+(defvar snow/org-notes-context 'private
+  "Current notes context. Either `private' or `work'.")
+
+(defun snow/org-notes-root (&optional context)
+  "Return the notes root for CONTEXT."
+  (pcase (or context snow/org-notes-context)
+    ('private (if (eq system-type 'android)
+                  snow/android-notes-path
+                snow/private-notes-path))
+    ('work (if (eq system-type 'android)
+               snow/android-work-notes-path
+             snow/work-notes-path))
+    (_ (user-error "Unknown notes context: %s" context))))
+
+(defun snow/org-roam-db-location-for-root (root)
+  "Return an unsynced org-roam database location for notes ROOT."
+  (expand-file-name
+   (format "org-roam-%s.db" (md5 (expand-file-name root)))
+   user-emacs-directory))
+
+(defun snow/org-load-notes-file (file-name)
+  "Load FILE-NAME from `org-directory' if it exists."
+  (let ((file (expand-file-name file-name org-directory)))
+    (if (file-exists-p file)
+        (load file)
+      (message "%s not found." file))))
+
+(defun snow/org-load-context-files ()
+  "Load agenda commands and capture templates for the current notes context."
+  (snow/org-load-notes-file "custom-agenda-commands.el")
+  (snow/org-load-notes-file "capture-templates.el"))
 
 ;; Set org-directory early so other packages can use it
-(setq org-directory (if (eq system-type 'android)
-                        snow/android-notes-path
-                      snow/notes-path))
+(setq org-directory (snow/org-notes-root 'private))
 
 (use-package org
-    :demand t
-    :hook
-    (org-after-todo-statistics . org-summary-todo)
-    (org-mode . flyspell-mode)
-    (org-mode . (lambda () (setq-local flycheck-disabled-checkers
-                                       (cons 'org-lint flycheck-disabled-checkers))))
-    (org-capture-mode . (lambda () (flycheck-mode -1)))
-    :bind
-    ("C-c o a" . org-agenda)
-    ("C-c o c" . org-capture)
-    ("C-c o s" . snow/rg-org)
-    (:map org-mode-map
-                ("C-c S" . snow/org-start-presentation)
-                ("M-TAB" . completion-at-point))
-    :custom
-    ;; AGENDA SETTINGS
-    (org-agenda-files (file-expand-wildcards (concat org-directory "/roam/pages/agenda/*.org")))
-    (org-agenda-skip-deadline-if-done t)
-    (org-agenda-skip-deadline-prewarning-if-scheduled t)
-    (org-agenda-skip-scheduled-if-deadline-is-shown t)
-    (org-agenda-skip-scheduled-if-done t)
-    (org-agenda-window-setup 'current-window)
-    (org-archive-location "%s_archive::datetree/* Archived Tasks")
-    (org-babel-python-command "python3")
-    (org-confirm-babel-evaluate nil)
-    (org-default-notes-file (concat org-directory "/capture.org"))
-    (org-ellipsis " ")
-    (org-image-actual-width nil)
-    (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
-                         (sequence "|" "CANCELLED(c)")))
-    ;; Open org links in the same buffer instead of splitting
-    (org-link-frame-setup '((file . find-file)))
-    :config
-    (set-face-attribute 'org-ellipsis nil :background 'unspecified :box nil)
-    (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
-    (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
-    (require 'org-faces)
-    (require 'ox-md)
-    ;; Hide emphasis markers on formatted text
-    (setq org-hide-emphasis-markers t)
-    ;; Resize Org headings
-    (dolist (face '((org-level-1 . 1.25)
-                    (org-level-2 . 1.2)
-                    (org-level-3 . 1.15)
-                    (org-level-4 . 1.1)
-                    (org-level-5 . 1.05)
-                    (org-level-6 . 1.0)
-                    (org-level-7 . 1.0)
-                    (org-level-8 . 1.0)))
-      (set-face-attribute (car face) nil :font snow/variable-width-font :weight 'medium :height (cdr face)))
-    ;; Make sure certain org faces use the fixed-pitch face when variable-pitch-mode is on
-    (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-formula nil :inherit 'fixed-pitch)
-    (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
-    (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
-    (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
+      :demand t
+      :hook
+      (org-after-todo-statistics . org-summary-todo)
+      (org-mode . flyspell-mode)
+      (org-mode . (lambda () (setq-local flycheck-disabled-checkers
+                                         (cons 'org-lint flycheck-disabled-checkers))))
+      (org-capture-mode . (lambda () (flycheck-mode -1)))
+      :bind
+      ("C-c o a" . org-agenda)
+      ("C-c o c" . org-capture)
+      ("C-c o s" . snow/rg-org)
+      (:map org-mode-map
+                  ("C-c S" . snow/org-start-presentation)
+                  ("M-TAB" . completion-at-point))
+      :custom
+      ;; AGENDA SETTINGS
+      (org-agenda-files (file-expand-wildcards (concat org-directory "/roam/pages/agenda/*.org")))
+      (org-agenda-skip-deadline-if-done t)
+      (org-agenda-skip-deadline-prewarning-if-scheduled t)
+      (org-agenda-skip-scheduled-if-deadline-is-shown t)
+      (org-agenda-skip-scheduled-if-done t)
+      (org-agenda-window-setup 'current-window)
+      (org-archive-location "%s_archive::datetree/* Archived Tasks")
+      (org-babel-python-command "python3")
+      (org-confirm-babel-evaluate nil)
+      (org-default-notes-file (concat org-directory "/capture.org"))
+      (org-ellipsis " ")
+      (org-image-actual-width nil)
+      (org-todo-keywords '((sequence "TODO(t)" "TODAY(y)" "WAITING(w)" "|" "DONE(d)")
+                           (sequence "|" "CANCELLED(c)")))
+      ;; Open org links in the same buffer instead of splitting
+      (org-link-frame-setup '((file . find-file)))
+      :config
+      (set-face-attribute 'org-ellipsis nil :background 'unspecified :box nil)
+      (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
+      (advice-add 'org-archive-subtree :before #'snow/org-set-archive-location)
+      (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
+      (require 'org-faces)
+      (require 'ox-md)
+      ;; Hide emphasis markers on formatted text
+      (setq org-hide-emphasis-markers t)
+      ;; Resize Org headings
+      (dolist (face '((org-level-1 . 1.25)
+                      (org-level-2 . 1.2)
+                      (org-level-3 . 1.15)
+                      (org-level-4 . 1.1)
+                      (org-level-5 . 1.05)
+                      (org-level-6 . 1.0)
+                      (org-level-7 . 1.0)
+                      (org-level-8 . 1.0)))
+        (set-face-attribute (car face) nil :font snow/variable-width-font :weight 'medium :height (cdr face)))
+      ;; Make sure certain org faces use the fixed-pitch face when variable-pitch-mode is on
+      (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
+      (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
+      (set-face-attribute 'org-formula nil :inherit 'fixed-pitch)
+      (set-face-attribute 'org-code nil :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-verbatim nil :inherit '(shadow fixed-pitch))
+      (set-face-attribute 'org-special-keyword nil :inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-meta-line nil :inherit '(font-lock-comment-face fixed-pitch))
+      (set-face-attribute 'org-checkbox nil :inherit 'fixed-pitch))
 
-(defun org-summary-todo (n-done n-not-done)
-    "Switch entry to DONE when all subentries are done, to TODO otherwise."
-    (let (org-log-done org-log-states)   ; turn off logging
-      (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
-  
-  (put 'dired-find-alternate-file 'disabled nil)
+  (defun org-summary-todo (n-done n-not-done)
+      "Switch entry to DONE when all subentries are done, to TODO otherwise."
+      (let (org-log-done org-log-states)   ; turn off logging
+        (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+  (defun snow/org-archive-location ()
+    "Return an archive location below the current org-roam archive folder.
+
+Preserve the file structure below `org-roam-directory'.  For example,
+roam/projects/foo/index.org archives to roam/archive/projects/foo/index.org."
+    (if-let* ((file buffer-file-name)
+              (roam-directory (and (boundp 'org-roam-directory) org-roam-directory))
+              (_ (file-in-directory-p file roam-directory)))
+        (let* ((archive-root (expand-file-name "archive" roam-directory))
+               (relative-file (file-relative-name file roam-directory))
+               (archive-file (expand-file-name relative-file archive-root)))
+          (make-directory (file-name-directory archive-file) t)
+          (concat archive-file "::datetree/* Archived Tasks"))
+      "%s_archive::datetree/* Archived Tasks"))
+
+  (defun snow/org-set-archive-location (&rest _)
+    "Set `org-archive-location' for the current buffer."
+    (setq-local org-archive-location (snow/org-archive-location)))
+    
+    (put 'dired-find-alternate-file 'disabled nil)
 
 (defun snow/org-babel-tangle-config ()
   (when (string-equal (buffer-file-name)
@@ -531,6 +588,99 @@ Interactively, use a 60 second rest timer."
   :after org
   :hook (org-mode . org-modern-mode))
 
+(defun snow/org-set-notes-context (context)
+  "Switch Org and org-roam to notes CONTEXT."
+  (interactive
+   (list (intern (completing-read "Notes context: " '("private" "work") nil t))))
+  (let ((root (snow/org-notes-root context)))
+    (unless (file-directory-p root)
+      (user-error "Notes directory does not exist: %s" root))
+    (setq snow/org-notes-context context
+          org-directory root
+          org-default-notes-file (expand-file-name "capture.org" root)
+          org-roam-directory (expand-file-name "roam" root)
+          org-roam-db-location (snow/org-roam-db-location-for-root root))
+    (snow/org-load-context-files)
+    (when (featurep 'org-roam)
+      (org-roam-db-autosync-mode -1)
+      (org-roam-db-autosync-mode 1)
+      (org-roam-db-sync))
+    (when-let ((agenda-buffer (get-buffer org-agenda-buffer-name)))
+      (kill-buffer agenda-buffer))
+    (force-mode-line-update t)
+    (message "Switched to %s notes: %s" context root)))
+
+(defun snow/org-private-context ()
+  "Switch to the private notes context."
+  (interactive)
+  (snow/org-set-notes-context 'private))
+
+(defun snow/org-work-context ()
+  "Switch to the work notes context."
+  (interactive)
+  (snow/org-set-notes-context 'work))
+
+(defun snow/org-roam-insert-private-node ()
+  "Insert an org-roam node link from the private notes context."
+  (interactive)
+  (let* ((private-root (snow/org-notes-root 'private))
+         (private-roam-directory (expand-file-name "roam" private-root))
+         (private-roam-db-location (snow/org-roam-db-location-for-root private-root)))
+    (unless (file-directory-p private-roam-directory)
+      (user-error "Private org-roam directory does not exist: %s" private-roam-directory))
+    (let ((org-directory private-root)
+          (org-roam-directory private-roam-directory)
+          (org-roam-db-location private-roam-db-location))
+      (org-roam-db-sync)
+      (org-roam-node-insert))))
+
+(defun snow/org-roam-project-index-path ()
+  "Create and return the relative path for a project index note."
+  (let* ((slug (org-roam-node-slug org-roam-capture--node))
+         (dir (expand-file-name (concat "projects/" slug) org-roam-directory)))
+    (make-directory dir t)
+    (concat "projects/" slug "/index.org")))
+
+(defun snow/org-roam-project-note-path ()
+  "Prompt for a project directory and return the relative path for a project note."
+  (let* ((project-dir (read-directory-name "Project folder: "
+                                           (expand-file-name "projects/" org-roam-directory)
+                                           nil
+                                           t))
+         (dir (file-relative-name (directory-file-name project-dir) org-roam-directory))
+         (slug (org-roam-node-slug org-roam-capture--node)))
+    (make-directory project-dir t)
+    (concat dir "/" slug ".org")))
+
+(defun snow/org-roam-area-index-path ()
+  "Create and return the relative path for an area index note."
+  (let* ((slug (org-roam-node-slug org-roam-capture--node))
+         (dir (expand-file-name (concat "areas/" slug) org-roam-directory)))
+    (make-directory dir t)
+    (concat "areas/" slug "/index.org")))
+
+(defun snow/org-roam-area-note-path ()
+  "Prompt for an area directory and return the relative path for an area note."
+  (let* ((area-dir (read-directory-name "Area folder: "
+                                        (expand-file-name "areas/" org-roam-directory)
+                                        nil
+                                        t))
+         (dir (file-relative-name (directory-file-name area-dir) org-roam-directory))
+         (slug (org-roam-node-slug org-roam-capture--node)))
+    (make-directory area-dir t)
+    (concat dir "/" slug ".org")))
+
+(defun snow/org-roam-resource-note-path ()
+  "Prompt for a resource directory and return the relative path for a resource note."
+  (let* ((resource-dir (read-directory-name "Resource folder: "
+                                            (expand-file-name "resources/" org-roam-directory)
+                                            nil
+                                            t))
+         (dir (file-relative-name (directory-file-name resource-dir) org-roam-directory))
+         (slug (org-roam-node-slug org-roam-capture--node)))
+    (make-directory resource-dir t)
+    (concat dir "/" slug ".org")))
+
 (defun snow/org-capf ()
   (setq-local completion-at-point-functions
               (list (cape-capf-super
@@ -546,12 +696,16 @@ Interactively, use a 60 second rest timer."
   :init
   (setq org-roam-v2-ack t)
   :bind
+  ("C-c o P" . snow/org-private-context)
+  ("C-c o W" . snow/org-work-context)
   ("C-c o r d" . org-roam-dailies-map)
   ("C-c o r f" . org-roam-node-find)
   (:map org-mode-map
-              ("C-c C-n C-i" . org-roam-node-insert))
+              ("C-c C-n C-i" . org-roam-node-insert)
+              ("C-c C-n C-S-i" . snow/org-roam-insert-private-node))
   :custom
-  (org-roam-directory (concat org-directory "/roam"))
+  (org-roam-directory (expand-file-name "roam" org-directory))
+  (org-roam-db-location (snow/org-roam-db-location-for-root org-directory))
   (org-roam-dailies-directory "journals/")
   (org-roam-completion-everywhere t)
   (org-roam-capture-templates
@@ -575,16 +729,7 @@ Interactively, use a 60 second rest timer."
   (add-hook 'org-mode-hook #'snow/org-capf)
   (with-eval-after-load 'flyspell
     (define-key flyspell-mode-map (kbd "M-TAB") nil))
-  ;; Load Custom Agendas
-  (let ((custom-agenda-commands (expand-file-name "custom-agenda-commands.el" org-directory)))
-    (if (file-exists-p custom-agenda-commands)
-        (load custom-agenda-commands)
-      (message (format "%s not found." custom-agenda-commands))))
-  ;; Load Capture Templates
-  (let ((capture-templates (expand-file-name "capture-templates.el" org-directory)))
-    (if (file-exists-p capture-templates)
-        (load capture-templates)
-      (message (format "%s not found." capture-templates)))))
+  (snow/org-load-context-files))
 
 (use-package linkmarks
   :vc (:url "https://github.com/dustinlacewell/linkmarks" :rev :newest)
@@ -694,16 +839,16 @@ Interactively, use a 60 second rest timer."
 
 (defhydra hydra-scale-window (:timeout 4)
   "scale window"
-  ("m" enlarge-window-horizontally "h+")
-  ("i" shrink-window-horizontally "h-")
+  ("f" enlarge-window-horizontally "h+")
+  ("b" shrink-window-horizontally "h-")
   ("n" enlarge-window "v+")
-  ("e" shrink-window "v-")
+  ("p" shrink-window "v-")
   ("q" nil "finished" :exit t))
 
 (defhydra hydra-scale-font (:timeout 4)
   "scale text"
   ("n" text-scale-increase "+")
-  ("e" text-scale-decrease "-")
+  ("p" text-scale-decrease "-")
   ("q" nil "finished" :exit t))
 
 (use-package erc
@@ -736,24 +881,7 @@ Interactively, use a 60 second rest timer."
    :port "6697"
    :nick "snowiow"))
 
-(use-package cider)
-(use-package clojure-mode)
-
 (use-package cue-mode)
-
-(use-package dart-mode
-  :hook
-  (dart-mode . flutter-test-mode))
-
-(use-package flutter
-  :after dart-mode
-  :custom
-  (flutter-sdk-path "~/flutter/"))
-
-(use-package flutter-l10n-flycheck
-  :after flutter
-  :config
-  (flutter-l10n-flycheck-setup))
 
 (use-package dockerfile-mode)
 
@@ -787,11 +915,6 @@ Interactively, use a 60 second rest timer."
   (add-to-list 'auto-mode-alist '("\\.md\\'" . markdown-ts-mode))
   :hook
   (markdown-ts-mode . flyspell-mode))
-
-(use-package plantuml-mode
- :config
-(add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
-(add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode)))
 
 (use-package protobuf-mode
  :config
@@ -873,6 +996,52 @@ Interactively, use a 60 second rest timer."
   (marginalia-mode))
 
 (use-package consult)
+
+(use-package multiple-cursors
+  :bind
+  (("C-S-c C-S-c" . mc/edit-lines)
+   ("C->" . mc/mark-next-like-this)
+   ("C-<" . mc/mark-previous-like-this)
+   ("C-c C-<" . mc/mark-all-like-this)))
+
+(use-package avy
+  :bind
+  (("C-:" . avy-goto-char-timer)
+   ("M-g f" . avy-goto-line)
+   ("M-g w" . avy-goto-word-1))
+  :config
+  (defun avy-action-kill-whole-line (pt)
+    (save-excursion
+      (goto-char pt)
+      (kill-whole-line))
+    (select-window
+     (cdr
+      (ring-ref avy-ring 0)))
+    t)
+
+  (defun avy-action-embark (pt)
+    (unwind-protect
+        (save-excursion
+          (goto-char pt)
+          (embark-act))
+      (select-window
+       (cdr (ring-ref avy-ring 0))))
+    t)
+
+  (defun avy-action-multiple-cursors (pt)
+    (require 'multiple-cursors-core)
+    (save-excursion
+      (goto-char pt)
+      (mc/create-fake-cursor-at-point))
+    (mc/maybe-multiple-cursors-mode)
+    (select-window
+     (cdr (ring-ref avy-ring 0)))
+    t)
+
+  (setf (alist-get ?k avy-dispatch-alist) 'avy-action-kill-stay
+        (alist-get ?K avy-dispatch-alist) 'avy-action-kill-whole-line
+        (alist-get ?. avy-dispatch-alist) 'avy-action-embark
+        (alist-get ?m avy-dispatch-alist) 'avy-action-multiple-cursors))
 
 (use-package embark
   :custom
@@ -956,6 +1125,7 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :bind (:map project-prefix-map
               ("R" . 'snow/rg-project)
               ("a" . 'snow/pi-vterm)
+              ("r" . 'snow/pi-vterm-resume)
               ("m" . 'magit-status))
   :config
   (when (eq system-type 'android)
@@ -1090,6 +1260,29 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :if (not-android))
 
 (use-package emacsql)
+
+;; TODO: Remove this workaround after updating Magit past 20260701.1407.
+;; Work around Magit 20260701.1407 byte/native-compiled code
+;; containing an unexpanded `thread$' shorthand, which breaks with:
+;; "Symbol’s value as variable is void: $".
+(with-eval-after-load 'magit-git
+  (defun magit-config-get-from-cached-list (key)
+    (let ((normalized-key
+           (replace-regexp-in-string
+            "[^.]+\\'" #'downcase
+            (replace-regexp-in-string "\\`[^.]+" #'downcase key t t)
+            t t)))
+      (gethash
+       normalized-key
+       (magit--with-refresh-cache (cons (magit-toplevel) 'config)
+         (let ((configs (make-hash-table :test #'equal)))
+           (dolist (conf (magit-git-items "config" "--list" "-z"))
+             (let* ((nl-pos (cl-position ?\n conf))
+                    (key (substring conf 0 nl-pos))
+                    (val (if nl-pos (substring conf (1+ nl-pos)) "")))
+               (puthash key (nconc (gethash key configs) (list val)) configs)))
+           configs))))))
+
 (use-package magit
   :init
   (setq magit-show-long-lines-warning nil)
@@ -1098,11 +1291,45 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   ("C-c g c" . magit-clone)
   ("C-c g b" . magit-blame))
 
-;; Keybinding for commit message buffers
+;; Keybindings and AI trailer prompt for commit message buffers
 (with-eval-after-load 'git-commit
+  (defvar snow/git-commit-ai-trailers
+    '(("No AI used" . nil)
+      ("Codex GPT-5.5" . "Co-authored-by: GPT-5.5 via Pi <codex@openai.com>")
+      ("Claude Opus 4.8" . "Co-authored-by: Claude Opus 4.8 via Pi <noreply@anthropic.com>")
+      ("Claude Sonnet 4.6" . "Co-authored-by: Claude Sonnet 4.6 via Pi <noreply@anthropic.com>"))
+    "AI co-author trailers available for commit messages.")
+
+  (defun snow/git-commit-add-ai-trailer (&optional name)
+    "Add an AI co-authorship trailer to the current commit message."
+    (interactive)
+    (let* ((choice (or name
+                       (completing-read
+                        "AI used: "
+                        (mapcar #'car snow/git-commit-ai-trailers)
+                        nil t nil nil "No AI used")))
+           (trailer (cdr (assoc choice snow/git-commit-ai-trailers))))
+      (unless (assoc choice snow/git-commit-ai-trailers)
+        (user-error "Unknown AI trailer: %s" choice))
+      (when trailer
+        (save-excursion
+          (goto-char (point-min))
+          (unless (search-forward trailer nil t)
+            (goto-char (point-min))
+            (if (re-search-forward "^# Please enter the commit message" nil t)
+                (beginning-of-line)
+              (goto-char (point-max)))
+            (skip-chars-backward "\n\t ")
+            (insert "\n\n" trailer "\n"))))))
+
+  (add-hook 'git-commit-setup-hook
+            (lambda ()
+              (snow/git-commit-add-ai-trailer)))
+
   (add-hook 'git-commit-mode-hook
             (lambda ()
-              (local-set-key (kbd "C-c b") 'snow/branch-name-to-commit-msg))))
+              (local-set-key (kbd "C-c b") 'snow/branch-name-to-commit-msg)
+              (local-set-key (kbd "C-c C-a") 'snow/git-commit-add-ai-trailer))))
 
 (use-package mu4e
   :if (not-android)
@@ -1179,9 +1406,65 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
     ("C-c a s c" . agent-shell-anthropic-start-claude-code)
     ("C-c a s g" . agent-shell-github-start-copilot))
 
-(defun snow/pi-vterm ()
+(with-eval-after-load 'vterm
+  (defun snow/pi-vterm-copy-mode-beginning-of-line ()
+    "Move to the beginning of the current vterm copy-mode buffer line."
+    (interactive "^")
+    (beginning-of-line))
+
+  (defun snow/pi-vterm-copy-mode-end-of-line ()
+    "Move to the end of the current vterm copy-mode buffer line."
+    (interactive "^")
+    (end-of-line))
+
+  (defvar snow/pi-vterm-copy-mode-map
+    (let ((map (make-sparse-keymap)))
+      (set-keymap-parent map vterm-copy-mode-map)
+      ;; In Pi's TUI output, vterm's own C-a/C-e intentionally skip across
+      ;; terminal soft wraps.  That can jump to the start/end of a whole
+      ;; rendered block, so use normal buffer line movement in copy mode.
+      (define-key map (kbd "C-a") #'snow/pi-vterm-copy-mode-beginning-of-line)
+      (define-key map (kbd "C-e") #'snow/pi-vterm-copy-mode-end-of-line)
+      map)
+    "Copy-mode keymap used only in Pi vterm buffers.")
+
+  (defvar-local snow/pi-vterm-region-face-cookie nil
+    "Face-remap cookie for Pi vterm region highlighting.")
+
+  (defun snow/pi-vterm-buffer-p ()
+    "Return non-nil when the current buffer is a Pi vterm buffer."
+    (string-match-p "\\`\\*pi\\(?::\\|\\*\\)" (buffer-name)))
+
+  (defun snow/pi-vterm-setup-copy-mode ()
+    "Make `vterm-copy-mode' behave more like a normal buffer in Pi vterms."
+    (setq-local minor-mode-overriding-map-alist
+                `((vterm-copy-mode . ,snow/pi-vterm-copy-mode-map)
+                  ,@(assq-delete-all 'vterm-copy-mode
+                                      minor-mode-overriding-map-alist)))
+    ;; Pi paints much of the terminal background itself; force the normal
+    ;; Emacs region colour so the active region stays visible on those cells.
+    (when snow/pi-vterm-region-face-cookie
+      (face-remap-remove-relative snow/pi-vterm-region-face-cookie))
+    (let ((region-bg (face-attribute 'region :background nil t))
+          (region-fg (face-attribute 'region :foreground nil t)))
+      (setq-local
+       snow/pi-vterm-region-face-cookie
+       (face-remap-add-relative
+        'region
+        `(:background ,region-bg
+          ,@(unless (eq region-fg 'unspecified)
+              `(:foreground ,region-fg))
+          :extend t)))))
+
+  (add-hook 'vterm-mode-hook
+            (lambda ()
+              (when (snow/pi-vterm-buffer-p)
+                (snow/pi-vterm-setup-copy-mode)))))
+
+(defun snow/pi-vterm (&optional resume)
   "Open Pi in a new vterm, rooted at the current project when possible.
-Include the `project.el' root directory in the vterm buffer name."
+Include the `project.el' root directory in the vterm buffer name.
+With RESUME, start Pi with -r."
   (interactive)
   (require 'vterm)
   (let* ((project (project-current nil))
@@ -1193,10 +1476,17 @@ Include the `project.el' root directory in the vterm buffer name."
                                    (directory-file-name project-root)))
                         "*pi*")))
     (vterm (generate-new-buffer-name buffer-name))
-    (vterm-send-string "pi")
+    (snow/pi-vterm-setup-copy-mode)
+    (vterm-send-string (if resume "pi -r" "pi"))
     (vterm-send-return)))
 
-(global-set-key (kbd "C-c a p") #'snow/pi-vterm)
+(defun snow/pi-vterm-resume ()
+  "Open Pi with -r in a new vterm."
+  (interactive)
+  (snow/pi-vterm t))
+
+(global-set-key (kbd "C-c a a") #'snow/pi-vterm)
+(global-set-key (kbd "C-c a r") #'snow/pi-vterm-resume)
 
 (use-package claude-code-ide
   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
@@ -1306,7 +1596,7 @@ Return nil to include the entry, return point to exclude it."
   :load-path "~/.emacs.d/packages/aws.el"
   :commands (aws aws-login aws-set-profile) 
   :custom
-  (aws-login-method 'sso)
+  (aws-login-method 'profile)
   (aws-output "yaml")
   (aws-organizations-account "Moia-Master:pe-infra-engineer-m")
   :bind

@@ -7,12 +7,13 @@
 
 - name: symlink .local bin
   file:
-    src: "{{ ansible_env.PWD }}/roles/base/files/bin/{{ item }}"
-    path: "~/.local/bin/{{ item }}"
+    src: "{{ ansible_env.PWD }}/roles/base/files/bin/{{ item.src | default(item) }}"
+    path: "~/.local/bin/{{ item.name | default(item) }}"
     state: link
     follow: false
     force: yes
   loop:
-    - aws-gen-profiles.py
+    - src: aws-gen-profiles.py
+      name: aws-gen-profiles
     - bank-to-ledger
     - dkb-to-ledger

@@ -6,6 +6,15 @@ Definition of functions used throughout the config
   (defun not-android ()
       (not (eq system-type 'android)))
 
+  (defun snow/org-roam-context-modeline ()
+    "Return the current org-roam notes context for the mode line."
+    (when (boundp 'snow/org-notes-context)
+      (format "Roam: %s"
+              (pcase snow/org-notes-context
+                ('private "P")
+                ('work "W")
+                (_ "?")))))
+
   (defvar-local snow/rest-timer--state nil
     "Current rest timer state for this buffer.")
 
@@ -164,7 +173,8 @@ This is a pseudo package specifying all emacs builtin settings
     :bind
     ("C-x C-b" . ibuffer)
     :config
-    (windmove-default-keybindings))
+    (windmove-default-keybindings)
+    (winner-mode 1))
 
   (use-package polymode)
   (use-package aio)
@@ -419,10 +429,6 @@ Have something similar to vim-surround.
       (highlight-indent-guides-method 'character))
 #+END_SRC
 
-** String Inflection
-#+BEGIN_SRC emacs-lisp
-  (use-package string-inflection)
-#+END_SRC
 ** change-inner
 #+begin_src emacs-lisp
   (use-package change-inner
@@ -433,14 +439,12 @@ Have something similar to vim-surround.
 
 ** Marks
 #+begin_src emacs-lisp
-  (defun snow/mark-current-line ()
-      "Mark the current line."
-      (interactive)
-      (beginning-of-line)
-      (set-mark (point))
-      (end-of-line))
+    (defun snow/yank-current-line ()
+        "yank the current line."
+        (interactive)
+        (kill-ring-save (line-beginning-position) (line-beginning-position 2)))
 
-  (global-set-key (kbd "C-c l") 'snow/mark-current-line)
+    (global-set-key (kbd "C-c l") 'snow/yank-current-line)
  #+end_src 
 * Buffer Management 
 #+BEGIN_SRC emacs-lisp
@@ -512,12 +516,43 @@ Have something similar to vim-surround.
 First define the different paths between Android and the normal notes location and set the org-directory. Setting org-directory in the init block is deferred and my custom agendas and capture templates are not read.
 #+begin_src emacs-lisp
   (defvar snow/android-notes-path "/content/storage/com.android.externalstorage.documents/primary:Sync%2Fnotes")
-  (defvar snow/notes-path "~/Sync/notes")
+  (defvar snow/android-work-notes-path "/content/storage/com.android.externalstorage.documents/primary:Sync%2Fwork-notes")
+  (defvar snow/private-notes-path "~/Sync/notes")
+  (defvar snow/work-notes-path "~/Sync/work-notes")
+  (defvar snow/org-notes-context 'private
+    "Current notes context. Either `private' or `work'.")
+
+  (defun snow/org-notes-root (&optional context)
+    "Return the notes root for CONTEXT."
+    (pcase (or context snow/org-notes-context)
+      ('private (if (eq system-type 'android)
+                    snow/android-notes-path
+                  snow/private-notes-path))
+      ('work (if (eq system-type 'android)
+                 snow/android-work-notes-path
+               snow/work-notes-path))
+      (_ (user-error "Unknown notes context: %s" context))))
+
+  (defun snow/org-roam-db-location-for-root (root)
+    "Return an unsynced org-roam database location for notes ROOT."
+    (expand-file-name
+     (format "org-roam-%s.db" (md5 (expand-file-name root)))
+     user-emacs-directory))
+
+  (defun snow/org-load-notes-file (file-name)
+    "Load FILE-NAME from `org-directory' if it exists."
+    (let ((file (expand-file-name file-name org-directory)))
+      (if (file-exists-p file)
+          (load file)
+        (message "%s not found." file))))
+
+  (defun snow/org-load-context-files ()
+    "Load agenda commands and capture templates for the current notes context."
+    (snow/org-load-notes-file "custom-agenda-commands.el")
+    (snow/org-load-notes-file "capture-templates.el"))
 
   ;; Set org-directory early so other packages can use it
-  (setq org-directory (if (eq system-type 'android)
-                          snow/android-notes-path
-                        snow/notes-path))
+  (setq org-directory (snow/org-notes-root 'private))
 
 #+end_src
 
@@ -559,6 +594,7 @@ Now configure org-mode
       :config
       (set-face-attribute 'org-ellipsis nil :background 'unspecified :box nil)
       (advice-add 'org-agenda-todo :after 'org-save-all-org-buffers)
+      (advice-add 'org-archive-subtree :before #'snow/org-set-archive-location)
       (advice-add 'org-archive-subtree :after 'org-save-all-org-buffers)
       (require 'org-faces)
       (require 'ox-md)
@@ -588,6 +624,25 @@ Now configure org-mode
       "Switch entry to DONE when all subentries are done, to TODO otherwise."
       (let (org-log-done org-log-states)   ; turn off logging
         (org-todo (if (= n-not-done 0) "DONE" "TODO"))))
+
+  (defun snow/org-archive-location ()
+    "Return an archive location below the current org-roam archive folder.
+
+Preserve the file structure below `org-roam-directory'.  For example,
+roam/projects/foo/index.org archives to roam/archive/projects/foo/index.org."
+    (if-let* ((file buffer-file-name)
+              (roam-directory (and (boundp 'org-roam-directory) org-roam-directory))
+              (_ (file-in-directory-p file roam-directory)))
+        (let* ((archive-root (expand-file-name "archive" roam-directory))
+               (relative-file (file-relative-name file roam-directory))
+               (archive-file (expand-file-name relative-file archive-root)))
+          (make-directory (file-name-directory archive-file) t)
+          (concat archive-file "::datetree/* Archived Tasks"))
+      "%s_archive::datetree/* Archived Tasks"))
+
+  (defun snow/org-set-archive-location (&rest _)
+    "Set `org-archive-location' for the current buffer."
+    (setq-local org-archive-location (snow/org-archive-location)))
     
     (put 'dired-find-alternate-file 'disabled nil)
 #+END_SRC
@@ -668,6 +723,99 @@ Gives different org syntax modern ligatures. Doesn't work on Android natively an
 #+END_SRC
 ** Roam
 #+BEGIN_SRC emacs-lisp
+  (defun snow/org-set-notes-context (context)
+    "Switch Org and org-roam to notes CONTEXT."
+    (interactive
+     (list (intern (completing-read "Notes context: " '("private" "work") nil t))))
+    (let ((root (snow/org-notes-root context)))
+      (unless (file-directory-p root)
+        (user-error "Notes directory does not exist: %s" root))
+      (setq snow/org-notes-context context
+            org-directory root
+            org-default-notes-file (expand-file-name "capture.org" root)
+            org-roam-directory (expand-file-name "roam" root)
+            org-roam-db-location (snow/org-roam-db-location-for-root root))
+      (snow/org-load-context-files)
+      (when (featurep 'org-roam)
+        (org-roam-db-autosync-mode -1)
+        (org-roam-db-autosync-mode 1)
+        (org-roam-db-sync))
+      (when-let ((agenda-buffer (get-buffer org-agenda-buffer-name)))
+        (kill-buffer agenda-buffer))
+      (force-mode-line-update t)
+      (message "Switched to %s notes: %s" context root)))
+
+  (defun snow/org-private-context ()
+    "Switch to the private notes context."
+    (interactive)
+    (snow/org-set-notes-context 'private))
+
+  (defun snow/org-work-context ()
+    "Switch to the work notes context."
+    (interactive)
+    (snow/org-set-notes-context 'work))
+
+  (defun snow/org-roam-insert-private-node ()
+    "Insert an org-roam node link from the private notes context."
+    (interactive)
+    (let* ((private-root (snow/org-notes-root 'private))
+           (private-roam-directory (expand-file-name "roam" private-root))
+           (private-roam-db-location (snow/org-roam-db-location-for-root private-root)))
+      (unless (file-directory-p private-roam-directory)
+        (user-error "Private org-roam directory does not exist: %s" private-roam-directory))
+      (let ((org-directory private-root)
+            (org-roam-directory private-roam-directory)
+            (org-roam-db-location private-roam-db-location))
+        (org-roam-db-sync)
+        (org-roam-node-insert))))
+
+  (defun snow/org-roam-project-index-path ()
+    "Create and return the relative path for a project index note."
+    (let* ((slug (org-roam-node-slug org-roam-capture--node))
+           (dir (expand-file-name (concat "projects/" slug) org-roam-directory)))
+      (make-directory dir t)
+      (concat "projects/" slug "/index.org")))
+
+  (defun snow/org-roam-project-note-path ()
+    "Prompt for a project directory and return the relative path for a project note."
+    (let* ((project-dir (read-directory-name "Project folder: "
+                                             (expand-file-name "projects/" org-roam-directory)
+                                             nil
+                                             t))
+           (dir (file-relative-name (directory-file-name project-dir) org-roam-directory))
+           (slug (org-roam-node-slug org-roam-capture--node)))
+      (make-directory project-dir t)
+      (concat dir "/" slug ".org")))
+
+  (defun snow/org-roam-area-index-path ()
+    "Create and return the relative path for an area index note."
+    (let* ((slug (org-roam-node-slug org-roam-capture--node))
+           (dir (expand-file-name (concat "areas/" slug) org-roam-directory)))
+      (make-directory dir t)
+      (concat "areas/" slug "/index.org")))
+
+  (defun snow/org-roam-area-note-path ()
+    "Prompt for an area directory and return the relative path for an area note."
+    (let* ((area-dir (read-directory-name "Area folder: "
+                                          (expand-file-name "areas/" org-roam-directory)
+                                          nil
+                                          t))
+           (dir (file-relative-name (directory-file-name area-dir) org-roam-directory))
+           (slug (org-roam-node-slug org-roam-capture--node)))
+      (make-directory area-dir t)
+      (concat dir "/" slug ".org")))
+
+  (defun snow/org-roam-resource-note-path ()
+    "Prompt for a resource directory and return the relative path for a resource note."
+    (let* ((resource-dir (read-directory-name "Resource folder: "
+                                              (expand-file-name "resources/" org-roam-directory)
+                                              nil
+                                              t))
+           (dir (file-relative-name (directory-file-name resource-dir) org-roam-directory))
+           (slug (org-roam-node-slug org-roam-capture--node)))
+      (make-directory resource-dir t)
+      (concat dir "/" slug ".org")))
+
   (defun snow/org-capf ()
     (setq-local completion-at-point-functions
                 (list (cape-capf-super
@@ -683,12 +831,16 @@ Gives different org syntax modern ligatures. Doesn't work on Android natively an
     :init
     (setq org-roam-v2-ack t)
     :bind
+    ("C-c o P" . snow/org-private-context)
+    ("C-c o W" . snow/org-work-context)
     ("C-c o r d" . org-roam-dailies-map)
     ("C-c o r f" . org-roam-node-find)
     (:map org-mode-map
-                ("C-c C-n C-i" . org-roam-node-insert))
+                ("C-c C-n C-i" . org-roam-node-insert)
+                ("C-c C-n C-S-i" . snow/org-roam-insert-private-node))
     :custom
-    (org-roam-directory (concat org-directory "/roam"))
+    (org-roam-directory (expand-file-name "roam" org-directory))
+    (org-roam-db-location (snow/org-roam-db-location-for-root org-directory))
     (org-roam-dailies-directory "journals/")
     (org-roam-completion-everywhere t)
     (org-roam-capture-templates
@@ -712,16 +864,7 @@ Gives different org syntax modern ligatures. Doesn't work on Android natively an
     (add-hook 'org-mode-hook #'snow/org-capf)
     (with-eval-after-load 'flyspell
       (define-key flyspell-mode-map (kbd "M-TAB") nil))
-    ;; Load Custom Agendas
-    (let ((custom-agenda-commands (expand-file-name "custom-agenda-commands.el" org-directory)))
-      (if (file-exists-p custom-agenda-commands)
-          (load custom-agenda-commands)
-        (message (format "%s not found." custom-agenda-commands))))
-    ;; Load Capture Templates
-    (let ((capture-templates (expand-file-name "capture-templates.el" org-directory)))
-      (if (file-exists-p capture-templates)
-          (load capture-templates)
-        (message (format "%s not found." capture-templates)))))
+    (snow/org-load-context-files))
 #+END_SRC
 ** linkmarks
 #+begin_src emacs-lisp
@@ -855,16 +998,16 @@ During Presentations we want to hide the model-line.
 
   (defhydra hydra-scale-window (:timeout 4)
     "scale window"
-    ("m" enlarge-window-horizontally "h+")
-    ("i" shrink-window-horizontally "h-")
+    ("f" enlarge-window-horizontally "h+")
+    ("b" shrink-window-horizontally "h-")
     ("n" enlarge-window "v+")
-    ("e" shrink-window "v-")
+    ("p" shrink-window "v-")
     ("q" nil "finished" :exit t))
 
   (defhydra hydra-scale-font (:timeout 4)
     "scale text"
     ("n" text-scale-increase "+")
-    ("e" text-scale-decrease "-")
+    ("p" text-scale-decrease "-")
     ("q" nil "finished" :exit t))
 #+END_SRC
 
@@ -902,32 +1045,11 @@ During Presentations we want to hide the model-line.
 #+END_SRC
 
 * Languages
-** Clojure
-#+BEGIN_SRC emacs-lisp
-  (use-package cider)
-  (use-package clojure-mode)
-#+END_SRC
 ** Cue
 #+BEGIN_SRC emacs-lisp
   (use-package cue-mode)
 #+END_SRC
 
-** Dart
-#+BEGIN_SRC emacs-lisp
-  (use-package dart-mode
-    :hook
-    (dart-mode . flutter-test-mode))
-
-  (use-package flutter
-    :after dart-mode
-    :custom
-    (flutter-sdk-path "~/flutter/"))
-
-  (use-package flutter-l10n-flycheck
-    :after flutter
-    :config
-    (flutter-l10n-flycheck-setup))
-#+END_SRC
 ** Docker
 #+BEGIN_SRC emacs-lisp
   (use-package dockerfile-mode)
@@ -962,7 +1084,6 @@ During Presentations we want to hide the model-line.
 #+END_SRC
 ** Ledger
 #+BEGIN_SRC emacs-lisp
-
   (use-package ledger-mode)
 #+END_SRC
 ** Markdown
@@ -976,14 +1097,6 @@ During Presentations we want to hide the model-line.
     :hook
     (markdown-ts-mode . flyspell-mode))
 #+END_SRC
-** PlantUML
-#+BEGIN_SRC emacs-lisp
-  (use-package plantuml-mode
-   :config
-  (add-to-list 'auto-mode-alist '("\\.puml\\'" . plantuml-mode))
-  (add-to-list 'auto-mode-alist '("\\.plantuml\\'" . plantuml-mode)))
-#+END_SRC
-
 ** ProtoBuf
 #+BEGIN_SRC emacs-lisp
   (use-package protobuf-mode
@@ -1078,6 +1191,52 @@ During Presentations we want to hide the model-line.
         (marginalia-mode))
 
       (use-package consult)
+
+      (use-package multiple-cursors
+        :bind
+        (("C-S-c C-S-c" . mc/edit-lines)
+         ("C->" . mc/mark-next-like-this)
+         ("C-<" . mc/mark-previous-like-this)
+         ("C-c C-<" . mc/mark-all-like-this)))
+
+      (use-package avy
+        :bind
+        (("C-:" . avy-goto-char-timer)
+         ("M-g f" . avy-goto-line)
+         ("M-g w" . avy-goto-word-1))
+        :config
+        (defun avy-action-kill-whole-line (pt)
+          (save-excursion
+            (goto-char pt)
+            (kill-whole-line))
+          (select-window
+           (cdr
+            (ring-ref avy-ring 0)))
+          t)
+
+        (defun avy-action-embark (pt)
+          (unwind-protect
+              (save-excursion
+                (goto-char pt)
+                (embark-act))
+            (select-window
+             (cdr (ring-ref avy-ring 0))))
+          t)
+
+        (defun avy-action-multiple-cursors (pt)
+          (require 'multiple-cursors-core)
+          (save-excursion
+            (goto-char pt)
+            (mc/create-fake-cursor-at-point))
+          (mc/maybe-multiple-cursors-mode)
+          (select-window
+           (cdr (ring-ref avy-ring 0)))
+          t)
+
+        (setf (alist-get ?k avy-dispatch-alist) 'avy-action-kill-stay
+              (alist-get ?K avy-dispatch-alist) 'avy-action-kill-whole-line
+              (alist-get ?. avy-dispatch-alist) 'avy-action-embark
+              (alist-get ?m avy-dispatch-alist) 'avy-action-multiple-cursors))
 
       (use-package embark
         :custom
@@ -1174,6 +1333,7 @@ During Presentations we want to hide the model-line.
       :bind (:map project-prefix-map
                   ("R" . 'snow/rg-project)
                   ("a" . 'snow/pi-vterm)
+                  ("r" . 'snow/pi-vterm-resume)
                   ("m" . 'magit-status))
       :config
       (when (eq system-type 'android)
@@ -1331,6 +1491,29 @@ This section installs the various terminals I use
       :if (not-android))
 
     (use-package emacsql)
+
+    ;; TODO: Remove this workaround after updating Magit past 20260701.1407.
+    ;; Work around Magit 20260701.1407 byte/native-compiled code
+    ;; containing an unexpanded `thread$' shorthand, which breaks with:
+    ;; "Symbol’s value as variable is void: $".
+    (with-eval-after-load 'magit-git
+      (defun magit-config-get-from-cached-list (key)
+        (let ((normalized-key
+               (replace-regexp-in-string
+                "[^.]+\\'" #'downcase
+                (replace-regexp-in-string "\\`[^.]+" #'downcase key t t)
+                t t)))
+          (gethash
+           normalized-key
+           (magit--with-refresh-cache (cons (magit-toplevel) 'config)
+             (let ((configs (make-hash-table :test #'equal)))
+               (dolist (conf (magit-git-items "config" "--list" "-z"))
+                 (let* ((nl-pos (cl-position ?\n conf))
+                        (key (substring conf 0 nl-pos))
+                        (val (if nl-pos (substring conf (1+ nl-pos)) "")))
+                   (puthash key (nconc (gethash key configs) (list val)) configs)))
+               configs))))))
+
     (use-package magit
       :init
       (setq magit-show-long-lines-warning nil)
@@ -1339,11 +1522,45 @@ This section installs the various terminals I use
       ("C-c g c" . magit-clone)
       ("C-c g b" . magit-blame))
 
-    ;; Keybinding for commit message buffers
+    ;; Keybindings and AI trailer prompt for commit message buffers
     (with-eval-after-load 'git-commit
+      (defvar snow/git-commit-ai-trailers
+        '(("No AI used" . nil)
+          ("Codex GPT-5.5" . "Co-authored-by: GPT-5.5 via Pi <codex@openai.com>")
+          ("Claude Opus 4.8" . "Co-authored-by: Claude Opus 4.8 via Pi <noreply@anthropic.com>")
+          ("Claude Sonnet 4.6" . "Co-authored-by: Claude Sonnet 4.6 via Pi <noreply@anthropic.com>"))
+        "AI co-author trailers available for commit messages.")
+
+      (defun snow/git-commit-add-ai-trailer (&optional name)
+        "Add an AI co-authorship trailer to the current commit message."
+        (interactive)
+        (let* ((choice (or name
+                           (completing-read
+                            "AI used: "
+                            (mapcar #'car snow/git-commit-ai-trailers)
+                            nil t nil nil "No AI used")))
+               (trailer (cdr (assoc choice snow/git-commit-ai-trailers))))
+          (unless (assoc choice snow/git-commit-ai-trailers)
+            (user-error "Unknown AI trailer: %s" choice))
+          (when trailer
+            (save-excursion
+              (goto-char (point-min))
+              (unless (search-forward trailer nil t)
+                (goto-char (point-min))
+                (if (re-search-forward "^# Please enter the commit message" nil t)
+                    (beginning-of-line)
+                  (goto-char (point-max)))
+                (skip-chars-backward "\n\t ")
+                (insert "\n\n" trailer "\n"))))))
+
+      (add-hook 'git-commit-setup-hook
+                (lambda ()
+                  (snow/git-commit-add-ai-trailer)))
+
       (add-hook 'git-commit-mode-hook
                 (lambda ()
-                  (local-set-key (kbd "C-c b") 'snow/branch-name-to-commit-msg))))
+                  (local-set-key (kbd "C-c b") 'snow/branch-name-to-commit-msg)
+                  (local-set-key (kbd "C-c C-a") 'snow/git-commit-add-ai-trailer))))
 #+END_SRC
 * Mail
 #+BEGIN_SRC emacs-lisp
@@ -1439,9 +1656,65 @@ This section installs the various terminals I use
 #+end_src
 ** Pi
 #+begin_src emacs-lisp
-  (defun snow/pi-vterm ()
+  (with-eval-after-load 'vterm
+    (defun snow/pi-vterm-copy-mode-beginning-of-line ()
+      "Move to the beginning of the current vterm copy-mode buffer line."
+      (interactive "^")
+      (beginning-of-line))
+
+    (defun snow/pi-vterm-copy-mode-end-of-line ()
+      "Move to the end of the current vterm copy-mode buffer line."
+      (interactive "^")
+      (end-of-line))
+
+    (defvar snow/pi-vterm-copy-mode-map
+      (let ((map (make-sparse-keymap)))
+        (set-keymap-parent map vterm-copy-mode-map)
+        ;; In Pi's TUI output, vterm's own C-a/C-e intentionally skip across
+        ;; terminal soft wraps.  That can jump to the start/end of a whole
+        ;; rendered block, so use normal buffer line movement in copy mode.
+        (define-key map (kbd "C-a") #'snow/pi-vterm-copy-mode-beginning-of-line)
+        (define-key map (kbd "C-e") #'snow/pi-vterm-copy-mode-end-of-line)
+        map)
+      "Copy-mode keymap used only in Pi vterm buffers.")
+
+    (defvar-local snow/pi-vterm-region-face-cookie nil
+      "Face-remap cookie for Pi vterm region highlighting.")
+
+    (defun snow/pi-vterm-buffer-p ()
+      "Return non-nil when the current buffer is a Pi vterm buffer."
+      (string-match-p "\\`\\*pi\\(?::\\|\\*\\)" (buffer-name)))
+
+    (defun snow/pi-vterm-setup-copy-mode ()
+      "Make `vterm-copy-mode' behave more like a normal buffer in Pi vterms."
+      (setq-local minor-mode-overriding-map-alist
+                  `((vterm-copy-mode . ,snow/pi-vterm-copy-mode-map)
+                    ,@(assq-delete-all 'vterm-copy-mode
+                                        minor-mode-overriding-map-alist)))
+      ;; Pi paints much of the terminal background itself; force the normal
+      ;; Emacs region colour so the active region stays visible on those cells.
+      (when snow/pi-vterm-region-face-cookie
+        (face-remap-remove-relative snow/pi-vterm-region-face-cookie))
+      (let ((region-bg (face-attribute 'region :background nil t))
+            (region-fg (face-attribute 'region :foreground nil t)))
+        (setq-local
+         snow/pi-vterm-region-face-cookie
+         (face-remap-add-relative
+          'region
+          `(:background ,region-bg
+            ,@(unless (eq region-fg 'unspecified)
+                `(:foreground ,region-fg))
+            :extend t)))))
+
+    (add-hook 'vterm-mode-hook
+              (lambda ()
+                (when (snow/pi-vterm-buffer-p)
+                  (snow/pi-vterm-setup-copy-mode)))))
+
+  (defun snow/pi-vterm (&optional resume)
     "Open Pi in a new vterm, rooted at the current project when possible.
-  Include the `project.el' root directory in the vterm buffer name."
+  Include the `project.el' root directory in the vterm buffer name.
+  With RESUME, start Pi with -r."
     (interactive)
     (require 'vterm)
     (let* ((project (project-current nil))
@@ -1453,10 +1726,17 @@ This section installs the various terminals I use
                                      (directory-file-name project-root)))
                           "*pi*")))
       (vterm (generate-new-buffer-name buffer-name))
-      (vterm-send-string "pi")
+      (snow/pi-vterm-setup-copy-mode)
+      (vterm-send-string (if resume "pi -r" "pi"))
       (vterm-send-return)))
 
-  (global-set-key (kbd "C-c a p") #'snow/pi-vterm)
+  (defun snow/pi-vterm-resume ()
+    "Open Pi with -r in a new vterm."
+    (interactive)
+    (snow/pi-vterm t))
+
+  (global-set-key (kbd "C-c a a") #'snow/pi-vterm)
+  (global-set-key (kbd "C-c a r") #'snow/pi-vterm-resume)
 #+end_src
 ** Claude Code IDE
 #+begin_src emacs-lisp
@@ -1586,7 +1866,7 @@ and convert it to Org using the pandoc utility."
     :load-path "~/.emacs.d/packages/aws.el"
     :commands (aws aws-login aws-set-profile) 
     :custom
-    (aws-login-method 'sso)
+    (aws-login-method 'profile)
     (aws-output "yaml")
     (aws-organizations-account "Moia-Master:pe-infra-engineer-m")
     :bind

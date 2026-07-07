@@ -31,3 +31,6 @@ set -gx HELIX_RUNTIME $HOME/workspace/helix/runtime
 
 # The next line updates PATH for the Google Cloud SDK.
 if [ -f '/home/marcel_patzwahl/Downloads/google-cloud-sdk/path.fish.inc' ]; . '/home/marcel_patzwahl/Downloads/google-cloud-sdk/path.fish.inc'; end
+
+# Caddy local CA for AI Gateway (Node.js/Pi)
+set -gx NODE_EXTRA_CA_CERTS "$HOME/.local/share/caddy-root-ca.crt"

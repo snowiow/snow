@@ -1,3 +1,6 @@
 tags
 *.retry
 /bin
+
+# Keep private Pi skill data out of the public dotfiles repo
+roles/pi/files/agent/skills/handle-aws-health-events/

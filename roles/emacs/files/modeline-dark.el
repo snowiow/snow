@@ -29,6 +29,9 @@
 		                `((space :align-to (- (+ right right-fringe right-margin)
 				                              ,(+ 5
                                                   (string-width (format-mode-line mode-name))
+                                                  (string-width (or (and (fboundp 'snow/org-roam-context-modeline)
+                                                                        (concat "[" (snow/org-roam-context-modeline) "] "))
+                                                                    ""))
                                                   (string-width (
                                                                  concat
                                                                  "["
@@ -37,6 +40,11 @@
                                                                  (alist-get 'name (tab-bar--current-tab))
                                                                  "]"))))))))
                (propertize " %m " 'face 'font-lock-string-face)
+               "["
+               '(:eval (when (fboundp 'snow/org-roam-context-modeline)
+                         (propertize (snow/org-roam-context-modeline)
+                                     'face 'font-lock-constant-face)))
+               "] "
                "["
                '(:eval (propertize (number-to-string (tab-bar--current-tab-index))
                                    'face 'font-lock-constant-face))

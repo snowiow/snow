@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import argparse
+import configparser
 import json
 import subprocess
 import sys
@@ -19,6 +20,30 @@ def get_access_token(sso_start_url: str) -> str:
         f"No cached SSO token found for {sso_start_url}.\n"
         f"Run: aws sso login --sso-session <session-name>"
     )
+
+
+def resolve_sso_config(sso_session: str, sso_start_url: str | None, sso_region: str | None) -> tuple[str, str]:
+    config_path = Path.home() / ".aws" / "config"
+    section = f"sso-session {sso_session}"
+
+    if config_path.exists():
+        config = configparser.RawConfigParser()
+        config.read(config_path)
+        if config.has_section(section):
+            sso_start_url = sso_start_url or config.get(section, "sso_start_url", fallback=None)
+            sso_region = sso_region or config.get(section, "sso_region", fallback=None)
+
+    missing = []
+    if not sso_start_url:
+        missing.append("--sso-start-url")
+    if not sso_region:
+        missing.append("--sso-region")
+    if missing:
+        raise SystemExit(
+            f"Missing {', '.join(missing)} and could not read them from [{section}] in {config_path}"
+        )
+
+    return sso_start_url, sso_region
 
 
 def aws_sso(sso_region: str, *args) -> dict:
@@ -111,23 +136,25 @@ def main():
         help="Role whose profiles are named by account name only (e.g. pe-infra-engineer)",
     )
     parser.add_argument("--sso-session", required=True, help="SSO session name in ~/.aws/config")
-    parser.add_argument("--sso-start-url", required=True, help="SSO start URL")
-    parser.add_argument("--sso-region", default="eu-west-1", help="Region of the SSO service (default: eu-west-1)")
+    parser.add_argument("--sso-start-url", help="SSO start URL (defaults to the sso-session setting)")
+    parser.add_argument("--sso-region", help="Region of the SSO service (defaults to the sso-session setting)")
     parser.add_argument("--region", default="eu-central-1", help="Default region for profiles (default: eu-central-1)")
     args = parser.parse_args()
 
+    sso_start_url, sso_region = resolve_sso_config(args.sso_session, args.sso_start_url, args.sso_region)
+
     print("Locating SSO token...")
-    token = get_access_token(args.sso_start_url)
+    token = get_access_token(sso_start_url)
 
     print("Fetching accounts...")
-    accounts = list_accounts(token, args.sso_region)
+    accounts = list_accounts(token, sso_region)
     print(f"Found {len(accounts)} accounts")
 
     profiles = []
     total = len(accounts)
     for i, account in enumerate(accounts, 1):
         print(f"  [{i}/{total}] Fetching roles for {account['accountName']}...")
-        roles = list_roles(token, account["accountId"], args.sso_region)
+        roles = list_roles(token, account["accountId"], sso_region)
         for role in roles:
             profiles.append({
                 "name": make_profile_name(account["accountName"], role["roleName"], args.primary_role),
