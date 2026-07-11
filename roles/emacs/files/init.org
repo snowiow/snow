@@ -1628,7 +1628,6 @@ This section installs the various terminals I use
 ** rg
 #+begin_src emacs-lisp
   (use-package rg
-    :if (not-android)
     :config
     (rg-define-search snow/rg-org
       :query ask

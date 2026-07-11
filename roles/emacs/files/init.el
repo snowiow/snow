@@ -1383,7 +1383,6 @@ See `https://github.com/aws-cloudformation/cfn-python-lint'."
   :if (not-android))
 
 (use-package rg
-  :if (not-android)
   :config
   (rg-define-search snow/rg-org
     :query ask
