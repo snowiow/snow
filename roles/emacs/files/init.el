@@ -205,7 +205,7 @@ Interactively, use a 60 second rest timer."
    (load-theme 'doom-one-light t))
 
 (use-package acid-theme
-  :load-path "~/.emacs.d/packages/emacs-acid-theme"
+  :vc (:url "https://github.com/snowiow/emacs-acid-theme" :rev :newest)
   :config
   (load-theme 'acid t))
 
@@ -443,7 +443,7 @@ Interactively, use a 60 second rest timer."
       :demand t
       :hook
       (org-after-todo-statistics . org-summary-todo)
-      (org-mode . flyspell-mode)
+      (org-mode . (lambda () (when (not-android) (flyspell-mode 1))))
       (org-mode . (lambda () (setq-local flycheck-disabled-checkers
                                          (cons 'org-lint flycheck-disabled-checkers))))
       (org-capture-mode . (lambda () (flycheck-mode -1)))
@@ -490,7 +490,8 @@ Interactively, use a 60 second rest timer."
                       (org-level-6 . 1.0)
                       (org-level-7 . 1.0)
                       (org-level-8 . 1.0)))
-        (set-face-attribute (car face) nil :font snow/variable-width-font :weight 'medium :height (cdr face)))
+        (when (not-android)
+          (set-face-attribute (car face) nil :font snow/variable-width-font :weight 'medium :height (cdr face))))
       ;; Make sure certain org faces use the fixed-pitch face when variable-pitch-mode is on
       (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
       (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
@@ -1067,7 +1068,10 @@ roam/projects/foo/index.org archives to roam/archive/projects/foo/index.org."
 
 (use-package dired
   :ensure nil
-  :commands (dired dired-jump))
+  :commands (dired dired-jump)
+  :hook (dired-mode . (lambda ()
+                        (when (eq system-type 'android)
+                          (dired-hide-details-mode 1)))))
 
 (use-package flycheck
   :init
@@ -1485,8 +1489,30 @@ With RESUME, start Pi with -r."
   (interactive)
   (snow/pi-vterm t))
 
+(defun snow/pi-vterm-insert-file (&optional file)
+  "Pick FILE with Emacs' own file completion and insert it into a Pi vterm.
+Uses `read-file-name' \(with Vertico/Orderless completion\) instead of
+Pi's own `@' file picker, which can jump to unrelated same-named
+directories deep in the project tree.  The chosen path is sent to the
+current vterm as a Pi `@file' mention, relative to the buffer's
+`default-directory' when possible."
+  (interactive)
+  (unless (derived-mode-p 'vterm-mode)
+    (user-error "Not in a vterm buffer"))
+  (let* ((root default-directory)
+         (chosen (or file (read-file-name "Insert file: " root nil t)))
+         (relative (file-relative-name chosen root))
+         (path (if (string-prefix-p "../" relative) chosen relative))
+         (mention (if (string-match-p "[ \t]" path)
+                      (format "@\"%s\"" path)
+                    (format "@%s" path))))
+    (vterm-send-string mention)))
+
 (global-set-key (kbd "C-c a a") #'snow/pi-vterm)
 (global-set-key (kbd "C-c a r") #'snow/pi-vterm-resume)
+
+(with-eval-after-load 'vterm
+  (define-key vterm-mode-map (kbd "C-c a f") #'snow/pi-vterm-insert-file))
 
 (use-package claude-code-ide
   :vc (:url "https://github.com/manzaltu/claude-code-ide.el" :rev :newest)
@@ -1495,6 +1521,7 @@ With RESUME, start Pi with -r."
   (claude-code-ide-emacs-tools-setup))
 
 (use-package xdg-launcher
+      :if (not-android)
       :load-path "~/.emacs.d/packages/xdg-launcher")
 
 (defun snow/app-launcher ()
@@ -1624,7 +1651,7 @@ Return nil to include the entry, return point to exclude it."
   :load-path "~/.emacs.d/packages/org-roam-readwise"
   :after org-roam
   :custom
-  (org-roam-readwise-output-location (concat org-roam-directory "/pages/readwise"))
+  (org-roam-readwise-output-location (concat org-roam-directory "/areas/reading/readwise"))
   (org-readwise-sync-highlights t)
   (org-readwise-sync-reader nil)
   (org-readwise-auth-source 'auth-source-pass)

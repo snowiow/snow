@@ -240,30 +240,30 @@ The tool-bar should only be visible in Android and there it should be at the bot
 
 ** Theme
 #+BEGIN_SRC emacs-lisp
-      (use-package doom-themes
-        :custom
-        (doom-themes-enable-bold t)
-        (doom-themes-enable-italic t)
-        :config
-        (load-theme 'doom-one-light t))
+   (use-package doom-themes
+     :custom
+     (doom-themes-enable-bold t)
+     (doom-themes-enable-italic t)
+     :config
+     (load-theme 'doom-one-light t))
 
-     (use-package acid-theme
-       :load-path "~/.emacs.d/packages/emacs-acid-theme"
-       :config
-       (load-theme 'acid t))
+  (use-package acid-theme
+    :vc (:url "https://github.com/snowiow/emacs-acid-theme" :rev :newest)
+    :config
+    (load-theme 'acid t))
 
-      (defun snow/switch-theme ()
-        "switches between dark and light theme"
-        (interactive)
-        (if (eq (car custom-enabled-themes) 'acid)
-            (progn
-              (disable-theme 'acid)
-              (enable-theme 'doom-one-light)
-              (load "~/.emacs.d/modeline-light.el"))
-          (progn
-            (disable-theme 'doom-one-light)
-            (enable-theme 'acid)
-            (load "~/.emacs.d/modeline-dark.el"))))
+   (defun snow/switch-theme ()
+     "switches between dark and light theme"
+     (interactive)
+     (if (eq (car custom-enabled-themes) 'acid)
+         (progn
+           (disable-theme 'acid)
+           (enable-theme 'doom-one-light)
+           (load "~/.emacs.d/modeline-light.el"))
+       (progn
+         (disable-theme 'doom-one-light)
+         (enable-theme 'acid)
+         (load "~/.emacs.d/modeline-dark.el"))))
 #+END_SRC
 
 ** Which Key
@@ -562,7 +562,7 @@ Now configure org-mode
       :demand t
       :hook
       (org-after-todo-statistics . org-summary-todo)
-      (org-mode . flyspell-mode)
+      (org-mode . (lambda () (when (not-android) (flyspell-mode 1))))
       (org-mode . (lambda () (setq-local flycheck-disabled-checkers
                                          (cons 'org-lint flycheck-disabled-checkers))))
       (org-capture-mode . (lambda () (flycheck-mode -1)))
@@ -609,7 +609,8 @@ Now configure org-mode
                       (org-level-6 . 1.0)
                       (org-level-7 . 1.0)
                       (org-level-8 . 1.0)))
-        (set-face-attribute (car face) nil :font snow/variable-width-font :weight 'medium :height (cdr face)))
+        (when (not-android)
+          (set-face-attribute (car face) nil :font snow/variable-width-font :weight 'medium :height (cdr face))))
       ;; Make sure certain org faces use the fixed-pitch face when variable-pitch-mode is on
       (set-face-attribute 'org-block nil :foreground nil :inherit 'fixed-pitch)
       (set-face-attribute 'org-table nil :inherit 'fixed-pitch)
@@ -1264,7 +1265,10 @@ During Presentations we want to hide the model-line.
 
   (use-package dired
     :ensure nil
-    :commands (dired dired-jump))
+    :commands (dired dired-jump)
+    :hook (dired-mode . (lambda ()
+                          (when (eq system-type 'android)
+                            (dired-hide-details-mode 1)))))
 
 #+end_src
 * Programming
@@ -1735,8 +1739,30 @@ This section installs the various terminals I use
     (interactive)
     (snow/pi-vterm t))
 
+  (defun snow/pi-vterm-insert-file (&optional file)
+    "Pick FILE with Emacs' own file completion and insert it into a Pi vterm.
+  Uses `read-file-name' \(with Vertico/Orderless completion\) instead of
+  Pi's own `@' file picker, which can jump to unrelated same-named
+  directories deep in the project tree.  The chosen path is sent to the
+  current vterm as a Pi `@file' mention, relative to the buffer's
+  `default-directory' when possible."
+    (interactive)
+    (unless (derived-mode-p 'vterm-mode)
+      (user-error "Not in a vterm buffer"))
+    (let* ((root default-directory)
+           (chosen (or file (read-file-name "Insert file: " root nil t)))
+           (relative (file-relative-name chosen root))
+           (path (if (string-prefix-p "../" relative) chosen relative))
+           (mention (if (string-match-p "[ \t]" path)
+                        (format "@\"%s\"" path)
+                      (format "@%s" path))))
+      (vterm-send-string mention)))
+
   (global-set-key (kbd "C-c a a") #'snow/pi-vterm)
   (global-set-key (kbd "C-c a r") #'snow/pi-vterm-resume)
+
+  (with-eval-after-load 'vterm
+    (define-key vterm-mode-map (kbd "C-c a f") #'snow/pi-vterm-insert-file))
 #+end_src
 ** Claude Code IDE
 #+begin_src emacs-lisp
@@ -1750,6 +1776,7 @@ This section installs the various terminals I use
 Install xdg launcher from manually cloned git repo, because for some reason the ~:vc~ version doesn't load the most current version
 #+begin_src emacs-lisp
 (use-package xdg-launcher
+      :if (not-android)
       :load-path "~/.emacs.d/packages/xdg-launcher")
 #+end_src
 
@@ -1894,7 +1921,7 @@ and convert it to Org using the pandoc utility."
     :load-path "~/.emacs.d/packages/org-roam-readwise"
     :after org-roam
     :custom
-    (org-roam-readwise-output-location (concat org-roam-directory "/pages/readwise"))
+    (org-roam-readwise-output-location (concat org-roam-directory "/areas/reading/readwise"))
     (org-readwise-sync-highlights t)
     (org-readwise-sync-reader nil)
     (org-readwise-auth-source 'auth-source-pass)

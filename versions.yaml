@@ -1,4 +1,4 @@
-awscli: 2.34.15
+awscli: 2.35.17
 aws_vault: 7.2.0
 aws_sso: 2.2.0
 alacritty: 0.16.1

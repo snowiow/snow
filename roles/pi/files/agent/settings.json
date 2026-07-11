@@ -8,7 +8,13 @@
     "github-copilot/claude-opus-4.6",
     "github-copilot/claude-sonnet-4.6",
     "github-copilot/gpt-5.5",
-    "openai-codex/gpt-5.5"
+    "openai-codex/gpt-5.5",
+    "moia-ai-gateway/Claude Haiku 4.5",
+    "moia-ai-gateway/Claude Sonnet 4.6",
+    "moia-ai-gateway/Claude Opus 4.8",
+    "amazon-bedrock/anthropic.claude-haiku-4-5-20251001-v1:0",
+    "amazon-bedrock/anthropic.claude-sonnet-4-6",
+    "amazon-bedrock/anthropic.claude-opus-4-8"
   ],
   "packages": [
     "npm:pi-web-access"
