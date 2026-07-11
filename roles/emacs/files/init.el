@@ -400,8 +400,8 @@ Interactively, use a 60 second rest timer."
  '(ediff-current-diff-B ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "#50a14f"))))
  '(ediff-current-diff-C ((t (:inherit ediff-current-diff-A :background "#223448" :foreground "dark gray")))))
 
-(defvar snow/android-notes-path "/content/storage/com.android.externalstorage.documents/primary:Sync%2Fnotes")
-(defvar snow/android-work-notes-path "/content/storage/com.android.externalstorage.documents/primary:Sync%2Fwork-notes")
+(defvar snow/android-notes-path "/data/data/com.termux/files/home/Sync/notes")
+(defvar snow/android-work-notes-path "/data/data/com.termux/files/home/Sync/work-notes")
 (defvar snow/private-notes-path "~/Sync/notes")
 (defvar snow/work-notes-path "~/Sync/work-notes")
 (defvar snow/org-notes-context 'private
