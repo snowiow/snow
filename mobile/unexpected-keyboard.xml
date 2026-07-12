@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<keyboard bottom_row="false" name="Colemak DH German" script="latin">
+  <row>
+    <key key0="q" key1="loc esc"/>
+    <key key0="w" key1="&quot;"/>
+    <key key0="f" key1="'"/>
+    <key key0="p" key1=":"/>
+    <key key0="b" key1=";"/>
+    <key key0="j" key1="{"/>
+    <key key0="l" key1="}"/>
+    <key key0="u" key1="ü" />
+    <key key0="y" key1="~"/>
+    <key key0="backspace"/>
+  </row>
+  <row>
+    <key key0="a" key1="ä"/>
+    <key key0="r" key1="="/>
+    <key key0="s" key1="ß"/>
+    <key key0="t" key1="-"/>
+    <key key0="g" key1="+"/>
+    <key key0="m" key1="("/>
+    <key key0="n" key1=")"/>
+    <key key0="e" key1="€"/>
+    <key key0="i"/>
+    <key key0="o" key1="ö"/>
+  </row>
+  <row>
+    <key key0="shift"/>
+    <key key0="z" key1="&lt;"/>
+    <key key0="x" key1="&gt;"/>
+    <key key0="c" key1="|"/>
+    <key key0="d" key1="_"/>
+    <key key0="v" key1="["/>
+    <key key0="k" key1="]"/>
+    <key key0="h"/>
+    <key key0=","/>
+    <key key0="." key1="\"/>
+  </row>
+  <row>
+    <key width="1.5" key0="ctrl" />
+    <key width="1.5" key0="alt" key1="fn"/>
+    <key key0="loc tab"/>
+    <key width="3" key0=" " key5="left" key6="right" key7="up" key8="down"/>
+    <key key0="/" key1="?"/>
+    <key width="2" key0="enter" key1="action"/>
+  </row>
+</keyboard>
